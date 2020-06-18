@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_marginLeft="@dimen/dp36"
+    android:layout_marginRight="@dimen/dp36"
+    android:layout_width="match_parent"
+    android:background="@drawable/shape_dialog_agreement"
+    android:gravity="center_horizontal"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp40"
+        android:text="星球计划用户协议"
+        android:textColor="#ff333333"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        />
+    <TextView
+        android:id="@+id/tv_xieyi"
+        android:textColor="#333333"
+        android:layout_marginTop="@dimen/dp16"
+        android:layout_marginLeft="@dimen/dp33"
+        android:layout_marginRight="@dimen/dp33"
+        android:textSize="14sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:background="@drawable/shape_round_yellow_22"
+        android:id="@+id/tv_agree"
+        android:layout_marginLeft="@dimen/dp33"
+        android:layout_marginRight="@dimen/dp33"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/dp20"
+        android:paddingTop="@dimen/dp8"
+        android:paddingBottom="@dimen/dp8"
+        android:layout_height="wrap_content"
+        android:text="同意"
+        android:gravity="center"
+        android:textColor="#ffffffff"
+        android:textSize="16sp"
+        />
+
+    <TextView
+        android:id="@+id/tv_close"
+        android:layout_marginTop="@dimen/dp10"
+        android:layout_marginBottom="@dimen/dp20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="不同意并退出"
+        android:textColor="#ff878787"
+        android:textSize="14sp"
+        />
+</LinearLayout>

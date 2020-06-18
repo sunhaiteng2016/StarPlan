@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="text_33">#ff333333</color>
+    <color name="black">#000000</color>
+    <color name="text_473b07">#ff473b07</color>
+    <color name="text_a88f00">#ffa88f00</color>
+    <color name="f3f3f3">#f3f3f3</color>
+    <color name="FF7272">#FF7272</color>
+    <color name="fea21a">#fffea21a</color>
+    <color name="FF5151">#FF5151</color>
+    <color name="c3c3c3">#c3c3c3</color>
+    <color name="FF5700">#FF5700</color>
+    <color name="f6">#f6f6f6</color>
+    <color name="white">#ffffff</color>
+    <color name="FFAF4B">#FFAF4B</color>
+    <color name="FFE54B">#FFE54B</color>
+    <color name="d8d8d8">#ffd8d8d8</color>
+    <color name="f4f4f4">#fff4f4f4</color>
+    <color name="FF4F1E">#FF4F1E</color>
+    <color name="FFC34A">#FFC34A</color>
+    <color name="FEC50B">#FD8136</color>
+    <color name="D4C0">#00D4C0</color>
+    <color name="B7BE">#03B7BE</color>
+    <color name="D7B6">#04B9BE</color>
+    <color name="eeeeee">#ffeeeeee</color>
+    <color name="AEFF">#26AEFF</color>
+    <color name="FFEA8A">#FFEA8A</color>
+    <color name="fffef9eb">#fffef9eb</color>
+    <color name="ffd8d8d8">#ffd8d8d8</color>
+</resources>

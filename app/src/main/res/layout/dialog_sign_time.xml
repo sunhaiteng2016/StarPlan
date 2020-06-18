@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/lqsd"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="120dp"
+            android:text="什么是时段奖励？"
+            android:textColor="#333"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/dp14"
+            android:layout_marginTop="@dimen/dp20"
+            android:layout_marginRight="@dimen/dp14"
+            android:text="          星球计划送金币啦！每小时打开App
+进入首页，最高可领取68金币时段奖励！
+具体金额以实际获得金币为准。"
+            android:textColor="#ff999999"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dp20"
+            android:src="@mipmap/an" />
+    </LinearLayout>
+    <ImageView
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dp38"
+        android:layout_below="@+id/top_layout"
+        android:layout_centerHorizontal="true"
+        android:background="@mipmap/dialog_close"
+        android:layout_width="@dimen/dp30"
+        android:layout_height="@dimen/dp30"/>
+</LinearLayout>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:background="@drawable/button_sel_bg_white"
+    android:paddingLeft="@dimen/dp16"
+    android:paddingTop="@dimen/dp12"
+    android:paddingRight="@dimen/dp16"
+    android:paddingBottom="@dimen/dp12">
+
+    <ImageView
+        android:layout_width="@dimen/dp45"
+        android:layout_height="@dimen/dp45"
+        android:src="@mipmap/bb" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp45"
+        android:paddingLeft="@dimen/dp8"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLength="14"
+                android:text="试玩软件赚钱"
+                android:textColor="@color/text_33"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+5000 金币"
+                android:textColor="@color/text_33"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/dp6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLength="14"
+                android:text="06/02 14:20:00"
+                android:textColor="@color/text_33"
+                android:textSize="12sp" />
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="审核中，大约需要3个工作日"
+                android:textColor="#fffa6400"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

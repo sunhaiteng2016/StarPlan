@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.boniu.starplan">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:name=".ui.ApplicationUtils"
+        android:allowBackup="true"
+        android:icon="@mipmap/bb"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/bb"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+
+        <activity android:name=".ui.LauncherActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.LoginActivity" />
+        <activity android:name=".ui.FinishRegisterActivity" />
+        <activity android:name=".ui.ReceiveGoldDetailsActivity" />
+        <activity android:name=".ui.ReceiveGoldCoinActivity" />
+        <activity android:name=".ui.TryToEarnDetailsActivity" />
+        <activity android:name=".ui.TryToEarnActivity" />
+        <activity android:name=".ui.SignInRewardActivity" />
+        <activity android:name=".ui.WithdrawalRecordActivity" />
+        <activity android:name=".ui.WithdrawalActivity" />
+        <activity android:name=".ui.MainActivity" />
+        <activity android:name=".ui.WebViewActivity" />
+        <activity android:name=".ui.MyWalletActivity" />
+        <activity android:name=".ui.ReviewProgressActivity" />
+
+        <!--value的值填写你在友盟后台申请的应用Appkey-->
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="5a910933f29d986f35000064" />
+        <!--value的值填写渠道名称，例如yingyongbao。这里设置动态渠道变量-->
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="${UMENG_CHANNEL_VALUE}" />
+    </application>
+
+</manifest>

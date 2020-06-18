@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/dp9"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rl_activity_new_user"
+        android:layout_width="@dimen/dp80"
+        android:layout_height="@dimen/dp40"
+        android:layout_weight="1"
+        android:background="@drawable/shape_board_f3"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/tv_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            android:text="30元"
+            android:textColor="@color/text_33"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+</LinearLayout>

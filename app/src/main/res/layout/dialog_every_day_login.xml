@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@mipmap/fg"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="280dp"
+        android:layout_height="370dp"
+        android:layout_centerInParent="true"
+        android:background="@mipmap/everydaysign">
+
+        <TextView
+            android:id="@+id/tv_gold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="130dp"
+            android:text="+38金币"
+            android:textColor="#A0361C"
+            android:textSize="30sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_gold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dp4"
+            android:text="动动手指上上网金币可兑换现金"
+            android:textColor="#A53320"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tv_go_to_look"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/dp50"
+            android:background="@drawable/shape_round_yellow_22"
+            android:paddingLeft="@dimen/dp45"
+            android:paddingTop="@dimen/dp8"
+            android:paddingRight="@dimen/dp45"
+            android:paddingBottom="@dimen/dp8"
+            android:text="去看看"
+            android:textColor="#A84B25" />
+        <TextView
+            android:id="@+id/tv_no_remind"
+            android:textColor="@color/white"
+            android:layout_marginBottom="@dimen/dp10"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="9sp"
+            android:text="本月不在提醒"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="282dp"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_marginTop="@dimen/dp40"
+        android:id="@+id/top_layout"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dp20"
+        android:paddingRight="@dimen/dp20"
+        android:paddingTop="@dimen/dp24"
+        android:gravity="center_horizontal"
+        android:background="@drawable/shape_dialog_bg_white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_marginTop="@dimen/dp55"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="奖励领取成功"
+            android:textColor="#ff333333"
+            android:textSize="20sp"
+            />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+38"
+                android:includeFontPadding="false"
+                android:textColor="#ffff4f1e"
+                android:textSize="30sp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="金币"
+                android:includeFontPadding="false"
+                android:textColor="#ffff4f1e"
+                android:textSize="20sp"
+                />
+        </LinearLayout>
+
+        <TextView
+            android:layout_marginLeft="@dimen/dp14"
+            android:layout_marginRight="@dimen/dp14"
+            android:layout_marginBottom="@dimen/dp20"
+            android:layout_marginTop="@dimen/dp30"
+            android:background="@drawable/shape_dialog_bg_yinying"
+            android:layout_width="190dp"
+            android:layout_height="@dimen/dp40"
+            android:gravity="center"
+            android:text="确定"
+            android:textColor="#ffffffff"
+            android:textSize="14sp"
+            />
+
+
+    </LinearLayout>
+    <ImageView
+        android:layout_centerHorizontal="true"
+        android:background="@mipmap/dialog_gongxini"
+        android:layout_width="150dp"
+        android:layout_height="@dimen/dp100"/>
+    <ImageView
+        android:layout_marginTop="@dimen/dp38"
+        android:layout_below="@+id/top_layout"
+        android:layout_centerHorizontal="true"
+        android:background="@mipmap/dialog_close"
+        android:layout_width="@dimen/dp30"
+        android:layout_height="@dimen/dp30"/>
+
+</RelativeLayout>

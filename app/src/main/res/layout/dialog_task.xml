@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp50"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:text="当前有正在进行的任务"
+        android:textColor="@color/text_33"
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp1"
+        android:background="@color/f3f3f3" />
+
+    <TextView
+        android:id="@+id/tv_back_task"
+        android:background="@drawable/button_sel_bg_white"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp50"
+        android:gravity="center"
+        android:text="返回当前任务"
+        android:textColor="@color/AEFF"
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp1"
+        android:background="@color/f3f3f3" />
+
+    <TextView
+        android:id="@+id/tv_take_new_task"
+        android:background="@drawable/button_sel_bg_white"
+        android:textColor="@color/AEFF"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp50"
+        android:gravity="center"
+        android:text="领取新任务"
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp1"
+        android:background="@color/f3f3f3" />
+
+    <TextView
+        android:id="@+id/tv_cancel"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp50"
+        android:gravity="center"
+        android:text="取消"
+        android:textColor="@color/text_33"
+        android:textSize="16sp" />
+</LinearLayout>

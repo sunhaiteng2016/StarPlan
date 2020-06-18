@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_centerVertical="true"
+            android:id="@+id/tv_circle"
+            android:layout_width="@dimen/dp24"
+            android:layout_height="@dimen/dp24"
+            android:background="@drawable/shape_circle_withe"
+            android:gravity="center"
+            android:text="68"
+            android:textColor="@color/text_33"
+            android:textSize="12sp" />
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_hb_close"
+            android:layout_width="@dimen/dp24"
+            android:layout_height="@dimen/dp28"
+            android:background="@mipmap/hb"
+            android:gravity="center|bottom"
+            android:text="888"
+            android:padding="@dimen/dp1"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_hb_open"
+            android:layout_width="@dimen/dp24"
+            android:layout_height="@dimen/dp33"
+            android:background="@mipmap/hongbao"
+            android:layout_marginBottom="@dimen/dp4"
+            android:gravity="center"
+            />
+    </RelativeLayout>
+
+    <View
+        android:layout_centerVertical="true"
+        android:id="@+id/line1"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp1"
+        android:layout_gravity="center_vertical"
+        android:background="#A88F00" />
+</LinearLayout>
