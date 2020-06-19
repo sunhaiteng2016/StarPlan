@@ -15,6 +15,15 @@ public class LoginInfo {
     private String mobile;
     private boolean success;
     private String uToken;
+    private String goldAmount;
+
+    public String getGoldAmount() {
+        return goldAmount;
+    }
+
+    public void setGoldAmount(String goldAmount) {
+        this.goldAmount = goldAmount;
+    }
 
     public String getCode() {
         return code;

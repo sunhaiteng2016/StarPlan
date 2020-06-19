@@ -12,4 +12,3 @@ public class OpenApp {
         context.startActivityForResult(intent,123);
     }
 }
-http://dahai:daihai123456@192.168.10.223:9999/android_platform/startplan.git

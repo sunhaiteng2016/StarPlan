@@ -47,6 +47,7 @@ public class MainTask {
         private int todayRemain;
         private int type;
 
+
         public int getCycleDays() {
             return cycleDays;
         }

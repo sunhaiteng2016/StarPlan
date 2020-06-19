@@ -84,14 +84,24 @@ public class ComParamContact {
         //获取用户任务详情
         public final static String GET_TASK = "api/task/user/getTask";
         //用户进行中的任务
-        public final static String List_to_Do = "api/task/user/getTask";
+        public final static String List_to_Do = "api/task/user/listToDo";
         //提交审核资料
         public final static String SUBMIT_AUDIT = "api/task/user/submitAudit";
+
         /**
          * 宝箱相关
          */
         //签到查询宝箱 状态
-        public final static  String queryTreasureBoxTaskStatus="api/treasureBoxTask/queryTreasureBoxTaskStatus";
+        public final static String getTreasureBox = "api/treasureBoxTask/getTreasureBox";
+
+        /**
+         * 首页时间检测
+         */
+        //时间检查的
+        public final static String checkCollectTime = "api/goldCoinCollect/checkCollectTime";
+        //
+        public final static String getCollectTaskRecord = "api/goldCoinCollect/getCollectTaskRecord";
+
 
     }
 }

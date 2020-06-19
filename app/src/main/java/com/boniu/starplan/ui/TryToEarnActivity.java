@@ -1,6 +1,7 @@
 package com.boniu.starplan.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -80,7 +81,7 @@ public class TryToEarnActivity extends BaseActivity implements BGARefreshLayout.
     }
 
     private void getData() {
-        RxHttp.postEncryptJson(ComParamContact.Main.TASk_LIST).add("page", page).add("pageSize", pageSize).add("type", type).asResponse(String.class).to(RxLife.to(this)).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.TASk_LIST).add("page", page).add("pageSize", pageSize).add("type", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             TaskMode taskModel = new Gson().fromJson(result, TaskMode.class);
             taskList.clear();
@@ -91,6 +92,12 @@ public class TryToEarnActivity extends BaseActivity implements BGARefreshLayout.
                     adapter.notifyDataSetChanged();
                 }
             });
+        }, (OnError) error -> {
+        });
+        //用户进行中的任务
+        RxHttp.postEncryptJson(ComParamContact.Main.List_to_Do).add("page", "1").add("pageSize", "10").add("taskType", "1").asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
+            String result = AESUtil.decrypt(s, AESUtil.KEY);
+
         }, (OnError) error -> {
         });
     }

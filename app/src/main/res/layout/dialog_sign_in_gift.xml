@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:id="@+id/rl"
     android:background="@mipmap/guang"
     android:layout_marginTop="@dimen/dp27"
     android:layout_width="match_parent"
@@ -64,7 +65,7 @@
                 android:id="@+id/tv_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+38"
+                android:text="+888"
                 android:includeFontPadding="false"
                 android:textColor="#ffff4f1e"
                 android:textSize="30sp"
@@ -79,6 +80,7 @@
                 />
         </LinearLayout>
         <TextView
+            android:id="@+id/tv_submit"
             android:paddingTop="@dimen/dp14"
             android:paddingBottom="@dimen/dp14"
             android:background="@drawable/shape_dialog_qiandao_btn_yinying"
@@ -96,6 +98,7 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/iv_cancel"
         android:layout_marginTop="@dimen/dp38"
         android:layout_below="@+id/top_layout"
         android:layout_centerHorizontal="true"

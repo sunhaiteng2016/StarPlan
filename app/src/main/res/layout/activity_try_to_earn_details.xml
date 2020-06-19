@@ -69,13 +69,13 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:padding="@dimen/dp4"
-                android:id="@+id/tv_time"
                 android:textColor="@color/white"
-                android:textSize="12sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textSize="12sp" />
         </LinearLayout>
 
     </RelativeLayout>
@@ -87,6 +87,7 @@
         android:background="@drawable/shape_round_withe_8"
         android:orientation="vertical"
         android:padding="16dp">
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -131,6 +132,7 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/tv_start_down"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -174,6 +176,7 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/tv_start_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -216,6 +219,7 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/tv_receive_rewards"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

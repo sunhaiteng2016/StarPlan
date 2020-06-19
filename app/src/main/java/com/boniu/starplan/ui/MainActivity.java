@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.boniu.starplan.dialog.SignSuccessDialog;
 import com.boniu.starplan.entity.IsSignModel;
 import com.boniu.starplan.entity.LoginInfo;
 import com.boniu.starplan.entity.MainTask;
@@ -37,8 +38,8 @@ import com.boniu.starplan.entity.TaskMode;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.AnimatorUtil;
 import com.boniu.starplan.utils.GlideUtils;
-import com.boniu.starplan.utils.OpenApp;
 import com.boniu.starplan.utils.RlvManagerUtils;
+import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
 import com.boniu.starplan.utils.Validator;
 import com.google.gson.Gson;
@@ -53,7 +54,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import pub.devrel.easypermissions.EasyPermissions;
 import rxhttp.wrapper.param.RxHttp;
 
@@ -98,9 +98,11 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.iv_user_bg)
     ImageView ivUserBg;
     @BindView(R.id.ll_sign_time)
-    LinearLayout llSignTime;
+    RelativeLayout llSignTime;
     @BindView(R.id.tv_more_sign)
     TextView tvMoreSign;
+    @BindView(R.id.tv_time_er)
+    TextView tv_time_er;
 
     //初始化首页相关数据
     private List<HomeMenu> menuList = new ArrayList<>();
@@ -123,6 +125,7 @@ public class MainActivity extends BaseActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+    private int threeDays = -1, sevenDays = -1, weekSign = -1;
 
 
     @Override
@@ -161,6 +164,7 @@ public class MainActivity extends BaseActivity {
             }
         });
         setStr();
+        TimerUtils.startTimerHour(this, tv_time_er);
 
     }
 
@@ -171,7 +175,13 @@ public class MainActivity extends BaseActivity {
                 .subscribe(s -> {
                     String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
                     LoginInfo loginInfo = new Gson().fromJson(resultStr, LoginInfo.class);
-                    tvPhone.setText(Validator.Md5Phone(loginInfo.getMobile()));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            tvPhone.setText(Validator.Md5Phone(loginInfo.getMobile()));
+                            tvMoney.setText(loginInfo.getGoldAmount());
+                        }
+                    });
                 }, (OnError) error -> {
                 });
         //签到相关
@@ -180,13 +190,19 @@ public class MainActivity extends BaseActivity {
                 .subscribe(s -> {
                     Response result = new Gson().fromJson(s, Response.class);
                     String resultStr = AESUtil.decrypt((String) result.getResult(), AESUtil.KEY);
-                    if (resultStr.equals("1")) {
-                        tvSign.setVisibility(View.GONE);
-                        tvMoreSign.setVisibility(View.VISIBLE);
-                    } else {
-                        tvMoreSign.setVisibility(View.GONE);
-                        tvSign.setVisibility(View.VISIBLE);
-                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (resultStr.equals("1")) {
+                                tvSign.setVisibility(View.GONE);
+                                tvMoreSign.setVisibility(View.VISIBLE);
+                            } else {
+                                tvMoreSign.setVisibility(View.GONE);
+                                tvSign.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
+
                 }, (OnError) error -> {
 
                 });
@@ -197,26 +213,16 @@ public class MainActivity extends BaseActivity {
                     Response result = new Gson().fromJson(s, Response.class);
                     String resultStr = AESUtil.decrypt((String) result.getResult(), AESUtil.KEY);
                     SignModel sigModel = new Gson().fromJson(resultStr, SignModel.class);
-                    int weekSign = sigModel.getWeekSign();
-                    tvSignDes.setText("已连续签到 " + weekSign + "/7 天");
-                    if (weekSign >= 3) {
-                        String typeValue = "threeDays";
-                        if (weekSign == 7) {
-                            typeValue = "sevenDays";
+                    weekSign = sigModel.getWeekSign();
+                    threeDays = sigModel.getThreeDays();
+                    sevenDays = sigModel.getSevenDays();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            tvSignDes.setText("已连续签到 " + weekSign + "/7 天");
+                            signAdapter.notifyDataSetChanged();
                         }
-                        RxHttp.postEncryptJson(ComParamContact.Main.queryTreasureBoxTaskStatus)
-                                .add("type", "0")
-                                .add("typeValue", typeValue).asResponse(String.class)
-                                .subscribe(s1 -> {
-                                    String sss = AESUtil.decrypt(s1, AESUtil.KEY);
-                                    Log.e("", "");
-
-                                }, (OnError) error -> {
-
-                                });
-                    }
-                    signList.add(0, sigModel);
-                    signAdapter.notifyDataSetChanged();
+                    });
                     //设置签到数据
                 }, (OnError) error -> {
 
@@ -229,13 +235,29 @@ public class MainActivity extends BaseActivity {
             MainTask mainTask = new Gson().fromJson(resultStr, MainTask.class);
             //每日任务
             dayTaskList.addAll(mainTask.getDayTask());
-            dayTaskAdapter.notifyDataSetChanged();
             //新手任务
             newUserTaskList.addAll(mainTask.getNewUserTask());
-            newUserTaskAdapter.notifyDataSetChanged();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dayTaskAdapter.notifyDataSetChanged();
+                    newUserTaskAdapter.notifyDataSetChanged();
+                }
+            });
         }, (OnError) error -> {
-
+            Log.e("","");
         });
+        //获取领取时间
+        RxHttp.postEncryptJson(ComParamContact.Main.checkCollectTime)
+                .add("source", "0")
+                .asString().subscribe(s -> {
+            Response result = new Gson().fromJson(s, Response.class);
+            String resultStr = AESUtil.decrypt(result.getResult(), AESUtil.KEY);
+            Log.e("", "");
+        }, (OnError) error -> {
+            Log.e("", "");
+        });
+
     }
 
     private void initUserData() {
@@ -247,28 +269,132 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, SignModel signModel, int position) {
-                //初始化页面
+
                 if (position == 2) {
-                    holder.setVisible(R.id.tv_hb_open, true);
-                } else {
-                    holder.setVisible(R.id.tv_hb_open, false);
-                }
-                if (position == 6) {
+                    if (threeDays == -1) {
+                        //宝箱未创建
+                        holder.setVisible(R.id.tv_circle, false);
+                        holder.setVisible(R.id.tv_hb_close, true);
+                        holder.setVisible(R.id.tv_hb_open, false);
+                    }
+                    if (threeDays == 0) {
+                        //未领取
+                        holder.setVisible(R.id.tv_circle, false);
+                        holder.setVisible(R.id.tv_hb_close, true);
+                        holder.setBackgroundRes(R.id.tv_hb_close, R.mipmap.yiqiandao);
+                        holder.setText(R.id.tv_hb_close, "");
+                        holder.setVisible(R.id.tv_hb_open, false);
+                        ObjectAnimator animator = AnimatorUtil.sway(holder.getView(R.id.tv_hb_close));
+                        animator.setRepeatCount(ValueAnimator.INFINITE);
+                        animator.start();
+                    }
+                    if (threeDays == 1) {
+                        //已领取
+                        holder.setVisible(R.id.tv_circle, false);
+                        holder.setVisible(R.id.tv_hb_close, false);
+                        holder.setVisible(R.id.tv_hb_open, true);
+                    }
+                    if (threeDays == 2) {
+                        //失效
+                        holder.setVisible(R.id.tv_circle, false);
+                        holder.setVisible(R.id.tv_hb_close, true);
+                        holder.setVisible(R.id.tv_hb_open, false);
+                    }
+                } else if (position == 6) {
                     holder.setVisible(R.id.line1, false);
-                    holder.setVisible(R.id.tv_hb_close, true);
-                    holder.setVisible(R.id.tv_circle, false);
+                    if (sevenDays == -1) {
+                        //宝箱未创建
+                        holder.setVisible(R.id.tv_circle, false);
+                        holder.setVisible(R.id.tv_hb_close, true);
+                        holder.setVisible(R.id.tv_hb_open, false);
+                    }
+                    if (sevenDays == 0) {
+                        //未领取
+                        holder.setVisible(R.id.tv_circle, false);
+                        holder.setVisible(R.id.tv_hb_close, true);
+                        holder.setBackgroundRes(R.id.tv_hb_close, R.mipmap.yiqiandao);
+                        holder.setVisible(R.id.tv_hb_open, false);
+                        holder.setText(R.id.tv_hb_close, "");
+                        ObjectAnimator animator = AnimatorUtil.sway(holder.getView(R.id.tv_hb_close));
+                        animator.setRepeatCount(ValueAnimator.INFINITE);
+                        animator.start();
+                    }
+                    if (sevenDays == 1) {
+                        //已领取
+                        holder.setVisible(R.id.tv_circle, false);
+                        holder.setVisible(R.id.tv_hb_close, false);
+                        holder.setVisible(R.id.tv_hb_open, true);
+                    }
+                    if (sevenDays == 2) {
+                        //失效
+                        holder.setVisible(R.id.tv_circle, false);
+                        holder.setVisible(R.id.tv_hb_close, true);
+                        holder.setVisible(R.id.tv_hb_open, false);
+                    }
                 } else {
-                    holder.setVisible(R.id.line1, true);
-                    holder.setVisible(R.id.tv_hb_close, false);
-                    holder.setVisible(R.id.tv_circle, true);
+                    if (position < weekSign) {
+                        //当前已签到
+                        holder.setVisible(R.id.tv_circle, true);
+                        holder.setVisible(R.id.tv_hb_close, false);
+                        holder.setVisible(R.id.tv_hb_open, false);
+                        holder.setText(R.id.tv_circle, "");
+                        holder.setBackgroundRes(R.id.tv_circle, R.mipmap.signdui);
+                    } else {
+                        holder.setVisible(R.id.tv_circle, true);
+                        holder.setVisible(R.id.tv_hb_close, false);
+                        holder.setVisible(R.id.tv_hb_open, false);
+                        holder.setBackgroundRes(R.id.tv_circle, R.drawable.shape_circle_withe);
+                    }
                 }
-                //设置数据
-               /* ObjectAnimator animator = AnimatorUtil.sway(holder.getView(R.id.tv_hb_close));
-                animator.setRepeatCount(ValueAnimator.INFINITE);
-                animator.start();*/
             }
         };
         rlvSign.setAdapter(signAdapter);
+        signAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
+                if (i == 2) {
+                    if (threeDays == 0) {
+                        showSignDialog(3);
+                    }
+                }
+                if (i == 6) {
+                    if (sevenDays == 0) {
+                        showSignDialog(7);
+                    }
+                }
+            }
+
+            @Override
+            public boolean onItemLongClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
+                return false;
+            }
+        });
+    }
+
+    private void showSignDialog(int i) {
+        SignSuccessDialog dialog = new SignSuccessDialog(this, i, new SignSuccessDialog.SubMitCallBack() {
+            @Override
+            public void onSuccess() {
+                String typeValue = "";
+                if (i == 3) typeValue = "threeDays";
+                if (i == 7) typeValue = "sevenDays";
+                //点击领取签到
+                RxHttp.postEncryptJson(ComParamContact.Main.getTreasureBox).add("type", "0").add("typeValue", typeValue).asResponse(String.class).subscribe(
+                        s -> {
+                            String result = AESUtil.decrypt(s, AESUtil.KEY);
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                }
+                            });
+                        }, throwable -> {
+                            Log.e("", "");
+                        });
+            }
+        });
+        dialog.show();
     }
 
     private void requestMPermission() {
@@ -311,14 +437,27 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, MainTask.DayTaskBean taskMode, int position) {
-
+                holder.setText(R.id.main_title, taskMode.getTaskName()).setText(R.id.sub_title, taskMode.getSubTitle()).setText(R.id.gold, taskMode.getTodayRemain() + "");
+                int viewStatus = newUserTaskList.get(position).getTaskViewStatus();
+                if (viewStatus == 0) {
+                    holder.setBackgroundRes(R.id.tv_complete, R.drawable.shape_round_16_red);
+                    holder.setText(R.id.tv_complete, "去完成");
+                }
+                if (viewStatus == 1) {
+                    holder.setBackgroundRes(R.id.tv_complete, R.drawable.shape_round_16_c3);
+                    holder.setText(R.id.tv_complete, "已完成");
+                }
+                if (viewStatus == 3) {
+                    holder.setBackgroundRes(R.id.tv_complete, R.drawable.shape_round_16_c3);
+                    holder.setText(R.id.tv_complete, "明日再来");
+                }
             }
         };
         rlvDayTask.setAdapter(dayTaskAdapter);
         dayTaskAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
-                OpenApp.OpenApp(MainActivity.this, "com.boniu.qushuiyin");
+
             }
 
             @Override
@@ -332,18 +471,38 @@ public class MainActivity extends BaseActivity {
         RlvManagerUtils.createLinearLayout(this, rlvNewUserTask);
         newUserTaskAdapter = new CommonAdapter<MainTask.NewUserTaskBean>(this, R.layout.item_task_we, newUserTaskList) {
 
-
             @Override
             protected void convert(ViewHolder holder, MainTask.NewUserTaskBean taskMode, int position) {
                 //GlideUtils.getInstance().LoadContextRoundBitmap(MainActivity.this, taskMode.getIcon(), holder.getView(R.id.iv_img), 8);
-                //holder.setText(R.id.main_title, taskMode.getMainTitle()).setText(R.id.sub_title, taskMode.getSubTitle()).setText(R.id.gold, taskMode.getTodayRemain() + "");
+                holder.setText(R.id.main_title, taskMode.getTaskName()).setText(R.id.sub_title, taskMode.getSubTitle()).setText(R.id.gold, taskMode.getTodayRemain() + "");
+                int viewStatus = newUserTaskList.get(position).getTaskViewStatus();
+                if (viewStatus == 0) {
+                    holder.setBackgroundRes(R.id.tv_complete, R.drawable.shape_round_16_red);
+                    holder.setText(R.id.tv_complete, "去完成");
+                }
+                if (viewStatus == 1) {
+                    holder.setBackgroundRes(R.id.tv_complete, R.drawable.shape_round_16_c3);
+                    holder.setText(R.id.tv_complete, "已完成");
+                }
+                if (viewStatus == 3) {
+                    holder.setBackgroundRes(R.id.tv_complete, R.drawable.shape_round_16_c3);
+                    holder.setText(R.id.tv_complete, "明日再来");
+                }
             }
         };
         rlvNewUserTask.setAdapter(newUserTaskAdapter);
         newUserTaskAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
-
+                int viewStatus = newUserTaskList.get(i).getTaskViewStatus();
+                int type = newUserTaskList.get(i).getType();
+                if (viewStatus == 0) {
+                    if (type == 1) {
+                        ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("id", newUserTaskList.get(i).getTaskId()).navigation();
+                    } else {
+                        ARouter.getInstance().build("/ui/ReceiveGoldDetailsActivity").withInt("id", newUserTaskList.get(i).getTaskId()).navigation();
+                    }
+                }
             }
 
             @Override
@@ -426,11 +585,21 @@ public class MainActivity extends BaseActivity {
                         s -> {
                             String result = AESUtil.decrypt(s, AESUtil.KEY);
                             IsSignModel isSignModel = new Gson().fromJson(result, IsSignModel.class);
-                            if (isSignModel.isSuccess()) {
-                                Tip.show("签到成功！");
-                            } else {
-                                Tip.show("签到失败！");
-                            }
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (isSignModel.isSuccess()) {
+                                        Tip.show("签到成功！");
+                                        tvSign.setVisibility(View.GONE);
+                                        tvMoreSign.setVisibility(View.VISIBLE);
+                                    } else {
+                                        Tip.show("签到失败！");
+                                        tvSign.setVisibility(View.VISIBLE);
+                                        tvMoreSign.setVisibility(View.GONE);
+                                    }
+                                }
+                            });
                         }, throwable -> {
                         });
                 break;

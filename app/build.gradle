@@ -102,5 +102,8 @@ dependencies {
     implementation 'com.umeng.umsdk:analytics:8.1.6'
     implementation 'com.umeng.umsdk:common:2.0.0'
 
+    //图片预览库
+    implementation 'liji.library.dev:imagezoom:1.2.1'
+
 
 }
