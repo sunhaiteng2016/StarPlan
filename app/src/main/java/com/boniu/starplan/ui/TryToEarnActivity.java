@@ -63,7 +63,7 @@ public class TryToEarnActivity extends BaseActivity implements BGARefreshLayout.
     @BindView(R.id.loadingView)
     LoadingView loadingView;
     private int page = 1;
-    private int type = 2; //任务类型 1试玩赚,2领金币,3视频任务,4激励视频翻倍任务
+    private int type = 1; //任务类型 1试玩赚,2领金币,3视频任务,4激励视频翻倍任务
     private String pageSize = "10";
     private List<TaskMode.RowsBean> taskList = new ArrayList<>();
     private CommonAdapter<TaskMode.RowsBean> adapter;

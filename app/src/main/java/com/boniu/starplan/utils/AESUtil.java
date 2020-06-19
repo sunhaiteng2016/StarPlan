@@ -1,4 +1,6 @@
 package com.boniu.starplan.utils;
+import android.util.Log;
+
 import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
@@ -31,6 +33,7 @@ public class AESUtil {
             cipher.init(Cipher.DECRYPT_MODE, spec, new IvParameterSpec(new byte[cipher.getBlockSize()]));
             byte[] originBytes = JukeBase64.decode(data);
             byte[] result = cipher.doFinal(originBytes);
+            Log.e("参数","参数-->"+new String(result, "UTF-8"));
             return new String(result, "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException("AES加密异常", e);

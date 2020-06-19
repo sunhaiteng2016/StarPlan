@@ -17,10 +17,12 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.entity.TaskDetailsModel;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
+import com.google.gson.Gson;
 import com.rxjava.rxlife.RxLife;
 
 import java.io.File;
@@ -82,7 +84,15 @@ public class TryToEarnDetailsActivity extends BaseActivity {
     private void getData() {
         RxHttp.postEncryptJson(ComParamContact.Main.getTask).add("id", taskId).add("type", "1").asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
-            Log.e("", "");
+            TaskDetailsModel taskDetailsModel = new Gson().fromJson(result, TaskDetailsModel.class);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    tvTitle.setText(taskDetailsModel.getMainTitle());
+                    tvDes.setText(taskDetailsModel.getSubTitle());
+                    tvNumberGold.setText(taskDetailsModel.getIncome());
+                }
+            });
         }, error -> {
         });
     }
