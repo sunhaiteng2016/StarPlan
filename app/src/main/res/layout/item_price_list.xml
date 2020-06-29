@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/dp9"
     android:orientation="vertical">
 
     <RelativeLayout
+        android:layout_marginRight="@dimen/dp17"
         android:id="@+id/rl_activity_new_user"
-        android:layout_width="@dimen/dp80"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/dp40"
         android:layout_weight="1"
         android:background="@drawable/shape_board_f3"

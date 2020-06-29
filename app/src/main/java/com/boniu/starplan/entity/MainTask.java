@@ -46,7 +46,15 @@ public class MainTask {
         private int taskViewStatus;
         private int todayRemain;
         private int type;
+        private String applySource;
 
+        public String getApplySource() {
+            return applySource;
+        }
+
+        public void setApplySource(String applySource) {
+            this.applySource = applySource;
+        }
 
         public int getCycleDays() {
             return cycleDays;
@@ -143,6 +151,15 @@ public class MainTask {
         private int taskViewStatus;
         private int todayRemain;
         private int type;
+        private String applySource;
+
+        public String getApplySource() {
+            return applySource;
+        }
+
+        public void setApplySource(String applySource) {
+            this.applySource = applySource;
+        }
 
         public int getCycleDays() {
             return cycleDays;

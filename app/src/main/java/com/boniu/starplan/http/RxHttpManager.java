@@ -81,7 +81,7 @@ public class RxHttpManager {
             String channel = SystemInfoUtils.getAppSource(context, "UMENG_CHANNEL");
             String deviceModel = SystemInfoUtils.getProductName();
             String deviceType = "Android";
-            String uuid = "BDAF6B4D5DC04AEFBCF86C7EFC94DE97";
+            String uuid = "dsfasdfasfasfasf";
             String version = SystemInfoUtils.getAppVersionName(context);
             Map<String, String> map = new HashMap<>();
             map.put("accountId", accountId);

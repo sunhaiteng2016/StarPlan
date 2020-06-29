@@ -16,7 +16,6 @@
             android:layout_height="@dimen/dp24"
             android:background="@drawable/shape_circle_withe"
             android:gravity="center"
-            android:text="68"
             android:textColor="@color/text_33"
             android:textSize="12sp" />
 

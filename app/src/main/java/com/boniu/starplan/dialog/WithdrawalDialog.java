@@ -1,42 +1,68 @@
 package com.boniu.starplan.dialog;
 
-/**
- * 绑定支付宝
- */
-
 import android.app.Dialog;
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
-import com.boniu.starplan.ui.LauncherActivity;
+import com.boniu.starplan.utils.StringUtils;
 
 
+//提现绑定支付宝信息
 public class WithdrawalDialog extends Dialog {
 
-
-    public WithdrawalDialog(@NonNull Context context) {
+    private TextView tvSubmit;
+    private ImageView imgClose;
+    private EditText edtZhanghao;
+    private EditText edtName;
+    private String price;
+    private Withdrawal2Dialog.WithdrawalInterfaces withdrawalInterfaces;
+    public WithdrawalDialog(@NonNull Context context, String price, Withdrawal2Dialog.WithdrawalInterfaces withdrawalInterfaces) {
         super(context, R.style.CustomProgressDialog);
+        this.price = price;
+        this.withdrawalInterfaces = withdrawalInterfaces;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_withdrawal);
-
+        initView();
+        tvSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (StringUtils.isEmpty(edtZhanghao.getText().toString())){
+                    Toast.makeText(getContext(), "还未输入支付宝账号", Toast.LENGTH_SHORT).show();
+                }else if (StringUtils.isEmpty(edtName.getText().toString())){
+                    Toast.makeText(getContext(), "还未输入真实姓名", Toast.LENGTH_SHORT).show();
+                }else{
+                    //绑定成功
+                    Withdrawal2Dialog withdrawal2Dialog = new Withdrawal2Dialog(getContext(),edtZhanghao.getText().toString().trim(),edtName.getText().toString().trim(),price,withdrawalInterfaces);
+                    withdrawal2Dialog.show();
+                    dismiss();
+                }
+            }
+        });
+        imgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
     }
 
+    private void initView() {
+        tvSubmit = ((TextView) findViewById(R.id.tv_submit));
+        imgClose = ((ImageView) findViewById(R.id.img_close));
+        edtZhanghao = ((EditText) findViewById(R.id.edt_zhanghao));
+        edtName = ((EditText) findViewById(R.id.edt_name));
 
+    }
 }

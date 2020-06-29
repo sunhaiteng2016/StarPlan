@@ -31,6 +31,7 @@
             android:textSize="17sp" />
 
         <EditText
+            android:id="@+id/ed_phone"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp40"
             android:background="@null"
@@ -62,6 +63,7 @@
             android:textSize="17sp" />
 
         <EditText
+            android:id="@+id/ed_name"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp40"
             android:background="@null"
@@ -94,6 +96,7 @@
             android:textSize="17sp" />
 
         <EditText
+            android:id="@+id/ed_content"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp100"
             android:layout_marginTop="@dimen/dp10"
@@ -154,7 +157,6 @@
 
 
                     <ImageView
-                        android:id="@+id/iv_ex1"
                         android:layout_width="@dimen/dp56"
                         android:layout_height="@dimen/dp56"
                         android:layout_centerInParent="true"
@@ -171,6 +173,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/rl_ex1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
@@ -184,6 +187,7 @@
                         android:textColor="@color/white" />
 
                     <ImageView
+                        android:id="@+id/iv_ex1"
                         android:layout_width="@dimen/dp18"
                         android:layout_height="@dimen/dp18"
                         android:layout_centerInParent="true"
@@ -240,6 +244,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/rl_ex2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
@@ -253,8 +258,9 @@
                         android:textColor="@color/white" />
 
                     <ImageView
-                        android:layout_width="@dimen/dp18"
-                        android:layout_height="@dimen/dp18"
+                        android:id="@+id/iv_ex2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:src="@mipmap/jia" />
                 </RelativeLayout>

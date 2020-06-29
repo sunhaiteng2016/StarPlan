@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.boniu.starplan.dialog.LoadingDialog;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
@@ -41,6 +42,7 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.tv_login)
     TextView tvLogin;
     private String phone, code;
+    private LoadingDialog loadingDialog;
 
     @Override
     public int getLayoutId() {
@@ -51,6 +53,7 @@ public class LoginActivity extends BaseActivity {
     public void init() {
         StatusBarUtil.setTranslucentStatus(this);
         StatusBarUtil.setRootViewFitsSystemWindows(this, false);
+        loadingDialog = new LoadingDialog(this);
     }
 
     @Override
@@ -85,7 +88,7 @@ public class LoginActivity extends BaseActivity {
                         Tip.show(codeBean.getErrorMsg());
                     }
                 }, (OnError) error -> {
-
+                    error.show();
                 });
                 break;
             case R.id.tv_login:
@@ -93,11 +96,13 @@ public class LoginActivity extends BaseActivity {
                     Tip.show("请输入验证码！");
                     return;
                 }
+                loadingDialog.show();
                 RxHttp.postEncryptJson(ComParamContact.Login.LOGIN)
                         .add(ComParamContact.Login.MOBILE, phone)
                         .add(ComParamContact.Login.CODE, code)
                         .asString()
                         .subscribe(s -> {
+                            loadingDialog.dismiss();
                             Response codeBean = new Gson().fromJson(s, Response.class);
                             if (codeBean.getSuccess()) {
                                 String result = AESUtil.decrypt((String) codeBean.getResult(), AESUtil.KEY);
@@ -107,9 +112,11 @@ public class LoginActivity extends BaseActivity {
                                 Tip.show("登录成功！");
                                 ARouter.getInstance().build("/ui/MainActivity").navigation();
                                 finish();
+                            } else {
+                                Tip.show(codeBean.getErrorMsg());
                             }
                         }, (OnError) error -> {
-
+                            error.show();
                         });
                 break;
         }

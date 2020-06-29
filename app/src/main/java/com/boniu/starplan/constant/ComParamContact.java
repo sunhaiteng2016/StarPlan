@@ -63,6 +63,7 @@ public class ComParamContact {
         public final static String getSignAmount = "api/sign/getSignAmount";
         //获取累计签到奖励
         public final static String getCumulativeSignRewards = "api/sign/getCumulativeSignRewards";
+        public final static String isGetCumulativeSignRewards = "api/sign/isGetCumulativeSignRewards";
         //签到
         public final static String GET_SIGN = "api/sign/signIn";
         /**
@@ -72,13 +73,11 @@ public class ComParamContact {
         public final static String queryTaskMarketList = "api/taskMarketConfig/queryTaskMarketList";
         //任务列表
         public final static String TASk_LIST = "api/task/list";
-        //任务详情
-        public final static String getTask = "api/task/getTask";
         //领取任务
         public final static String TASK_APPLY = "api/task/user/apply";
         //开始任务
         public final static String TASK_BEGIN = "api/task/user/begin";
-        public final static String UserTaskId = "userTaskId";
+        public final static String giveUp = "api/task/user/giveUp";
         //任务完成 领金币
         public final static String TASk_END = "api/task/user/end";
         //获取用户任务详情
@@ -93,14 +92,45 @@ public class ComParamContact {
          */
         //签到查询宝箱 状态
         public final static String getTreasureBox = "api/treasureBoxTask/getTreasureBox";
+        public final static String queryTreasureBoxTaskStatus = "api/treasureBoxTask/queryTreasureBoxTaskStatus";
+        public final static String getDoubleTreasureBox = "api/treasureBoxTask/getDoubleTreasureBox";
 
         /**
          * 首页时间检测
          */
         //时间检查的
         public final static String checkCollectTime = "api/goldCoinCollect/checkCollectTime";
-        //
-        public final static String getCollectTaskRecord = "api/goldCoinCollect/getCollectTaskRecord";
+        public final static String getGoldCoin = "api/goldCoinCollect/getGoldCoin";
+        public final static String getCollectTaskRecord = "api/goldCoinCollect/collectTaskRecord";
+        /**
+         * 上传 审核资料
+         */
+        public final static String uploadAudit = "api/task/user/uploadAudit";
+        public final static String submitAudit = "api/task/user/submitAudit";
+
+        /**
+         * 用户金币详情
+         */
+        public final static String account = "api/gold/account";
+        //收益明细
+        public final static String earning = "api/gold/earning/list";
+        //支出明细
+        public final static String expend = "api/gold/expend/list";
+        /**
+         * 提现
+         */
+        //普通提现列表
+        public final static String ordinaryList = "api/gold/expend/ordinary/list";
+        //专属提现列表
+        public final static String exclusiveList = "api/gold/expend/exclusive/list";
+        //特惠任务完成情况
+        public final static String preferential = "api/gold/expend/preferential";
+        //金额提现
+        public final static String goldLaunch = "api/gold/launch";
+        //获取用户转账用户详情
+        public final static String transferInfo = "api/gold/expend/transfer/info";
+        //提现记录
+        public final static String withdrawalList = "api/gold/withdrawal/list";
 
 
     }

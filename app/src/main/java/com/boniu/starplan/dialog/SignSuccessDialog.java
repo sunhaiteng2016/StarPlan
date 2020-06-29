@@ -50,6 +50,7 @@ public class SignSuccessDialog extends Dialog {
         findViewById(R.id.tv_submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dismiss();
                 //领取签到奖励
                 subMitCallBack.onSuccess();
             }

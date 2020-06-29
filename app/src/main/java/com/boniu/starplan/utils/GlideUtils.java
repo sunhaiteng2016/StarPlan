@@ -252,8 +252,8 @@ public class GlideUtils {
     public void LoadContextRoundBitmap(Context context, String path, ImageView imageView, int roundradius) {
         RequestOptions myOptions = new RequestOptions()
                 .centerCrop()
-                .error(R.mipmap.ic_launcher)
-                .placeholder(R.mipmap.ic_launcher)
+                .error(R.mipmap.bb)
+                .placeholder(R.mipmap.bb)
                 .transform(new GlideRoundTransform(context, roundradius));
         Glide.with(context).load(path).apply(myOptions).into(imageView);
     }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_get_more"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp45"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/shape_round_22_orange"
+        android:gravity="center"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="刷视频赚更多的金币(不限制)"
+        android:textColor="@color/text_473b07"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+</RelativeLayout>

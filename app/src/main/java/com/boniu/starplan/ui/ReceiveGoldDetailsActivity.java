@@ -1,21 +1,34 @@
 package com.boniu.starplan.ui;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
-import com.boniu.starplan.entity.ImgListModel;
+import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.entity.ReceiveGoldModel;
+import com.boniu.starplan.http.OnError;
+import com.boniu.starplan.utils.AESUtil;
+import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.RlvManagerUtils;
-import com.boniu.starplan.utils.TimerUtils;
+import com.boniu.starplan.utils.StringUtils;
+import com.boniu.starplan.utils.Tip;
+import com.google.gson.Gson;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
@@ -26,6 +39,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rxhttp.wrapper.param.RxHttp;
 
 /**
  * 领金币详情
@@ -54,12 +68,16 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
     TextView tvEndTask;
     @BindView(R.id.rl_back)
     RelativeLayout rlBack;
+    @BindView(R.id.tv_play_sm)
+    TextView tvPlaySm;
     @BindView(R.id.tv_bar_title)
     TextView tvBarTitle;
     @BindView(R.id.tv_submit)
     TextView tvSubmit;
-    private List<ImgListModel> imgList = new ArrayList<>();
-    private CommonAdapter<ImgListModel> adapter;
+    private List<ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean> imgList = new ArrayList<>();
+    private CommonAdapter<ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean> adapter;
+    private int taskId, userTaskId;
+    private ReceiveGoldModel receiveGoldModel;
 
     @Override
     public int getLayoutId() {
@@ -68,24 +86,76 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
 
     @Override
     public void init() {
+        taskId = getIntent().getIntExtra("taskId", -1);
+        userTaskId = getIntent().getIntExtra("userTaskId", -1);
         tvBarTitle.setText("领金币详情");
         tvSubmit.setText("审核进度");
         tvSubmit.setVisibility(View.VISIBLE);
         initView();
+        initWebView();
+        getData();
+    }
+
+    private void initWebView() {
+
+        WebSettings settings = webView.getSettings();
+        WebViewClient webViewClient = new WebViewClient() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+
+                return false;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+            }
+        };
+        webView.setWebViewClient(webViewClient);
+        settings.setJavaScriptEnabled(true);
+        settings.setDefaultTextEncodingName("UTF-8");
+        settings.setSupportZoom(true);
+        settings.setBuiltInZoomControls(true);
+        settings.setDisplayZoomControls(false);
+        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
+    }
+
+    private void getData() {
+        RxHttp.postEncryptJson(ComParamContact.Main.GET_TASK).add("userTaskId", userTaskId).add("type", "2").asResponse(String.class).subscribe(s -> {
+            String result = AESUtil.decrypt(s, AESUtil.KEY);
+            receiveGoldModel = new Gson().fromJson(result, ReceiveGoldModel.class);
+            ReceiveGoldModel.TaskDetailVOBean.AuditTaskVOBean auditTaskVO = receiveGoldModel.getTaskDetailVO().getAuditTaskVO();
+            List<ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean> taskImgVo = receiveGoldModel.getTaskDetailVO().getTaskImgsVO();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    GlideUtils.getInstance().LoadContextRoundBitmap(ReceiveGoldDetailsActivity.this, receiveGoldModel.getTaskDetailVO().getIcon(), ivImg, 8);
+                    tvName.setText(receiveGoldModel.getTaskDetailVO().getMainTitle());
+                    tvDes.setText(receiveGoldModel.getTaskDetailVO().getSubTitle());
+                    tvPlaySm.setText(auditTaskVO.getMajorDesc());
+                    webView.loadDataWithBaseURL(null, auditTaskVO.getShowDesc(), "text/html", "utf-8", null);
+                    tvGoldNum.setText(receiveGoldModel.getIncome() + "");
+                    imgList.clear();
+                    imgList.addAll(taskImgVo);
+                    adapter.notifyDataSetChanged();
+                }
+            });
+        }, (OnError) error -> {
+            error.show();
+        });
     }
 
     private void initView() {
         RlvManagerUtils.createLinearLayoutHorizontal(this, rlv);
-        imgList.add(new ImgListModel());
-        imgList.add(new ImgListModel());
-        imgList.add(new ImgListModel());
-        imgList.add(new ImgListModel());
-        imgList.add(new ImgListModel());
-        adapter = new CommonAdapter<ImgListModel>(this, R.layout.item_img_list, imgList) {
+        adapter = new CommonAdapter<ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean>(this, R.layout.item_img_list, imgList) {
 
             @Override
-            protected void convert(ViewHolder holder, ImgListModel imgListModel, int position) {
+            protected void convert(ViewHolder holder, ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean imgListModel, int position) {
                 holder.setText(R.id.tv_position, position + "");
+                GlideUtils.getInstance().LoadContextRoundBitmap(ReceiveGoldDetailsActivity.this, imgListModel.getImgUrl(), holder.getView(R.id.iv_img), 8);
             }
         };
         rlv.setAdapter(adapter);
@@ -101,7 +171,6 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
             }
         });
 
-        TimerUtils.startTimerHour(this, tvNumTime);
     }
 
     @Override
@@ -116,6 +185,12 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
         switch (view.getId()) {
             case R.id.tv_start_task:
                 //外链
+                if (!StringUtils.isEmpty(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl())) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl()));
+                    startActivity(browserIntent);
+                } else {
+                    Tip.show("链接失效，请退出重试！");
+                }
                 break;
             case R.id.tv_end_task:
                 ARouter.getInstance().build("/ui/FinishRegisterActivity").navigation();

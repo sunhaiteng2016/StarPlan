@@ -14,14 +14,21 @@
         android:layout_height="@dimen/dp90"
         android:background="@color/FFEA8A">
 
-        <ImageView
-            android:id="@+id/iv_img"
-            android:layout_width="@dimen/dp45"
-            android:layout_height="@dimen/dp45"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/dp16"
             android:layout_marginTop="@dimen/dp19"
-            android:scaleType="centerCrop"
-            android:src="@mipmap/bb" />
+            app:cardCornerRadius="@dimen/dp8">
+
+            <ImageView
+                android:id="@+id/iv_img"
+                android:layout_width="@dimen/dp45"
+                android:layout_height="@dimen/dp45"
+
+                android:scaleType="centerCrop" />
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/tv_name"
@@ -29,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/dp4"
             android:layout_marginTop="@dimen/dp19"
-            android:layout_toRightOf="@+id/iv_img"
+            android:layout_toRightOf="@+id/card"
             android:maxLength="10"
             android:text="童话故事社"
             android:textColor="@color/text_33"
@@ -43,7 +50,7 @@
             android:layout_below="@+id/tv_name"
             android:layout_marginLeft="@dimen/dp4"
             android:layout_marginTop="@dimen/dp4"
-            android:layout_toRightOf="@+id/iv_img"
+            android:layout_toRightOf="@+id/card"
             android:maxWidth="200dp"
             android:maxLines="2"
             android:text="童话故事社111111111111"
@@ -101,6 +108,7 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/tv_play_sm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/dp16"
@@ -116,39 +124,41 @@
         android:id="@+id/web_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp16"
         android:layout_marginTop="@dimen/dp8"
-        android:paddingLeft="@dimen/dp16"
-        android:paddingRight="@dimen/dp16" />
+        android:layout_marginRight="@dimen/dp16" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rlv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp16"
+        android:layout_marginTop="@dimen/dp8"
+        android:layout_marginRight="@dimen/dp16" />
 
     <TextView
-        android:textSize="16sp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:text="开始任务"
         android:id="@+id/tv_start_task"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp44"
         android:layout_marginLeft="@dimen/dp16"
         android:layout_marginTop="@dimen/dp42"
         android:layout_marginRight="@dimen/dp16"
-        android:background="@drawable/shape_round_22_red" />
+        android:background="@drawable/shape_round_22_red"
+        android:gravity="center"
+        android:text="开始任务"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 
     <TextView
-        android:textSize="16sp"
-        android:gravity="center"
-        android:textColor="#999"
-        android:text="完成注册"
         android:id="@+id/tv_end_task"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp44"
         android:layout_marginLeft="@dimen/dp16"
         android:layout_marginTop="@dimen/dp15"
         android:layout_marginRight="@dimen/dp16"
-        android:background="@drawable/shape_board_f3_22" />
+        android:background="@drawable/shape_board_f3_22"
+        android:gravity="center"
+        android:text="完成注册"
+        android:textColor="#999"
+        android:textSize="16sp" />
 </LinearLayout>

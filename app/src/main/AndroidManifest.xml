@@ -12,10 +12,10 @@
     <application
         android:name=".ui.ApplicationUtils"
         android:allowBackup="true"
-        android:icon="@mipmap/bb"
+        android:icon="@mipmap/logo"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_config"
-        android:roundIcon="@mipmap/bb"
+        android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -49,6 +49,7 @@
         <activity android:name=".ui.WebViewActivity" />
         <activity android:name=".ui.MyWalletActivity" />
         <activity android:name=".ui.ReviewProgressActivity" />
+        <activity android:name=".ui.DownLoadWebViewActivity" />
 
         <!--value的值填写你在友盟后台申请的应用Appkey-->
         <meta-data

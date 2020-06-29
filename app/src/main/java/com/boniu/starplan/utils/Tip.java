@@ -2,6 +2,7 @@ package com.boniu.starplan.utils;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import com.boniu.starplan.ui.ApplicationUtils;
@@ -30,6 +31,10 @@ public class Tip {
         show(msg, false);
     }
 
+    public static void showCancer1(CharSequence msg) {
+        showCancer(msg, false);
+    }
+
     public static void show(final CharSequence msg, final boolean timeLong) {
         runOnUiThread(() -> {
             if (mToast != null) {
@@ -37,6 +42,18 @@ public class Tip {
             }
             int duration = timeLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
             mToast = Toast.makeText(ApplicationUtils.getContext(), msg, duration);
+            mToast.show();
+        });
+    }
+
+    private static void showCancer(final CharSequence msg, final boolean timeLong) {
+        runOnUiThread(() -> {
+            if (mToast != null) {
+                mToast.cancel();
+            }
+            int duration = timeLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
+            mToast = Toast.makeText(ApplicationUtils.getContext(), msg, duration);
+            mToast.setGravity(Gravity.CENTER, 0, 0);
             mToast.show();
         });
     }

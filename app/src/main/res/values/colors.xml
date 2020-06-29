@@ -4,12 +4,14 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="text_33">#ff333333</color>
+    <color name="text_99">#ff999999</color>
     <color name="black">#000000</color>
     <color name="text_473b07">#ff473b07</color>
     <color name="text_a88f00">#ffa88f00</color>
     <color name="f3f3f3">#f3f3f3</color>
     <color name="FF7272">#FF7272</color>
     <color name="fea21a">#fffea21a</color>
+    <color name="FA6400">#FA6400</color>
     <color name="FF5151">#FF5151</color>
     <color name="c3c3c3">#c3c3c3</color>
     <color name="FF5700">#FF5700</color>

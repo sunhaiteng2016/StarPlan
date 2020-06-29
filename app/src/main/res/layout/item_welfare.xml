@@ -6,6 +6,7 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="87dp">
 
@@ -16,14 +17,19 @@
             android:scaleType="centerCrop"
             android:src="@mipmap/lxqdbkdj" />
 
-        <TextView
-            android:id="@+id/iv_right"
-            android:layout_width="@dimen/dp82"
-            android:layout_height="@dimen/dp30"
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:gravity="center"
-            android:src="@mipmap/bndj"
-            android:text="已领取" />
+            android:src="@mipmap/bndj">
+
+            <TextView
+                android:id="@+id/iv_right"
+                android:layout_width="@dimen/dp82"
+                android:layout_height="@dimen/dp30"
+                android:gravity="center"
+                android:text="已领取" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"

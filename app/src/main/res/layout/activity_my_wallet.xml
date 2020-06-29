@@ -10,206 +10,234 @@
     <include layout="@layout/tool_bar" />
 
     <RelativeLayout
+        android:paddingTop="@dimen/dp24"
+        android:paddingRight="@dimen/dp20"
+        android:paddingBottom="@dimen/dp16"
+        android:paddingLeft="@dimen/dp20"
+        android:background="@mipmap/qianbao"
+        android:layout_marginLeft="@dimen/dp16"
+        android:layout_marginRight="@dimen/dp16"
         android:layout_width="match_parent"
-        android:layout_height="158dp"
-        android:layout_margin="@dimen/dp16"
-        android:background="@mipmap/qianbao">
-
+        android:layout_height="160dp">
         <TextView
-            android:id="@+id/tv_gold_str"
+            android:id="@+id/tv_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/dp20"
-            android:layout_marginTop="@dimen/dp24"
             android:text="金币余额"
-            android:textColor="@color/white"
+            android:textColor="#ffffffff"
             android:textSize="16sp"
-            android:textStyle="bold" />
-
+            />
         <TextView
-            android:id="@+id/tv_gold_num"
-            style="@style/AppTheme.Widget.TextView"
+            android:id="@+id/tv_goldBalance"
+            android:includeFontPadding="false"
+            android:layout_marginTop="@dimen/dp10"
+            android:layout_below="@+id/tv_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_gold_str"
-            android:layout_marginLeft="@dimen/dp20"
-            android:layout_marginTop="@dimen/dp12"
             android:text="21635"
-            android:textColor="@color/white"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
+            android:textColor="#ffffffff"
+            android:textSize="34sp"
+            />
         <TextView
             android:id="@+id/tv_exchange"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="@dimen/dp34"
-            android:layout_marginRight="@dimen/dp20"
-            android:background="@drawable/shape_round_withe_22"
             android:gravity="center"
-            android:paddingLeft="@dimen/dp30"
-            android:paddingTop="@dimen/dp8"
-            android:paddingRight="@dimen/dp30"
-            android:paddingBottom="@dimen/dp8"
-            android:text="兑换"
-            android:textColor="#FF5858"
-            android:textSize="@dimen/dp18" />
-
-        <TextView
-            android:id="@+id/tv_can_take_gold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="@dimen/dp20"
-            android:layout_marginBottom="@dimen/dp16"
-            android:singleLine="true"
-            android:text="可提现金币: 21000"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp10"
+            android:layout_marginRight="@dimen/dp4"
             android:layout_alignParentRight="true"
+            android:background="@drawable/shape_round_withe_22"
+            android:layout_width="@dimen/dp100"
+            android:layout_height="@dimen/dp34"
+            android:text="兑换"
+            android:textColor="#ffff5858"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/tv_availableBalance"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="@dimen/dp20"
-            android:layout_marginRight="@dimen/dp20"
-            android:layout_marginBottom="@dimen/dp16"
-            android:singleLine="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="可提现金币：21000"
+            android:textColor="#ffffffff"
+            android:textSize="14sp"
+            />
+        <TextView
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="10000金币=1元"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:textColor="#ffffffff"
+            android:textSize="14sp"
+            />
     </RelativeLayout>
+    <androidx.cardview.widget.CardView
+        android:layout_marginTop="@dimen/dp15"
+        android:layout_marginLeft="@dimen/dp16"
+        android:layout_marginRight="@dimen/dp16"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="10dp"
+        android:id="@+id/f_view"
+        android:layout_width="match_parent"
+        >
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp61">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="今日收益金币"
+                    android:textColor="#ff333333"
+                    android:textSize="12sp"
+                    />
+                <TextView
+                    android:id="@+id/tv_todayEarnGoldAmount"
+                    android:textStyle="bold"
+                    android:layout_marginTop="@dimen/dp8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="89"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp"
+                    />
+            </LinearLayout>
+            <View
+                android:layout_gravity="center_vertical"
+                android:layout_width="@dimen/dp1"
+                android:layout_height="@dimen/dp24"/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="累计收益金币"
+                    android:textColor="#ff333333"
+                    android:textSize="12sp"
+                    />
+                <TextView
+                    android:id="@+id/tv_accumulateEarnGoldAmount"
+                    android:textStyle="bold"
+                    android:layout_marginTop="@dimen/dp8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="89"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp"
+                    />
+            </LinearLayout>
+            <View
+                android:layout_gravity="center_vertical"
+                android:layout_width="@dimen/dp1"
+                android:layout_height="@dimen/dp24"/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="累计支出金币"
+                    android:textColor="#ff333333"
+                    android:textSize="12sp"
+                    />
+                <TextView
+                    android:id="@+id/tv_accumulateExpendGoldAmount"
+                    android:textStyle="bold"
+                    android:layout_marginTop="@dimen/dp8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="89"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
+        android:layout_marginTop="@dimen/dp16"
+
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/dp20"
-        android:layout_marginRight="@dimen/dp20"
-        android:background="@drawable/shape_round_withe_8"
-        android:elevation="@dimen/dp2">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="@dimen/dp12">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="今日收益金币"
-                android:textColor="@color/text_33"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/dp6"
-                android:text="89"
-                android:textColor="@color/text_33"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="@dimen/dp1"
-            android:layout_height="@dimen/dp40"
-            android:layout_gravity="center_vertical"
-            android:background="@color/d8d8d8" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="@dimen/dp12">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="累计收益金币"
-                android:textColor="@color/text_33"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/dp6"
-                android:text="21635"
-                android:textColor="@color/text_33"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="@dimen/dp1"
-            android:layout_height="@dimen/dp40"
-            android:layout_gravity="center_vertical"
-            android:background="@color/d8d8d8" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="@dimen/dp12">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="累计支出金币"
-                android:textColor="@color/text_33"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/dp6"
-                android:text="89"
-                android:textColor="@color/text_33"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <TableLayout
-        android:id="@+id/tab_bar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp45"
-        android:layout_marginTop="@dimen/dp10"
-        />
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rlv"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <ExpandableListView
-            android:id="@+id/elv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </RelativeLayout>
-
-    <TextView
+        <TextView
+            android:id="@+id/tv_shouyi"
+            android:paddingTop="@dimen/dp8"
+            android:paddingBottom="@dimen/dp8"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="收益明细"
+            android:textColor="@color/text_33"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/tv_zhichu"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:paddingTop="@dimen/dp8"
+            android:paddingBottom="@dimen/dp8"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="支出明细"
+            android:textColor="#999999"
+            android:textSize="16sp"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:background="#f2f2f2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="@dimen/dp4"
-        android:text="仅展示最近3天的收益记录"
-        android:textColor="#999"
-        android:textSize="12sp" />
+        android:layout_height="@dimen/dp4">
+        <RelativeLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+            <View
+                android:id="@+id/view_shouyi"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/shape_red_round_3"
+                android:layout_width="@dimen/dp62"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+            <View
+                android:id="@+id/view_zhichu"
+                android:visibility="gone"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/shape_red_round_3"
+                android:layout_width="@dimen/dp62"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+    <ExpandableListView
+        android:id="@+id/expandableList"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:divider="#d8d8d8"
+        android:dividerHeight="0.5dp"
+        android:childDivider="#d8d8d8"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 </LinearLayout>

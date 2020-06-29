@@ -16,15 +16,16 @@
         android:background="@color/f3f3f3" />
 
     <androidx.core.widget.NestedScrollView
+        android:layout_below="@+id/rl1"
+        android:layout_marginTop="@dimen/dp4"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
-
+        android:orientation="vertical"
+        >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -144,6 +145,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:layout_marginRight="@dimen/dp20"
                     android:layout_width="100dp"
                     android:layout_height="@dimen/dp40"
                     android:layout_weight="1">
@@ -194,171 +196,85 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="15dp">
+                android:paddingTop="@dimen/dp15"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="活动专属提现"
+                    android:layout_marginLeft="@dimen/dp15"
                     android:textColor="@color/text_33"
                     android:textSize="16sp" />
-
-                <LinearLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/huodong_recycler"
+                    android:layout_marginTop="@dimen/dp10"
+                    android:paddingRight="@dimen/dp15"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"/>
 
-                    <RelativeLayout
-                        android:id="@+id/rl_activity_new_user"
-                        android:layout_width="98dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@mipmap/duibk2"
-                        android:padding="4dp">
-
-                        <TextView
-                            android:id="@+id/tv1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="6dp"
-                            android:text="1元"
-                            android:textColor="@color/text_33"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/tv1"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="4dp"
-                            android:text="新用户专享"
-                            android:textColor="@color/text_33" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/rl_activity_day_one"
-                        android:layout_width="98dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/shape_board_f3"
-                        android:padding="4dp">
-
-                        <TextView
-                            android:id="@+id/tv2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="6dp"
-                            android:text="1元"
-                            android:textColor="@color/text_33"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/tv2"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="4dp"
-                            android:text="连续活跃专享"
-                            android:textColor="@color/text_33" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/rl_activity_day_ten"
-                        android:layout_width="98dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/shape_board_f3"
-                        android:padding="4dp">
-
-                        <TextView
-                            android:id="@+id/tv3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="6dp"
-                            android:text="10元"
-                            android:textColor="@color/text_33"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/tv3"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="4dp"
-                            android:text="连续活跃专享"
-                            android:textColor="@color/text_33" />
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
+                <RelativeLayout
+                    android:layout_marginBottom="@dimen/dp10"
+                    android:layout_marginLeft="@dimen/dp16"
+                    android:layout_marginRight="@dimen/dp16"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
+                    android:paddingLeft="@dimen/dp10"
                     android:background="#fff1f1f1"
-                    android:orientation="vertical">
-
+                    android:orientation="horizontal">
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/dp14"
+                        android:id="@+id/ll_huoyuedu"
+                        android:visibility="gone"
                         android:layout_marginTop="@dimen/dp10"
-                        android:layout_marginRight="@dimen/dp14"
-                        android:orientation="horizontal">
-
-                        <ProgressBar
-                            android:id="@+id/progress_bar_h"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="1"
-                            android:max="5"
-                            android:progress="3" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="@dimen/dp20"
-                            android:text="3/5天"
-                            android:textColor="@color/black"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:layout_width="match_parent"
-                        android:layout_height="31dp"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="14dp"
-                            android:layout_height="16dp"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="14dp"
-                            android:src="@mipmap/start2" />
+                        android:layout_height="wrap_content">
+                        <ProgressBar
+                            android:id="@+id/progressbar"
+                            style="@android:style/Widget.ProgressBar.Horizontal"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="@dimen/dp10"
+                            android:max="100"
+                            android:progress="20"
+                            android:progressDrawable="@drawable/layer_list_progress_drawable" />
 
                         <TextView
+                            android:id="@+id/tv_days"
+                            android:layout_marginLeft="@dimen/dp16"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="10dp"
-                            android:text="您已达到条件，可以立即提现"
-                            android:textColor="@color/text_33"
-                            android:textSize="12sp" />
+                            android:text="3/5天"
+                            android:textSize="14sp"
+                            android:textColor="#FF333333"
+                            android:layout_marginRight="@dimen/dp5"
+                            android:gravity="left" />
                     </LinearLayout>
-                </LinearLayout>
+                    <ImageView
+                        android:id="@+id/left_img"
+                        android:layout_marginTop="@dimen/dp10"
+                        android:layout_below="@+id/ll_huoyuedu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:src="@mipmap/start2" />
 
+                    <TextView
+                        android:id="@+id/tv_desc"
+                        android:layout_toRightOf="@+id/left_img"
+                        android:layout_marginBottom="@dimen/dp10"
+                        android:layout_alignTop="@+id/left_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:text="您已达到条件，可以立即提现"
+                        android:textColor="@color/text_33"
+                        android:textSize="12sp" />
+                </RelativeLayout>
 
             </LinearLayout>
 
@@ -371,20 +287,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="15dp">
+                android:paddingTop="@dimen/dp15"
+                android:paddingBottom="@dimen/dp15"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="普通提现"
+                    android:layout_marginLeft="@dimen/dp15"
                     android:textColor="@color/text_33"
                     android:textSize="16sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rlv_normal"
+                    android:id="@+id/putong_recycler"
                     android:layout_width="match_parent"
+                    android:paddingLeft="@dimen/dp10"
+                    android:paddingRight="@dimen/dp15"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp" />
+                    />
             </LinearLayout>
 
             <View
@@ -417,7 +338,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="2. 提现金额将在提现审核通过后，汇入您的支付宝或者微信钱包中，您可以在支付宝账单或者微信钱包明细中查询；"
+                    android:text="2. 提现金额将在提现审核通过后，汇入您的支付宝或者微信  钱包中，您可以在支付宝账单或者微信钱包明细中查询；"
                     android:textColor="@color/text_33"
                     android:textSize="12sp" />
 

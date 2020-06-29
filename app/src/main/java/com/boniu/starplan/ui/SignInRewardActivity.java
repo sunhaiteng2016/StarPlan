@@ -1,6 +1,8 @@
 package com.boniu.starplan.ui;
 
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,14 +16,18 @@ import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.base.Response;
 import com.boniu.starplan.constant.ComParamContact;
-import com.boniu.starplan.entity.ContinuitySignDay;
+import com.boniu.starplan.dialog.ReceiveGoldDialog;
+import com.boniu.starplan.entity.BoxState;
+import com.boniu.starplan.entity.SignModel.ListBean;
 import com.boniu.starplan.entity.NumberDay;
 import com.boniu.starplan.entity.SignModel;
 import com.boniu.starplan.entity.WelfareBean;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
+import com.boniu.starplan.utils.AnimatorUtil;
 import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.RlvManagerUtils;
+import com.boniu.starplan.utils.Tip;
 import com.boniu.starplan.view.NumberRunningTextView;
 import com.google.gson.Gson;
 import com.zhy.adapter.recyclerview.CommonAdapter;
@@ -65,13 +71,14 @@ public class SignInRewardActivity extends BaseActivity {
     TextView tvBarTitle;
     @BindView(R.id.tv_submit)
     TextView tvSubmit;
-    private List<ContinuitySignDay> continuityList = new ArrayList<>();
-    private CommonAdapter<ContinuitySignDay> signBgAdapter;
+    private List<SignModel.ListBean> continuityList = new ArrayList<>();
+    private CommonAdapter<SignModel.ListBean> signBgAdapter;
     private List<NumberDay> numDayList = new ArrayList<>();
     private CommonAdapter<NumberDay> numSignAdapter;
-    private List<WelfareBean> welfareList = new ArrayList<>();
-    private CommonAdapter<WelfareBean> welfareAdapter;
-    private int continuousSign;
+    private List<WelfareBean.CumulativeSignConfigListBean> welfareList = new ArrayList<>();
+    private CommonAdapter<WelfareBean.CumulativeSignConfigListBean> welfareAdapter;
+    private int weekSign;
+    private WelfareBean welfareBean;
 
     @Override
     public int getLayoutId() {
@@ -93,64 +100,72 @@ public class SignInRewardActivity extends BaseActivity {
                     Response result = new Gson().fromJson(s, Response.class);
                     String resultStr = AESUtil.decrypt((String) result.getResult(), AESUtil.KEY);
                     SignModel sigModel = new Gson().fromJson(resultStr, SignModel.class);
-                    int weekSign = sigModel.getWeekSign();
-                     continuousSign = sigModel.getContinuousSign();
-                    int cumulativeSign = sigModel.getCumulativeSign();
-                    numDayList.clear();
-                    if (cumulativeSign < 10) {
-                        numDayList.add(new NumberDay(0, 0, cumulativeSign));
-                        numDayList.add(new NumberDay(0, 0, cumulativeSign));
-                        numDayList.add(new NumberDay(0, 0, cumulativeSign));
-                    }
-                    if (cumulativeSign < 100 && cumulativeSign > 10) {
-                        String cumulativeSigns = cumulativeSign + "";
-                        numDayList.add(new NumberDay(0, Integer.parseInt(cumulativeSigns.substring(0, 1)), Integer.parseInt(cumulativeSigns.substring(1, 2))));
-                        numDayList.add(new NumberDay(0, Integer.parseInt(cumulativeSigns.substring(0, 1)), Integer.parseInt(cumulativeSigns.substring(1, 2))));
-                        numDayList.add(new NumberDay(0, Integer.parseInt(cumulativeSigns.substring(0, 1)), Integer.parseInt(cumulativeSigns.substring(1, 2))));
-                    }
-                    if (cumulativeSign > 100) {
-                        String cumulativeSigns = cumulativeSign + "";
-                        numDayList.add(new NumberDay(Integer.parseInt(cumulativeSigns.substring(0, 1)), Integer.parseInt(cumulativeSigns.substring(1, 2)), Integer.parseInt(cumulativeSigns.substring(2, 3))));
-                        numDayList.add(new NumberDay(Integer.parseInt(cumulativeSigns.substring(0, 1)), Integer.parseInt(cumulativeSigns.substring(1, 2)), Integer.parseInt(cumulativeSigns.substring(2, 3))));
-                        numDayList.add(new NumberDay(Integer.parseInt(cumulativeSigns.substring(0, 1)), Integer.parseInt(cumulativeSigns.substring(1, 2)), Integer.parseInt(cumulativeSigns.substring(2, 3))));
+                    continuityList.clear();
+                    continuityList.addAll(sigModel.getList());
+                    weekSign = 0;
+                    for (SignModel.ListBean list : sigModel.getList()) {
+                        if (list.isIsSign()) {
+                            weekSign++;
+                        }
                     }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            tv_lx_day.setText("连续签到" + continuousSign + "天");
+                            tv_lx_day.setText("连续签到" + weekSign + "天");
                             tvSignDes.setText(weekSign + "/7");
-                            //按钮
-                            if (continuousSign >= 3 && continuousSign < 7) {
+                            //3天按钮的状态
+                            if (continuityList.get(2).getIsReceive() == 0) {
                                 tvTake.setText("领取奖励");
-                                tvTake.setBackgroundResource(R.drawable.shape_round_16_red);
+                                tvTake.setBackgroundResource(R.drawable.shape_round_22_red);
+                            } else if (continuityList.get(2).getIsReceive() == 1) {
+                                tvTake.setText("已领取");
+                                tvTake.setBackgroundResource(R.drawable.shape_round_16_c3);
                             } else {
                                 tvTake.setText("不符合条件" + weekSign + "/7");
                                 tvTake.setBackgroundResource(R.drawable.shape_round_16_c3);
-                                tvTake.setEnabled(false);
                             }
-                            if (continuousSign == 7) {
+                            //7天按钮的状态
+                            if (continuityList.get(6).getIsReceive() == 0) {
                                 tvTake7.setText("领取奖励");
-                                tvTake7.setBackgroundResource(R.drawable.shape_round_16_red);
+                                tvTake7.setBackgroundResource(R.drawable.shape_round_22_red);
+                            } else if (continuityList.get(6).getIsReceive() == 0) {
+                                tvTake7.setText("已领取");
+                                tvTake7.setBackgroundResource(R.drawable.shape_round_16_c3);
                             } else {
-                                tvTake7.setEnabled(false);
                                 tvTake7.setText("不符合条件" + weekSign + "/7");
                                 tvTake7.setBackgroundResource(R.drawable.shape_round_16_c3);
                             }
-                            //累计签到天数
                             numSignAdapter.notifyDataSetChanged();
+                            signBgAdapter.notifyDataSetChanged();
                         }
                     });
                     //设置签到数据
                 }, (OnError) error -> {
 
                 });
+        //获取签到累计奖励的列表
+        RxHttp.postEncryptJson(ComParamContact.Main.isGetCumulativeSignRewards).asResponse(String.class).subscribe(s -> {
+            String result = AESUtil.decrypt(s, AESUtil.KEY);
+            welfareBean = new Gson().fromJson(result, WelfareBean.class);
+            List<WelfareBean.CumulativeSignConfigListBean> newList = welfareBean.getCumulativeSignConfigList();
+            welfareList.clear();
+            welfareList.addAll(newList);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    welfareAdapter.notifyDataSetChanged();
+                }
+            });
+        }, (OnError) error -> {
+            error.show();
+        });
     }
 
     private void initView() {
         RlvManagerUtils.createLinearLayoutHorizontal(this, rlvNumberDay);
-        numDayList.add(new NumberDay(0, 0, 0));
-        numDayList.add(new NumberDay(0, 0, 0));
-        numDayList.add(new NumberDay(0, 0, 0));
+        numDayList.add(new NumberDay(9, 0, 0));
+        numDayList.add(new NumberDay(0, 9, 0));
+        numDayList.add(new NumberDay(0, 0, 9));
         numSignAdapter = new CommonAdapter<NumberDay>(this, R.layout.item_number_day, numDayList) {
 
             @Override
@@ -171,39 +186,84 @@ public class SignInRewardActivity extends BaseActivity {
 
         //签到
         RlvManagerUtils.createGridView(this, rlvSignBg, 7);
-        continuityList.add(new ContinuitySignDay());
-        continuityList.add(new ContinuitySignDay());
-        continuityList.add(new ContinuitySignDay());
-        continuityList.add(new ContinuitySignDay());
-        continuityList.add(new ContinuitySignDay());
-        continuityList.add(new ContinuitySignDay());
-        continuityList.add(new ContinuitySignDay());
-        continuityList.add(new ContinuitySignDay());
-        signBgAdapter = new CommonAdapter<ContinuitySignDay>(this, R.layout.item_continuity_sign_day, continuityList) {
+
+        signBgAdapter = new CommonAdapter<SignModel.ListBean>(this, R.layout.item_continuity_sign_day, continuityList) {
 
             @Override
-            protected void convert(ViewHolder holder, ContinuitySignDay continuitySignDay, int position) {
+            protected void convert(ViewHolder holder, SignModel.ListBean listBean, int position) {
+                holder.setText(R.id.tv_des, listBean.getWeekSignGold() + "");
+                if (listBean.isIsSign()) {
+                    holder.setTextColor(R.id.tv_des, mContext.getResources().getColor(R.color.FEC50B));
+                    if (listBean.getType().equals("gif")) {
+                        //3/7的状态
+                        if (listBean.getWeekSign() == 3 || listBean.getWeekSign() == 7) {
 
-                if (position == 0) {
-                    holder.setText(R.id.tv_des, "68");
-                    GlideUtils.getInstance().LoadContextBitmap(SignInRewardActivity.this, R.mipmap.signdui11, holder.getView(R.id.iv_img2));
-                } else if (position == 2) {
-                    holder.setText(R.id.tv_des, "888");
-                    GlideUtils.getInstance().LoadContextBitmap(SignInRewardActivity.this, R.mipmap.hongbaosign, holder.getView(R.id.iv_img));
-                } else if (position == 6) {
-                    holder.setText(R.id.tv_des, "888");
-                    GlideUtils.getInstance().LoadContextBitmap(SignInRewardActivity.this, R.mipmap.hongbaosign, holder.getView(R.id.iv_img));
+                            if (listBean.getIsReceive() == 0) {//签到未领取
+                                holder.setVisible(R.id.tv_hb_close, true);
+                                holder.setVisible(R.id.tv_hb_open, false);
+                                holder.setVisible(R.id.tv_circle, false);
+                                ObjectAnimator animator = AnimatorUtil.sway(holder.getView(R.id.tv_hb_close));
+                                animator.setRepeatCount(ValueAnimator.INFINITE);
+                                animator.start();
+                            } else {
+                                holder.setBackgroundRes(R.id.tv_hb_close, R.mipmap.yiqiandao);
+                                holder.setVisible(R.id.tv_hb_open, true);
+                                holder.setVisible(R.id.tv_hb_close, false);
+                                holder.setVisible(R.id.tv_circle, false);
+                            }
+                        }
+                    } else {
+                        //普通状态
+                        GlideUtils.getInstance().LoadContextBitmap(SignInRewardActivity.this, R.mipmap.signdui, holder.getView(R.id.tv_circle));
+                        holder.setVisible(R.id.tv_hb_close, false);
+                        holder.setVisible(R.id.tv_hb_open, false);
+                        holder.setVisible(R.id.tv_circle, true);
+                    }
                 } else {
-                    holder.setText(R.id.tv_des, "68");
-                    GlideUtils.getInstance().LoadContextBitmap(SignInRewardActivity.this, R.mipmap.signjinbi, holder.getView(R.id.iv_img2));
+                    //没签到
+                    holder.setTextColor(R.id.tv_des, mContext.getResources().getColor(R.color.text_33));
+                    //没签到 3 7
+                    if (listBean.getType().equals("gif")) {
+                        holder.setVisible(R.id.tv_hb_open, false);
+                        holder.setVisible(R.id.tv_hb_close, true);
+                        holder.setVisible(R.id.tv_circle, false);
+                    } else {
+                        holder.setVisible(R.id.tv_hb_open, false);
+                        holder.setVisible(R.id.tv_hb_close, false);
+                        holder.setVisible(R.id.tv_circle, true);
+                    }
                 }
+
             }
         };
         rlvSignBg.setAdapter(signBgAdapter);
-        signBgAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
+
+        RlvManagerUtils.createLinearLayout(this, rlvWelfare);
+
+        welfareAdapter = new CommonAdapter<WelfareBean.CumulativeSignConfigListBean>(this, R.layout.item_welfare, welfareList) {
+
+            @Override
+            protected void convert(ViewHolder holder, WelfareBean.CumulativeSignConfigListBean welfareBean1, int position) {
+                holder.setText(R.id.tv_title, "累计签到" + welfareBean1.getCumulativeSignAmount() + "天").setText(R.id.tv_gold, welfareBean1.getGoldAmount() + "");
+                if (welfareBean.getGetRewardsList().get(position).getStatus() == 1) {
+                    holder.setText(R.id.iv_right, "可领取");
+                } else {
+                    holder.setText(R.id.iv_right, "不可领取");
+                }
+            }
+        };
+        rlvWelfare.setAdapter(welfareAdapter);
+        welfareAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
-
+                if (welfareBean.getGetRewardsList().get(i).getStatus() == 1) {
+                    RxHttp.postEncryptJson(ComParamContact.Main.getCumulativeSignRewards).asResponse(String.class).subscribe(s -> {
+                        String result = AESUtil.decrypt(s, AESUtil.KEY);
+                        Tip.show("领取成功");
+                    }, (OnError) error -> {
+                        error.show();
+                    });
+                }
             }
 
             @Override
@@ -211,28 +271,6 @@ public class SignInRewardActivity extends BaseActivity {
                 return false;
             }
         });
-
-
-        RlvManagerUtils.createLinearLayout(this, rlvWelfare);
-        welfareList.add(new WelfareBean());
-        welfareList.add(new WelfareBean());
-        welfareList.add(new WelfareBean());
-        welfareAdapter = new CommonAdapter<WelfareBean>(this, R.layout.item_welfare, welfareList) {
-
-            @Override
-            protected void convert(ViewHolder holder, WelfareBean welfareBean, int position) {
-                if (position == 0) {
-                    holder.setText(R.id.tv_title, "累计签到30天");
-                }
-                if (position == 1) {
-                    holder.setText(R.id.tv_title, "累计签到100天");
-                }
-                if (position == 2) {
-                    holder.setText(R.id.tv_title, "累计签到200天");
-                }
-            }
-        };
-        rlvWelfare.setAdapter(welfareAdapter);
     }
 
     @Override
@@ -242,13 +280,42 @@ public class SignInRewardActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.rl_back, R.id.tv_submit})
+    @OnClick({R.id.rl_back, R.id.tv_submit, R.id.tv_take, R.id.tv_take7})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rl_back:
                 finish();
                 break;
             case R.id.tv_submit:
+
+                break;
+            case R.id.tv_take:
+                if (continuityList == null) return;
+                if (continuityList.get(2).getIsReceive() == 0) {
+                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(SignInRewardActivity.this, continuityList.get(2).getDoubleGold(), continuityList.get(2).getBoxId() + "", new ReceiveGoldDialog.ReceiveCallback() {
+                        @Override
+                        public void receive(int flag, String applyId) {
+                            //开启激励视频
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    Tip.show("不能领取");
+                }
+                break;
+            case R.id.tv_take7:
+                if (continuityList == null) return;
+                if (continuityList.get(6).getIsReceive() == 0) {
+                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(SignInRewardActivity.this, continuityList.get(6).getDoubleGold(), continuityList.get(6).getBoxId() + "", new ReceiveGoldDialog.ReceiveCallback() {
+                        @Override
+                        public void receive(int flag, String applyId) {
+                            //开启激励视频
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    Tip.show("不能领取");
+                }
                 break;
         }
     }

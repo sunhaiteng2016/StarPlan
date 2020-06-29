@@ -14,12 +14,15 @@ import android.widget.TextView;
 import androidx.core.content.FileProvider;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.entity.ErrorInfo;
 import com.boniu.starplan.entity.TaskDetailsModel;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
+import com.boniu.starplan.utils.OpenApp;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
@@ -66,7 +69,8 @@ public class TryToEarnDetailsActivity extends BaseActivity {
     TextView tvStartPlay;
     @BindView(R.id.tv_receive_rewards)
     TextView tvReceiveRewards;
-    private int taskId;
+    private int taskId, userTaskId;
+    private TaskDetailsModel taskDetailsModel;
 
     @Override
     public int getLayoutId() {
@@ -76,21 +80,33 @@ public class TryToEarnDetailsActivity extends BaseActivity {
     @Override
     public void init() {
         taskId = getIntent().getIntExtra("taskId", -1);
+        userTaskId = getIntent().getIntExtra("userTaskId", -1);
         tvBarTitle.setText("试玩赚详情");
-        TimerUtils.startTimerHour(this, tvTime);
         getData();
+        tvReceiveRewards.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RxHttp.postEncryptJson(ComParamContact.Main.TASk_END).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {
+                    String result = AESUtil.decrypt(s, AESUtil.KEY);
+                    Log.e("", "");
+                }, (OnError) error -> {
+                    error.show();
+                });
+            }
+        });
     }
 
     private void getData() {
-        RxHttp.postEncryptJson(ComParamContact.Main.getTask).add("id", taskId).add("type", "1").asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.GET_TASK).add("userTaskId", userTaskId).add("type", "1").asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
-            TaskDetailsModel taskDetailsModel = new Gson().fromJson(result, TaskDetailsModel.class);
+            taskDetailsModel = new Gson().fromJson(result, TaskDetailsModel.class);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    tvTitle.setText(taskDetailsModel.getMainTitle());
-                    tvDes.setText(taskDetailsModel.getSubTitle());
-                    tvNumberGold.setText(taskDetailsModel.getIncome());
+                    tvTitle.setText(taskDetailsModel.getTaskDetailVO().getMainTitle());
+                    tvDes.setText(taskDetailsModel.getTaskDetailVO().getSubTitle());
+                    tvNumberGold.setText(taskDetailsModel.getIncome() + "");
+                    TimerUtils.startTimerHour(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getDurableTime(), tvTime);
                 }
             });
         }, error -> {
@@ -104,25 +120,50 @@ public class TryToEarnDetailsActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
-
-    @OnClick({R.id.rl_back, R.id.tv_start_down, R.id.tv_start_play, R.id.tv_receive_rewards})
+    @OnClick({R.id.rl_back, R.id.tv_start_down, R.id.tv_start_play})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rl_back:
                 finish();
                 break;
             case R.id.tv_start_down:
-                if (true) {
-                    //有链接
+                if (taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAddrType() == 1) {
+                    if (OpenApp.isMobile_spExist(this)) {
+                        OpenApp.channelUrl(this, "com.boniu.qushuiyin");
+                    } else {
+                        String url = "https://sj.qq.com/myapp/detail.htm?apkName=com.boniu.qushuiyin";
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        startActivity(browserIntent);
+                    }
                 } else {
                     downLoadApp();
                 }
+                tvStartPlay.setBackgroundResource(R.drawable.shape_round_green_16);
+                tvStartPlay.setEnabled(true);
                 break;
             case R.id.tv_start_play:
+                //检查 是否下载了app
+                if (OpenApp.isInstalled(TryToEarnDetailsActivity.this, "com.boniu.qushuiyin")) {
+                    //还要开始任务
+                    RxHttp.postEncryptJson(ComParamContact.Main.TASK_BEGIN).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {
+                        String result = AESUtil.decrypt(s, AESUtil.KEY);
+                        Log.e("", "");
+                        if (result.equals("1")) {
+                            tvReceiveRewards.setBackgroundResource(R.drawable.shape_round_16_red);
+                            tvReceiveRewards.setEnabled(true);
+                            OpenApp.OpenApp(this, "com.boniu.qushuiyin");
+                        }else{
+                            Tip.show("开始失败，请重试！");
+                        }
+                    }, (OnError) error -> {
+                        error.show();
+                    });
 
+                } else {
+                    Tip.show("请安装后，在试玩！");
+                }
                 break;
-            case R.id.tv_receive_rewards:
-                break;
+
         }
     }
 
@@ -140,24 +181,12 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                 .subscribe(s -> {
                     //下载完成，处理相关逻辑
                     //安装app
-                    installApk(new File(destPath));
+                    OpenApp.checkInstallApkPermission(this, destPath);
                 }, (OnError) error -> {
                     //下载失败，处理相关逻辑
                     Tip.show("下载失败,请稍后再试!");
                 });
     }
 
-    private void installApk(File apk) {
-        Uri uri = null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            uri = Uri.fromFile(apk);
-        } else {
-            uri = FileProvider.getUriForFile(mContext, mContext.getPackageName() + ".fileprovider", apk);
-        }
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(uri, "application/vnd.android.package-archive");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        mContext.startActivity(intent);
-    }
+
 }

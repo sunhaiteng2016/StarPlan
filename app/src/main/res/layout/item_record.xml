@@ -15,16 +15,15 @@
 
         <TextView
             android:id="@+id/tv_title"
+            android:text="提现到支付宝"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="提现到支付宝"
             android:textColor="@color/text_33"
             android:textSize="14sp" />
 
         <TextView
             android:layout_centerVertical="true"
             android:textSize="12sp"
-            android:text="支付报提现异常"
             android:id="@+id/tv_err"
             android:textColor="#666"
             android:layout_width="wrap_content"
@@ -33,10 +32,10 @@
             android:layout_toRightOf="@+id/tv_title" />
 
         <TextView
+            android:id="@+id/tv_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="10元"
             android:textColor="@color/text_33"
             android:textStyle="bold" />
     </RelativeLayout>
@@ -47,17 +46,17 @@
         android:layout_marginTop="@dimen/dp6">
 
         <TextView
+            android:id="@+id/tv_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5月10号 17:00:34"
             android:textColor="@color/text_33"
             android:textSize="12sp" />
 
         <TextView
+            android:id="@+id/tv_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="审核中"
             android:textColor="#fffa6400"
             android:textSize="12sp" />
     </RelativeLayout>

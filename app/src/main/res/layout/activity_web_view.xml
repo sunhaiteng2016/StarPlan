@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context=".ui.WebViewActivity">
 
-    <include layout="@layout/public_tool_bar" />
+    <include layout="@layout/tool_bar" />
 
     <WebView
         android:id="@+id/web_view"

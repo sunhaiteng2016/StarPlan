@@ -88,7 +88,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,18 +101,25 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
 
-            <ImageView
-                android:id="@+id/iv_app_icon"
-                android:layout_width="@dimen/dp40"
-                android:layout_height="@dimen/dp40"
-                android:src="@mipmap/bb" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card"
+                app:cardCornerRadius="@dimen/dp8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_app_icon"
+                    android:layout_width="@dimen/dp40"
+                    android:layout_height="@dimen/dp40"
+                    android:src="@mipmap/bb" />
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@+id/iv_app_icon"
+                android:layout_toRightOf="@+id/card"
                 android:text="童话故事社"
                 android:textColor="@color/text_33"
                 android:textSize="14sp"
@@ -126,8 +132,8 @@
                 android:layout_below="@+id/tv_title"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="4dp"
+                android:layout_toRightOf="@+id/card"
                 android:maxLines="2"
-                android:layout_toRightOf="@+id/iv_app_icon"
                 android:text="教育儿童的好帮手"
                 android:textColor="@color/text_33"
                 android:textSize="12sp" />
@@ -190,6 +196,7 @@
             android:paddingRight="15dp"
             android:paddingBottom="6dp"
             android:text="开始试玩"
+            android:enabled="false"
             android:textColor="@color/white" />
 
     </LinearLayout>
@@ -220,6 +227,7 @@
             android:textSize="14sp" />
 
         <TextView
+            android:enabled="false"
             android:id="@+id/tv_receive_rewards"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -227,7 +235,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="right"
             android:layout_marginTop="15dp"
-            android:background="@drawable/shape_round_16_red"
+            android:background="@drawable/shape_round_hui_16"
             android:paddingLeft="15dp"
             android:paddingTop="6dp"
             android:paddingRight="15dp"
