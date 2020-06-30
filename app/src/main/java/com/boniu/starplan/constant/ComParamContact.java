@@ -53,6 +53,7 @@ public class ComParamContact {
         public final static String UPDATE_LOAD_HEAD_PHOTO = "api/user/uploadHeadPhoto";
         //查询用户信息
         public final static String getUserInfo = "api/user/getUserInfo";
+        public final static String isNewUserAndGetGoldWithoutToken = "api/sign/isNewUserAndGetGoldWithoutToken";
 
         /**
          * 签到模块
@@ -63,6 +64,7 @@ public class ComParamContact {
         public final static String getSignAmount = "api/sign/getSignAmount";
         //获取累计签到奖励
         public final static String getCumulativeSignRewards = "api/sign/getCumulativeSignRewards";
+
         public final static String isGetCumulativeSignRewards = "api/sign/isGetCumulativeSignRewards";
         //签到
         public final static String GET_SIGN = "api/sign/signIn";
@@ -84,8 +86,8 @@ public class ComParamContact {
         public final static String GET_TASK = "api/task/user/getTask";
         //用户进行中的任务
         public final static String List_to_Do = "api/task/user/listToDo";
-        //提交审核资料
-        public final static String SUBMIT_AUDIT = "api/task/user/submitAudit";
+        //任务翻倍
+        public final static String addPrepositionDouble = "api/task/user/addPrepositionDouble";
 
         /**
          * 宝箱相关

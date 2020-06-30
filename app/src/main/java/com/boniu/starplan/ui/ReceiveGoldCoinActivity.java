@@ -84,8 +84,6 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
     private int runTaskId;
     private int clickTaskId;
     private LoadingDialog loadingDialog1;
-    private LoadingDialog loadingDialog2;
-    private LoadingDialog loadingDialog3;
 
     @Override
     public int getLayoutId() {
@@ -95,6 +93,8 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
     @Override
     public void init() {
         tvBarTitle.setText("领金币");
+        tvSubmit.setVisibility(View.VISIBLE);
+        tvSubmit.setText("审核进度");
         initView();
         loadingDialog1 = new LoadingDialog(this);
         loadingDialog1.show();
@@ -141,7 +141,9 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
                         });
                     }
                     GlideUtils.getInstance().LoadContextRoundBitmap(ReceiveGoldCoinActivity.this, runningTaskModel.getIcon(), ivTaskImg, 8);
-                    TimerUtils.startTimerHour(ReceiveGoldCoinActivity.this, runningTaskModel.getExpiryTime(), tvTime);
+                    long curTime = System.currentTimeMillis();
+                    long timers = runningTaskModel.getExpiryTime() - curTime;
+                    TimerUtils.startTimerHour(ReceiveGoldCoinActivity.this, timers, tvTime);
                     tvTitle.setText(runningTaskModel.getMainTitle());
                     tvDes.setText(runningTaskModel.getSubTitle());
                 }
@@ -219,8 +221,7 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
      * @param
      */
     private void GiveUpTask() {
-        loadingDialog3 = new LoadingDialog(ReceiveGoldCoinActivity.this);
-        loadingDialog3.show();
+        loadingDialog1.show();
         RxHttp.postEncryptJson(ComParamContact.Main.giveUp).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             //放弃成功
@@ -229,12 +230,13 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        loadingDialog3.dismiss();
+                        loadingDialog1.dismiss();
                         //是否开始新的任务
                         RunningTaskDialog dialog = new RunningTaskDialog(ReceiveGoldCoinActivity.this, 2, new RunningTaskDialog.RunningCallback() {
                             @Override
                             public void running() {
                                 isRunningTask = false;
+                                rlRunningTask.setVisibility(View.GONE);
                                 ReceiveTask(clickTaskId);
                             }
                         });
@@ -251,7 +253,7 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    loadingDialog3.dismiss();
+                    loadingDialog1.dismiss();
                 }
             });
         });
@@ -263,8 +265,7 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
      * @param taskId
      */
     private void ReceiveTask(int taskId) {
-        loadingDialog2 = new LoadingDialog(ReceiveGoldCoinActivity.this);
-        loadingDialog2.show();
+        loadingDialog1.show();
         RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             ApplyTask applyTask = new Gson().fromJson(result, ApplyTask.class);
@@ -272,7 +273,7 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    loadingDialog2.dismiss();
+                    loadingDialog1.dismiss();
                     if (applyTask.isIsSucceed()) {
 
                         ARouter.getInstance().build("/ui/ReceiveGoldDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
@@ -290,7 +291,7 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    loadingDialog2.dismiss();
+                    loadingDialog1.dismiss();
                 }
             });
             error.show();
@@ -312,9 +313,7 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.tv_submit:
-                loadingDialog1.show();
-                page = 1;
-                getData();
+                ARouter.getInstance().build("/ui/ReviewProgressActivity").navigation();
                 break;
         }
     }

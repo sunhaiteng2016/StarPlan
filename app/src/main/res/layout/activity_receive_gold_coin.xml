@@ -185,6 +185,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </com.scwang.smart.refresh.layout.SmartRefreshLayout>
+        <include
+            android:visibility="gone"
+            layout="@layout/public_look_video_button" />
     </LinearLayout>
 
 </RelativeLayout>

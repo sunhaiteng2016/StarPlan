@@ -23,9 +23,14 @@ import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.base.Response;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.ReceiveGoldDialog5;
 import com.boniu.starplan.entity.ApplyTask;
+import com.boniu.starplan.entity.ImgUpLoadModel;
+import com.boniu.starplan.entity.SubmitAuditModel;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
+import com.boniu.starplan.utils.GlideUtils;
+import com.boniu.starplan.utils.PathFromUri;
 import com.boniu.starplan.utils.StringUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
@@ -89,7 +94,7 @@ public class FinishRegisterActivity extends BaseActivity {
 
     @Override
     public void init() {
-        tvBarTitle.setText("完成注册");
+        tvBarTitle.setText("提交资料");
         userTaskId = getIntent().getIntExtra("userTaskId", -1);
     }
 
@@ -134,17 +139,30 @@ public class FinishRegisterActivity extends BaseActivity {
                     Tip.show("请选择图片");
                     return;
                 }
-                List<userTaskImgsSaveParamSet> image = new ArrayList<>();
-                image.add(new userTaskImgsSaveParamSet(img1, 1 + ""));
-                image.add(new userTaskImgsSaveParamSet(img1, 2 + ""));
-                String newJson = new Gson().toJson(image);
+                SubmitAuditModel submitAuditModel = new SubmitAuditModel();
+                submitAuditModel.setUserMobile(phone);
+                submitAuditModel.setUserName(name);
+                submitAuditModel.setSubmitAudit(content);
+                submitAuditModel.setUserTaskId(userTaskId);
+                List<SubmitAuditModel.UserTaskImgsSaveParamSetBean> image = new ArrayList<>();
+                SubmitAuditModel.UserTaskImgsSaveParamSetBean bean = new SubmitAuditModel.UserTaskImgsSaveParamSetBean();
+                bean.setImgUrl(img1);
+                bean.setOrder(1);
+                SubmitAuditModel.UserTaskImgsSaveParamSetBean bean1 = new SubmitAuditModel.UserTaskImgsSaveParamSetBean();
+                bean1.setImgUrl(img2);
+                bean1.setOrder(2);
+                image.add(bean);
+                image.add(bean1);
+                submitAuditModel.setUserTaskImgsSaveParamSet(image);
+                String newJson = new Gson().toJson(submitAuditModel);
                 //phone
-                RxHttp.postEncryptJson(ComParamContact.Main.submitAudit).add("userMobile", phone).add("userName", name).add("submitAudit", content).add("userTaskId", userTaskId).add("userTaskImgsSaveParamSet", newJson).asResponse(String.class).subscribe(s -> {
+                RxHttp.postEncryptJson(ComParamContact.Main.submitAudit).addAll(newJson).asResponse(String.class).subscribe(s -> {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);
                     Log.e("", "");
+                    ReceiveGoldDialog5 dialog5 = new ReceiveGoldDialog5(this);
+                    dialog5.show();
                 }, (OnError) error -> {
                     error.show();
-
                 });
                 break;
             case R.id.rl_ex1:
@@ -178,14 +196,16 @@ public class FinishRegisterActivity extends BaseActivity {
         if (requestCode == 10086 && resultCode == RESULT_OK) {
             mSelected = Matisse.obtainResult(data);
             iv1 = mSelected.get(0);
+            GlideUtils.getInstance().LoadContextRoundBitmap(this, PathFromUri.getPathFromUri(this, iv1), ivEx1, 8);
             RxHttp.postForm(ComParamContact.Main.uploadAudit)
                     .addFile("file", getFileFromUri(iv1, this))
                     .asResponse(String.class) //from操作符，是异步操作
                     .to(RxLife.toMain(this))  //感知生命周期，并在主线程回调
                     .subscribe(s -> {
                         //成功回调
-                        img1 = AESUtil.decrypt(s, AESUtil.KEY);
-                        Log.e("","");
+                        String result = AESUtil.decrypt(s, AESUtil.KEY);
+                        ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
+                        img1 = imgUpLoadModel.getValue();
                     }, (OnError) error -> {
                         //失败回调
                         error.show("上传失败,请稍后再试!");
@@ -194,14 +214,17 @@ public class FinishRegisterActivity extends BaseActivity {
         if (requestCode == 10087 && resultCode == RESULT_OK) {
             mSelected7 = Matisse.obtainResult(data);
             iv2 = mSelected7.get(0);
+            GlideUtils.getInstance().LoadContextRoundBitmap(this, PathFromUri.getPathFromUri(this, iv2), ivEx2, 8);
             RxHttp.postForm(ComParamContact.Main.uploadAudit)
                     .addFile("file", getFileFromUri(iv1, this))
                     .asResponse(String.class) //from操作符，是异步操作
                     .to(RxLife.toMain(this))  //感知生命周期，并在主线程回调
                     .subscribe(s -> {
                         //成功回调
-                        img2 = AESUtil.decrypt(s, AESUtil.KEY);
-                        Log.e("","");
+                        String result = AESUtil.decrypt(s, AESUtil.KEY);
+                        ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
+                        img2 = imgUpLoadModel.getValue();
+                        Log.e("", "");
                     }, (OnError) error -> {
                         //失败回调
                         error.show("上传失败,请稍后再试!");

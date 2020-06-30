@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/dp4"
-            android:layout_marginTop="@dimen/dp19"
+            android:layout_marginTop="@dimen/dp23"
             android:layout_toRightOf="@+id/card"
             android:maxLength="10"
             android:text="童话故事社"
@@ -81,7 +81,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dp4"
-                    android:text="6000"
                     android:textColor="@color/text_33"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -92,73 +91,83 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:text="倒计时  50:24"
                 android:textColor="@color/text_33"
                 android:textSize="12sp" />
         </LinearLayout>
     </RelativeLayout>
 
-    <TextView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/dp10"
-        android:text="玩法介绍"
-        android:textColor="@color/text_33"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_play_sm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/dp16"
-        android:layout_marginTop="@dimen/dp8"
-        android:layout_marginRight="@dimen/dp16"
-        android:background="@color/fffef9eb"
-        android:padding="@dimen/dp8"
-        android:text="林的部习根出史开路调且办严重劳建厂当属路细元高当查示角下标力切场任切把车市红必民规立选公般那电时新决自决人家期意每打完设当层党北真"
-        android:textColor="#B66119"
-        android:textSize="12sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <WebView
-        android:id="@+id/web_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/dp16"
-        android:layout_marginTop="@dimen/dp8"
-        android:layout_marginRight="@dimen/dp16" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rlv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/dp16"
-        android:layout_marginTop="@dimen/dp8"
-        android:layout_marginRight="@dimen/dp16" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/dp10"
+                android:text="玩法介绍"
+                android:textColor="@color/text_33"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/tv_start_task"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp44"
-        android:layout_marginLeft="@dimen/dp16"
-        android:layout_marginTop="@dimen/dp42"
-        android:layout_marginRight="@dimen/dp16"
-        android:background="@drawable/shape_round_22_red"
-        android:gravity="center"
-        android:text="开始任务"
-        android:textColor="@color/white"
-        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tv_play_sm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp16"
+                android:layout_marginTop="@dimen/dp8"
+                android:layout_marginRight="@dimen/dp16"
+                android:background="@color/fffef9eb"
+                android:padding="@dimen/dp8"
+                android:textColor="#B66119"
+                android:textSize="12sp" />
 
-    <TextView
-        android:id="@+id/tv_end_task"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp44"
-        android:layout_marginLeft="@dimen/dp16"
-        android:layout_marginTop="@dimen/dp15"
-        android:layout_marginRight="@dimen/dp16"
-        android:background="@drawable/shape_board_f3_22"
-        android:gravity="center"
-        android:text="完成注册"
-        android:textColor="#999"
-        android:textSize="16sp" />
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp16"
+                android:layout_marginTop="@dimen/dp8"
+                android:layout_marginRight="@dimen/dp16" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rlv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp16"
+                android:layout_marginTop="@dimen/dp8"
+                android:layout_marginRight="@dimen/dp16" />
+
+            <TextView
+                android:id="@+id/tv_start_task"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp44"
+                android:layout_marginLeft="@dimen/dp16"
+                android:layout_marginTop="@dimen/dp42"
+                android:layout_marginRight="@dimen/dp16"
+                android:background="@drawable/shape_round_22_red"
+                android:gravity="center"
+                android:text="开始任务"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_end_task"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp44"
+                android:layout_marginLeft="@dimen/dp16"
+                android:layout_marginTop="@dimen/dp15"
+                android:layout_marginRight="@dimen/dp16"
+                android:background="@drawable/shape_board_f3_22"
+                android:gravity="center"
+                android:text="完成任务"
+                android:textColor="#999"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

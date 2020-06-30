@@ -18,11 +18,16 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.ReceiveGoldDialog;
+import com.boniu.starplan.dialog.ReceiveGoldDialog2;
+import com.boniu.starplan.dialog.ReceiveGoldDialog4;
 import com.boniu.starplan.entity.ErrorInfo;
 import com.boniu.starplan.entity.TaskDetailsModel;
+import com.boniu.starplan.entity.TaskSuccessModel;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.OpenApp;
+import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
@@ -88,7 +93,25 @@ public class TryToEarnDetailsActivity extends BaseActivity {
             public void onClick(View view) {
                 RxHttp.postEncryptJson(ComParamContact.Main.TASk_END).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);
-                    Log.e("", "");
+                    TaskSuccessModel taskSuccessModel = new Gson().fromJson(result, TaskSuccessModel.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (taskSuccessModel.isIsDouble()) {
+                                //如果翻倍
+                                ReceiveGoldDialog4 dialog4 = new ReceiveGoldDialog4(TryToEarnDetailsActivity.this, 100, taskSuccessModel.getApplyId(), new ReceiveGoldDialog4.ReceiveCallback() {
+                                    @Override
+                                    public void receive(int flag, String applyId) {
+
+                                    }
+                                });
+                                dialog4.show();
+                            } else {
+                                ReceiveGoldDialog2 dialog2 = new ReceiveGoldDialog2(TryToEarnDetailsActivity.this);
+                                dialog2.show();
+                            }
+                        }
+                    });
                 }, (OnError) error -> {
                     error.show();
                 });
@@ -106,7 +129,14 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     tvTitle.setText(taskDetailsModel.getTaskDetailVO().getMainTitle());
                     tvDes.setText(taskDetailsModel.getTaskDetailVO().getSubTitle());
                     tvNumberGold.setText(taskDetailsModel.getIncome() + "");
-                    TimerUtils.startTimerHour(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getDurableTime(), tvTime);
+                    long curTime = System.currentTimeMillis();
+                    long timers = taskDetailsModel.getExpiryTime() - curTime;
+                    TimerUtils.startTimerHour1(TryToEarnDetailsActivity.this, timers, tvTime);
+                    int taskID = SPUtils.getInstance().getInt("taskID");
+                    if (taskId == taskID) {
+                        tvStartPlay.setBackgroundResource(R.drawable.shape_round_green_22);
+                        tvStartPlay.setTextColor(TryToEarnDetailsActivity.this.getResources().getColor(R.color.white));
+                    }
                 }
             });
         }, error -> {
@@ -144,19 +174,20 @@ public class TryToEarnDetailsActivity extends BaseActivity {
             case R.id.tv_start_play:
                 //检查 是否下载了app
                 if (OpenApp.isInstalled(TryToEarnDetailsActivity.this, "com.boniu.qushuiyin")) {
+                    tvReceiveRewards.setBackgroundResource(R.drawable.shape_round_16_red);
+                    tvReceiveRewards.setEnabled(true);
+                    SPUtils.getInstance().put("taskID", taskId);
                     //还要开始任务
                     RxHttp.postEncryptJson(ComParamContact.Main.TASK_BEGIN).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {
                         String result = AESUtil.decrypt(s, AESUtil.KEY);
-                        Log.e("", "");
                         if (result.equals("1")) {
-                            tvReceiveRewards.setBackgroundResource(R.drawable.shape_round_16_red);
-                            tvReceiveRewards.setEnabled(true);
                             OpenApp.OpenApp(this, "com.boniu.qushuiyin");
-                        }else{
+                        } else {
                             Tip.show("开始失败，请重试！");
                         }
                     }, (OnError) error -> {
                         error.show();
+                        OpenApp.OpenApp(this, "com.boniu.qushuiyin");
                     });
 
                 } else {

@@ -1,5 +1,6 @@
 package com.boniu.starplan.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.widget.TextView;
@@ -91,5 +92,32 @@ public class TimerUtils {
         }.start();
 
     }
+    public static void startTimerHour1(Activity context, long times, final TextView tvCode) {
+        new CountDownTimer(times, 1000) {
+            public void onTick(long millisUntilFinished) {
+                String minutes = "";
+                String seconds = "";
+                long day = millisUntilFinished / (1000 * 60 * 60 * 24);//单位天
+                long hour = (millisUntilFinished - day * (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);//单位时
+                long minute = (millisUntilFinished - day * (1000 * 60 * 60 * 24) - hour * (1000 * 60 * 60)) / (1000 * 60);//单位发
+                long second = (millisUntilFinished - day * (1000 * 60 * 60 * 24) - hour * (1000 * 60 * 60) - minute * (1000 * 60)) / 1000;//单位发
+                if (minute < 10) {
+                    minutes = "0" + minute;
+                } else {
+                    minutes = minute + "";
+                }
+                if (second < 10) {
+                    seconds = "0" + second;
+                } else {
+                    seconds = second + "";
+                }
+                tvCode.setText("倒计时:" + minutes + ":" + seconds);
+            }
 
+            public void onFinish() {
+                context.finish();
+            }
+        }.start();
+
+    }
 }

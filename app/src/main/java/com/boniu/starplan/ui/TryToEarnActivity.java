@@ -74,8 +74,6 @@ public class TryToEarnActivity extends BaseActivity {
     TextView tvTime;
     @BindView(R.id.rl_running_task)
     LinearLayout rlRunningTask;
-    @BindView(R.id.loadingView)
-    LoadingView loadingView;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     private int page = 1;
@@ -88,8 +86,6 @@ public class TryToEarnActivity extends BaseActivity {
     private int runTaskId;
     private int clickTaskId;
     private LoadingDialog loadingDialog1;
-    private LoadingDialog loadingDialog2;
-    private LoadingDialog loadingDialog3;
 
     @Override
     public int getLayoutId() {
@@ -98,9 +94,9 @@ public class TryToEarnActivity extends BaseActivity {
 
     @Override
     public void init() {
-        tvSubmit.setVisibility(View.VISIBLE);
+        tvSubmit.setVisibility(View.GONE);
+        tvSubmit.setText("审核进度");
         tvBarTitle.setText("试玩赚");
-        tvSubmit.setText("刷新");
         initView();
         loadingDialog1 = new LoadingDialog(this);
         loadingDialog1.show();
@@ -119,7 +115,6 @@ public class TryToEarnActivity extends BaseActivity {
                 @Override
                 public void run() {
                     loadingDialog1.dismiss();
-                    loadingView.setVisibility(View.GONE);
                     adapter.notifyDataSetChanged();
                 }
             });
@@ -147,7 +142,9 @@ public class TryToEarnActivity extends BaseActivity {
                         });
                     }
                     GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnActivity.this, runningTaskModel.getIcon(), ivTaskImg, 8);
-                    TimerUtils.startTimerHour(TryToEarnActivity.this, runningTaskModel.getExpiryTime(), tvTime);
+                    long curTime = System.currentTimeMillis();
+                    long timers = runningTaskModel.getExpiryTime() - curTime;
+                    TimerUtils.startTimerHour(TryToEarnActivity.this, timers, tvTime);
                     tvTitle.setText(runningTaskModel.getMainTitle());
                     tvDes.setText(runningTaskModel.getSubTitle());
                 }
@@ -215,8 +212,7 @@ public class TryToEarnActivity extends BaseActivity {
      * @param
      */
     private void GiveUpTask() {
-        loadingDialog3 = new LoadingDialog(TryToEarnActivity.this);
-        loadingDialog3.show();
+        loadingDialog1.show();
         RxHttp.postEncryptJson(ComParamContact.Main.giveUp).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             //放弃成功
@@ -225,12 +221,13 @@ public class TryToEarnActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        loadingDialog3.dismiss();
+                        loadingDialog1.dismiss();
                         //是否开始新的任务
                         RunningTaskDialog dialog = new RunningTaskDialog(TryToEarnActivity.this, 2, new RunningTaskDialog.RunningCallback() {
                             @Override
                             public void running() {
                                 isRunningTask = false;
+                                rlRunningTask.setVisibility(View.GONE);
                                 ReceiveTask(clickTaskId);
                             }
                         });
@@ -247,7 +244,7 @@ public class TryToEarnActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    loadingDialog3.dismiss();
+                    loadingDialog1.dismiss();
                 }
             });
         });
@@ -259,8 +256,7 @@ public class TryToEarnActivity extends BaseActivity {
      * @param taskId
      */
     private void ReceiveTask(int taskId) {
-        loadingDialog2 = new LoadingDialog(TryToEarnActivity.this);
-        loadingDialog2.show();
+        loadingDialog1.show();
         RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             ApplyTask applyTask = new Gson().fromJson(result, ApplyTask.class);
@@ -268,7 +264,7 @@ public class TryToEarnActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    loadingDialog2.dismiss();
+                    loadingDialog1.dismiss();
                     if (applyTask.isIsSucceed()) {
                         Tip.showCancer1("领取成功，跳转中。。。");
                         ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
@@ -287,7 +283,7 @@ public class TryToEarnActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    loadingDialog2.dismiss();
+                    loadingDialog1.dismiss();
                 }
             });
         });
@@ -312,4 +308,9 @@ public class TryToEarnActivity extends BaseActivity {
         getData();
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        getData();
+    }
 }

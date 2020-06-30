@@ -26,9 +26,12 @@ import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.RlvManagerUtils;
+import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.StringUtils;
+import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
+import com.liji.imagezoom.util.ImageZoom;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
@@ -78,6 +81,7 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
     private CommonAdapter<ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean> adapter;
     private int taskId, userTaskId;
     private ReceiveGoldModel receiveGoldModel;
+    private List<String> zoomList = new ArrayList<>();
 
     @Override
     public int getLayoutId() {
@@ -89,8 +93,7 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
         taskId = getIntent().getIntExtra("taskId", -1);
         userTaskId = getIntent().getIntExtra("userTaskId", -1);
         tvBarTitle.setText("领金币详情");
-        tvSubmit.setText("审核进度");
-        tvSubmit.setVisibility(View.VISIBLE);
+        tvSubmit.setVisibility(View.GONE);
         initView();
         initWebView();
         getData();
@@ -135,12 +138,24 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                     GlideUtils.getInstance().LoadContextRoundBitmap(ReceiveGoldDetailsActivity.this, receiveGoldModel.getTaskDetailVO().getIcon(), ivImg, 8);
                     tvName.setText(receiveGoldModel.getTaskDetailVO().getMainTitle());
                     tvDes.setText(receiveGoldModel.getTaskDetailVO().getSubTitle());
-                    tvPlaySm.setText(auditTaskVO.getMajorDesc());
+                    tvPlaySm.setText(receiveGoldModel.getTaskDetailVO().getMajorDesc());
                     webView.loadDataWithBaseURL(null, auditTaskVO.getShowDesc(), "text/html", "utf-8", null);
                     tvGoldNum.setText(receiveGoldModel.getIncome() + "");
                     imgList.clear();
                     imgList.addAll(taskImgVo);
+                    for (ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean bean : imgList) {
+                        zoomList.add(bean.getImgUrl());
+                    }
                     adapter.notifyDataSetChanged();
+                    long curTime = System.currentTimeMillis();
+                    long timers = receiveGoldModel.getExpiryTime() - curTime;
+                    TimerUtils.startTimerHour1(ReceiveGoldDetailsActivity.this, timers, tvNumTime);
+                    //在这里检查是否开始过任务
+                    int taskID = SPUtils.getInstance().getInt("taskID");
+                    if (taskId == taskID) {
+                        tvEndTask.setBackgroundResource(R.drawable.shape_round_green_22);
+                        tvEndTask.setTextColor(ReceiveGoldDetailsActivity.this.getResources().getColor(R.color.white));
+                    }
                 }
             });
         }, (OnError) error -> {
@@ -154,7 +169,8 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean imgListModel, int position) {
-                holder.setText(R.id.tv_position, position + "");
+                int num = position + 1;
+                holder.setText(R.id.tv_position, num + "");
                 GlideUtils.getInstance().LoadContextRoundBitmap(ReceiveGoldDetailsActivity.this, imgListModel.getImgUrl(), holder.getView(R.id.iv_img), 8);
             }
         };
@@ -162,7 +178,7 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
         adapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
-
+                ImageZoom.show(ReceiveGoldDetailsActivity.this, i, zoomList);
             }
 
             @Override
@@ -186,6 +202,7 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
             case R.id.tv_start_task:
                 //外链
                 if (!StringUtils.isEmpty(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl())) {
+                    SPUtils.getInstance().put("taskID", taskId);
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl()));
                     startActivity(browserIntent);
                 } else {
@@ -193,13 +210,13 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                 }
                 break;
             case R.id.tv_end_task:
-                ARouter.getInstance().build("/ui/FinishRegisterActivity").navigation();
+                ARouter.getInstance().build("/ui/FinishRegisterActivity").withInt("userTaskId", userTaskId).navigation();
                 break;
             case R.id.rl_back:
                 finish();
                 break;
             case R.id.tv_submit:
-                ARouter.getInstance().build("/ui/ReviewProgressActivity").navigation();
+
                 break;
         }
     }

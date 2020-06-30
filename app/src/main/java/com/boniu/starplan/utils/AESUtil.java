@@ -36,7 +36,7 @@ public class AESUtil {
             Log.e("参数","参数-->"+new String(result, "UTF-8"));
             return new String(result, "UTF-8");
         } catch (Exception e) {
-            throw new RuntimeException("AES加密异常", e);
+            throw new RuntimeException("AES解密异常", e);
         }
     }
 

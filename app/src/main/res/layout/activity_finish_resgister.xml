@@ -31,6 +31,7 @@
             android:textSize="17sp" />
 
         <EditText
+            android:inputType="phone"
             android:id="@+id/ed_phone"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp40"
@@ -178,7 +179,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
 
-                    <TextView
+                    <ImageView
+                        android:scaleType="centerCrop"
+                        android:id="@+id/iv_ex1"
                         android:layout_width="@dimen/dp56"
                         android:layout_height="@dimen/dp56"
                         android:layout_centerInParent="true"
@@ -187,7 +190,6 @@
                         android:textColor="@color/white" />
 
                     <ImageView
-                        android:id="@+id/iv_ex1"
                         android:layout_width="@dimen/dp18"
                         android:layout_height="@dimen/dp18"
                         android:layout_centerInParent="true"
@@ -227,7 +229,6 @@
                     android:layout_weight="1">
 
                     <ImageView
-                        android:id="@+id/iv_ex2"
                         android:layout_width="@dimen/dp56"
                         android:layout_height="@dimen/dp56"
                         android:layout_centerInParent="true"
@@ -249,16 +250,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
 
-                    <TextView
+                    <ImageView
+                        android:id="@+id/iv_ex2"
+                        android:scaleType="centerCrop"
                         android:layout_width="@dimen/dp56"
                         android:layout_height="@dimen/dp56"
                         android:layout_centerInParent="true"
                         android:background="@drawable/shape_round_withe_8"
                         android:gravity="center"
                         android:textColor="@color/white" />
-
                     <ImageView
-                        android:id="@+id/iv_ex2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"

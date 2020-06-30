@@ -34,7 +34,6 @@
             android:layout_below="@+id/tv_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="21635"
             android:textColor="#ffffffff"
             android:textSize="34sp"
             />
@@ -56,7 +55,6 @@
             android:layout_alignParentBottom="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="可提现金币：21000"
             android:textColor="#ffffffff"
             android:textSize="14sp"
             />
@@ -103,7 +101,6 @@
                     android:layout_marginTop="@dimen/dp8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="89"
                     android:textColor="#ff333333"
                     android:textSize="16sp"
                     />
@@ -131,7 +128,6 @@
                     android:layout_marginTop="@dimen/dp8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="89"
                     android:textColor="#ff333333"
                     android:textSize="16sp"
                     />
@@ -159,7 +155,6 @@
                     android:layout_marginTop="@dimen/dp8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="89"
                     android:textColor="#ff333333"
                     android:textSize="16sp"
                     />

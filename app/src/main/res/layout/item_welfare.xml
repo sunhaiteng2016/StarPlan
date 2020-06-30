@@ -6,24 +6,29 @@
     android:orientation="vertical">
 
     <RelativeLayout
-        android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="87dp">
+        android:layout_height="87dp"
+        android:background="@color/white">
 
         <ImageView
             android:id="@+id/iv_img"
             android:layout_width="match_parent"
             android:layout_height="87dp"
-            android:scaleType="centerCrop"
-            android:src="@mipmap/lxqdbkdj" />
+            android:scaleType="centerCrop" />
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:src="@mipmap/bndj">
+            android:layout_width="@dimen/dp82"
+            android:layout_height="@dimen/dp30"
+            android:layout_alignParentRight="true">
+
+            <ImageView
+                android:id="@+id/iv_bndj"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/bndj" />
 
             <TextView
+                android:textColor="@color/white"
                 android:id="@+id/iv_right"
                 android:layout_width="@dimen/dp82"
                 android:layout_height="@dimen/dp30"
@@ -56,6 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="赠送"
+                    android:textColor="@color/text_33"
                     android:textSize="16sp" />
 
                 <TextView
@@ -66,6 +72,7 @@
                     android:textSize="16sp" />
 
                 <TextView
+                    android:textColor="@color/text_33"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="金币"

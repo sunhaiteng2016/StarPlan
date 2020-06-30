@@ -50,10 +50,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
-                    android:maxLength="14"
+                    android:maxLength="8"
                     android:padding="@dimen/dp2"
                     android:text="刷小视频赚钱"
                     android:textStyle="bold"
+                    android:ellipsize="end"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
 

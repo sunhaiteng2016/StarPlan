@@ -4,12 +4,14 @@ public class CollectTimeModel {
 
 
     /**
-     * finishTime : 1592813222000
+     * finishTime : 1593485889000
+     * income : 38
      * isTake : true
-     * startTime : 1592816634550
+     * startTime : 1593485985174
      */
 
     private long finishTime;
+    private int income;
     private boolean isTake;
     private long startTime;
 
@@ -19,6 +21,14 @@ public class CollectTimeModel {
 
     public void setFinishTime(long finishTime) {
         this.finishTime = finishTime;
+    }
+
+    public int getIncome() {
+        return income;
+    }
+
+    public void setIncome(int income) {
+        this.income = income;
     }
 
     public boolean isIsTake() {

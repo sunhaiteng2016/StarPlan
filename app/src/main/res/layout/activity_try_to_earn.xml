@@ -11,6 +11,7 @@
     tools:context=".ui.TryToEarnActivity">
 
     <LinearLayout
+        android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -179,9 +180,7 @@
                         android:background="@color/white" />
 
 
-                    <include
-                        android:visibility="gone"
-                        layout="@layout/public_look_video_button" />
+
 
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
@@ -191,11 +190,7 @@
                 android:layout_height="wrap_content" />
         </com.scwang.smart.refresh.layout.SmartRefreshLayout>
     </LinearLayout>
-
-    <com.boniu.starplan.view.LoadingView
-        android:id="@+id/loadingView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
+    <include
+        android:visibility="gone"
+        layout="@layout/public_look_video_button" />
 </LinearLayout>

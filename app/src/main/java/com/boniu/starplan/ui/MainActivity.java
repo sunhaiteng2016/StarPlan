@@ -22,7 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.boniu.starplan.ad.ReWardVideoAdUtils;
 import com.boniu.starplan.dialog.LoadingDialog;
+import com.boniu.starplan.dialog.NewPersonDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog2;
 import com.boniu.starplan.dialog.RunningTaskDialog;
@@ -34,6 +36,7 @@ import com.boniu.starplan.entity.CollectTimeModel;
 import com.boniu.starplan.entity.IsSignModel;
 import com.boniu.starplan.entity.LoginInfo;
 import com.boniu.starplan.entity.MainTask;
+import com.boniu.starplan.entity.NewUserInfo;
 import com.boniu.starplan.entity.TimeGoldModel;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.R;
@@ -49,6 +52,7 @@ import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.AnimatorUtil;
 import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.RlvManagerUtils;
+import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
 import com.boniu.starplan.utils.Validator;
@@ -59,6 +63,7 @@ import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -166,11 +171,11 @@ public class MainActivity extends BaseActivity {
     @Override
     public void init() {
         requestMPermission();
-        EverydayLogDialog dialog = new EverydayLogDialog(this);
-        dialog.show();
         loadingDialog = new LoadingDialog(MainActivity.this);
+        loadingDialog.show();
         GlideUtils.getInstance().LoadContextCircleBitmap(this, R.mipmap.touxiang, ivImg);
         //初始化
+        initNewUserInfo();
         initMenuView();
         initUserData();
         initNewUserTaskView();
@@ -181,13 +186,51 @@ public class MainActivity extends BaseActivity {
         tvGerMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                ReWardVideoAdUtils.initAd(MainActivity.this);
             }
         });
-        setStr();
+    }
+
+    /**
+     * 是否新用户
+     */
+    private void initNewUserInfo() {
+        RxHttp.postEncryptJson(ComParamContact.Main.isNewUserAndGetGoldWithoutToken)
+                .asResponse(String.class)
+                .subscribe(s -> {
+                    String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
+                    NewUserInfo userInfo = new Gson().fromJson(resultStr, NewUserInfo.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (userInfo.isIsNewUser()) {
+                                NewPersonDialog dialog = new NewPersonDialog(MainActivity.this);
+                                dialog.show();
+                            } else {
+                                Calendar cd = Calendar.getInstance();
+                                int month = cd.get(Calendar.MONTH) + 1;
+                                int months = SPUtils.getInstance().getInt("month");
+                                boolean isEvery = SPUtils.getInstance().getBoolean("isEvery", true);
+                                if (month != months) {
+                                    EverydayLogDialog dialog = new EverydayLogDialog(MainActivity.this);
+                                    dialog.show();
+                                } else {
+                                    if (isEvery) {
+                                        EverydayLogDialog dialog = new EverydayLogDialog(MainActivity.this);
+                                        dialog.show();
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }, (OnError) error -> {
+                });
 
     }
 
+    /**
+     * 大家都在做
+     */
     private void initWeTaskView() {
         RlvManagerUtils.createLinearLayout(this, rlvWeTask);
         weTaskList.add(new TaskMode());
@@ -198,17 +241,39 @@ public class MainActivity extends BaseActivity {
             @Override
             protected void convert(ViewHolder holder, TaskMode taskMode, int position) {
                 if (position == 0) {
-                    holder.setText(R.id.main_title, "刷小视频赚").setText(R.id.sub_title, "获取一次刷小视频的奖励").setText(R.id.gold, "500");
+                    holder.setText(R.id.main_title, "休闲游戏赚").setText(R.id.sub_title, "闯关玩金币，简单好玩").setText(R.id.gold, "500");
+                    GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.xiuxian, holder.getView(R.id.iv_img), 8);
                 }
                 if (position == 1) {
-                    holder.setText(R.id.main_title, "试玩APP").setText(R.id.sub_title, "点击右侧“去完成”按钮，下载App《童 话故事社》并打开此App，即可领取奖励").setText(R.id.gold, "500");
+                    GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.gaoe, holder.getView(R.id.iv_img), 8);
+                    holder.setText(R.id.main_title, "高额赚钱").setText(R.id.sub_title, "点击右侧“去完成”按钮，下载App《童 话故事社》并打开此App，即可领取奖励").setText(R.id.gold, "500");
                 }
                 if (position == 2) {
-                    holder.setText(R.id.main_title, "玩游戏赚").setText(R.id.sub_title, "点击右侧“去完成”按钮，参与一款游戏 的试玩，即可领取奖励").setText(R.id.gold, "500");
+                    GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.shiwan, holder.getView(R.id.iv_img), 8);
+                    holder.setText(R.id.main_title, "试玩软件赚钱").setText(R.id.sub_title, "点击右侧“去完成”按钮，参与一款游戏 的试玩，即可领取奖励").setText(R.id.gold, "500");
                 }
             }
         };
         rlvWeTask.setAdapter(weTaskAdapter);
+        weTaskAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
+                if (i == 0) {
+
+                }
+                if (i == 1) {
+                    ARouter.getInstance().build("/ui/TryToEarnActivity").navigation();
+                }
+                if (i == 2) {
+                    ARouter.getInstance().build("/ui/ReceiveGoldCoinActivity").navigation();
+                }
+            }
+
+            @Override
+            public boolean onItemLongClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
+                return false;
+            }
+        });
     }
 
     private void initDayTaskView() {
@@ -465,22 +530,18 @@ public class MainActivity extends BaseActivity {
                 if (listBean.isIsSign()) {
                     holder.setTextColor(R.id.tv_circle, mContext.getResources().getColor(R.color.FEC50B));
                     if (listBean.getType().equals("gif")) {
-                        //3/7的状态
-                        if (listBean.getWeekSign() == 3 || listBean.getWeekSign() == 7) {
-
-                            if (listBean.getIsReceive() == 0) {//签到未领取
-                                holder.setVisible(R.id.tv_hb_close, true);
-                                holder.setVisible(R.id.tv_hb_open, false);
-                                holder.setVisible(R.id.tv_circle, false);
-                                ObjectAnimator animator = AnimatorUtil.sway(holder.getView(R.id.tv_hb_close));
-                                animator.setRepeatCount(ValueAnimator.INFINITE);
-                                animator.start();
-                            } else {
-                                holder.setBackgroundRes(R.id.tv_hb_close, R.mipmap.yiqiandao);
-                                holder.setVisible(R.id.tv_hb_open, true);
-                                holder.setVisible(R.id.tv_hb_close, false);
-                                holder.setVisible(R.id.tv_circle, false);
-                            }
+                        if (listBean.getIsReceive() == 0) {//签到未领取
+                            holder.setVisible(R.id.tv_hb_close, true);
+                            holder.setVisible(R.id.tv_hb_open, false);
+                            holder.setVisible(R.id.tv_circle, false);
+                            ObjectAnimator animator = AnimatorUtil.sway(holder.getView(R.id.tv_hb_close));
+                            animator.setRepeatCount(ValueAnimator.INFINITE);
+                            animator.start();
+                        } else {
+                            holder.setBackgroundRes(R.id.tv_hb_close, R.mipmap.yiqiandao);
+                            holder.setVisible(R.id.tv_hb_open, true);
+                            holder.setVisible(R.id.tv_hb_close, false);
+                            holder.setVisible(R.id.tv_circle, false);
                         }
                     } else {
                         //普通状态
@@ -596,6 +657,7 @@ public class MainActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    loadingDialog.dismiss();
                     if (newUserTaskList.size() <= 0) {
                         new_user_title_rl.setVisibility(View.GONE);
                         rlvNewUserTask.setVisibility(View.GONE);
@@ -606,24 +668,7 @@ public class MainActivity extends BaseActivity {
                 }
             });
         }, (OnError) error -> {
-            Log.e("", "");
-        });
-
-        RxHttp.postEncryptJson(ComParamContact.Main.getCollectTaskRecord).add("source", "0").asResponse(String.class).subscribe(s -> {
-            String result = AESUtil.decrypt(s, AESUtil.KEY);
-            TimeGoldModel timeGoldModel = new Gson().fromJson(result, TimeGoldModel.class);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (timeGoldModel.isIsSuccess()) {
-                        getTimer();
-                    } else {
-                        Tip.show("领取失败！");
-                    }
-
-                }
-            });
-        }, error -> {
+            loadingDialog.dismiss();
         });
 
         getTimer();
@@ -648,7 +693,7 @@ public class MainActivity extends BaseActivity {
                     if (isTake) {
                         llSignTime.setBackgroundResource(R.mipmap.sygold);
                         tv_time_er.setText("领取");
-                        timeGold.setText("38");
+                        timeGold.setText(collectTimeModel.getIncome() + "");
                     } else {
                         llSignTime.setBackgroundResource(R.mipmap.lingqusy);
                         timeGold.setText("");
@@ -659,7 +704,7 @@ public class MainActivity extends BaseActivity {
                                 isTake = true;
                                 llSignTime.setBackgroundResource(R.mipmap.sygold);
                                 tv_time_er.setText("领取");
-                                timeGold.setText("38");
+                                timeGold.setText(collectTimeModel.getIncome() + "");
                             }
                         });
                     }
@@ -775,12 +820,14 @@ public class MainActivity extends BaseActivity {
             case R.id.ll_sign_time:
                 if (isTake) {
                     //领取金币
+                    loadingDialog.show();
                     RxHttp.postEncryptJson(ComParamContact.Main.getCollectTaskRecord).add("source", "0").asResponse(String.class).subscribe(s -> {
                         String result = AESUtil.decrypt(s, AESUtil.KEY);
                         TimeGoldModel timeGoldModel = new Gson().fromJson(result, TimeGoldModel.class);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                loadingDialog.dismiss();
                                 if (timeGoldModel.isIsSuccess()) {
                                     getTimer();
                                     ReceiveGoldDialog2 dialog = new ReceiveGoldDialog2(MainActivity.this, timeGoldModel.getIncome());
@@ -788,11 +835,10 @@ public class MainActivity extends BaseActivity {
                                 } else {
                                     Tip.show("领取失败！");
                                 }
-
                             }
                         });
                     }, error -> {
-
+                        loadingDialog.dismiss();
                     });
                 } else {
                     SignTimeDialog dialog = new SignTimeDialog(this);

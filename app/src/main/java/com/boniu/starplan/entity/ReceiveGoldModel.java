@@ -150,8 +150,15 @@ public class ReceiveGoldModel {
         private int takeMaxRemain;
         private int todayRemain;
         private int type;
+        private String remark;
         private List<TaskImgsVOBean> taskImgsVO;
+        public void setMajorDesc(String majorDesc) {
+            this.remark = majorDesc;
+        }
 
+        public String getMajorDesc() {
+            return remark;
+        }
         public AuditTaskVOBean getAuditTaskVO() {
             return auditTaskVO;
         }
@@ -279,7 +286,7 @@ public class ReceiveGoldModel {
             private boolean auditPicture;
             private int imgs;
             private String showDesc;
-            private String remark;
+
             private String toUrl;
             private int taskId;
 
@@ -327,13 +334,7 @@ public class ReceiveGoldModel {
                 return showDesc;
             }
 
-            public void setMajorDesc(String majorDesc) {
-                this.remark = majorDesc;
-            }
 
-            public String getMajorDesc() {
-                return remark;
-            }
 
             public void setShowDesc(String showDesc) {
                 this.showDesc = showDesc;

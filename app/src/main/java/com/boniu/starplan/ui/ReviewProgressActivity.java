@@ -9,10 +9,18 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
+import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.LoadingDialog;
+import com.boniu.starplan.entity.ApplyTask;
 import com.boniu.starplan.entity.ReviewProgressModel;
+import com.boniu.starplan.http.OnError;
+import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.RlvManagerUtils;
+import com.boniu.starplan.utils.Tip;
+import com.google.gson.Gson;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
 
@@ -22,6 +30,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rxhttp.wrapper.param.RxHttp;
 
 /**
  * 审核进度
@@ -40,6 +49,7 @@ public class ReviewProgressActivity extends BaseActivity {
     RecyclerView rlv;
     private List<ReviewProgressModel> list = new ArrayList<>();
     private CommonAdapter<ReviewProgressModel> adapter;
+    private LoadingDialog loadingDialog;
 
     @Override
     public int getLayoutId() {
@@ -50,6 +60,24 @@ public class ReviewProgressActivity extends BaseActivity {
     public void init() {
         tvBarTitle.setText("审核进度");
         initView();
+        loadingDialog = new LoadingDialog(this);
+        loadingDialog.show();
+        getDates();
+    }
+
+    private void getDates() {
+        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).asResponse(String.class).subscribe(s -> {
+            String result = AESUtil.decrypt(s, AESUtil.KEY);
+
+        }, (OnError) error -> {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadingDialog.dismiss();
+                }
+            });
+            error.show();
+        });
     }
 
     private void initView() {

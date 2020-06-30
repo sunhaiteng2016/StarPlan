@@ -68,6 +68,8 @@ public class ApplicationUtils extends Application {
                                 .build()))
                 .build());
         UMConfigure.init(this, UMConfigure.DEVICE_TYPE_PHONE, "");
+        TTAdManagerHolder.init(this);
+
     }
 
     public void AddActivity(Activity activity) {

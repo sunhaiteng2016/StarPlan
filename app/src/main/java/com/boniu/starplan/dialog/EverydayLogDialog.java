@@ -9,6 +9,9 @@ import androidx.annotation.NonNull;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
+import com.boniu.starplan.utils.SPUtils;
+
+import java.util.Calendar;
 
 /**
  * 每天登录弹窗
@@ -27,6 +30,7 @@ public class EverydayLogDialog extends Dialog {
         findViewById(R.id.tv_go_to_look).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dismiss();
                 ARouter.getInstance().build("/ui/MyWalletActivity").navigation();
             }
         });
@@ -34,6 +38,10 @@ public class EverydayLogDialog extends Dialog {
             @Override
             public void onClick(View view) {
                 dismiss();
+                Calendar cd = Calendar.getInstance();
+                int month = cd.get(Calendar.MONTH) + 1;
+                SPUtils.getInstance().put("month", month);
+                SPUtils.getInstance().put("isEvery", false);
             }
         });
 

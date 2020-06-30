@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import com.boniu.starplan.R;
 
 public class RunningTaskDialog extends Dialog {
-    private  int flag;
+    private int flag;
 
     public RunningTaskDialog(@NonNull Context context) {
         super(context, R.style.CustomProgressDialog);
@@ -19,10 +19,10 @@ public class RunningTaskDialog extends Dialog {
 
     public RunningCallback callback;
 
-    public RunningTaskDialog(@NonNull Context context,int flag, RunningCallback callback) {
+    public RunningTaskDialog(@NonNull Context context, int flag, RunningCallback callback) {
         super(context, R.style.CustomProgressDialog);
-        this.callback=callback;
-        this.flag=flag;
+        this.callback = callback;
+        this.flag = flag;
 
     }
 
@@ -31,9 +31,9 @@ public class RunningTaskDialog extends Dialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_running_task);
         TextView des = findViewById(R.id.tv_des);
-        if (flag==1){
+        if (flag == 1) {
             des.setText("不能同时抢多个任务，是否放弃正在进行的任务？");
-        }else{
+        } else {
             des.setText("任务已放弃，是否开始当前任务？");
         }
         findViewById(R.id.tv_dialog_submit).setOnClickListener(new View.OnClickListener() {

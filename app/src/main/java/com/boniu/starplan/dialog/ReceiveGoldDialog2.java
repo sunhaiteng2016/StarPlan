@@ -36,11 +36,17 @@ public class ReceiveGoldDialog2 extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_receive_gold);
+        setContentView(R.layout.dialog_receive_gold2);
         tvPrice = findViewById(R.id.tv_price);
         tvPrice.setText(goldNum + "");
 
         findViewById(R.id.iv_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+            }
+        });
+        findViewById(R.id.tv_submit2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dismiss();

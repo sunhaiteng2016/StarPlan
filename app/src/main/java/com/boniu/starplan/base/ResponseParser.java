@@ -1,9 +1,12 @@
 package com.boniu.starplan.base;
 
 
+import android.util.Log;
+
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.utils.SPUtils;
+import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -34,13 +37,14 @@ public class ResponseParser<T> extends AbstractParser<T> {
         if (null == t) {
             t = "";
         }
+        Log.e("sht", "code->" + data.getReturnCode());
         if (data.getReturnCode() == -400) {
             //清空token
             SPUtils.getInstance().put(ComParamContact.Common.TOKEN_KEY, "");
             SPUtils.getInstance().put(ComParamContact.Login.MOBILE, "");
-            ARouter.getInstance().build("/ui/MainActivity").navigation();
+            ARouter.getInstance().build("/ui/LoginActivity").navigation();
         }
-        if (data.getReturnCode() != 0 && data.getReturnCode() != -100) {//这里假设code不等于0，代表数据不正确，抛出异常
+        if (data.getReturnCode() != 0 ) {//这里假设code不等于0，代表数据不正确，抛出异常
             throw new ParseException(String.valueOf(data.getReturnCode()), data.getErrorMsg(), response);
         }
 
