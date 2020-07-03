@@ -2,19 +2,20 @@ package com.boniu.starplan.entity;
 
 public class LoginInfo {
 
+
     /**
+     * success : true
      * code : 200
      * message : 登录成功
      * mobile : 13561173094
-     * success : true
-     * uToken : 19e473afe41a4cc2a49f027e8f211af4
+     * utoken : fe3a492ba4424136b1bc66b609647e45
      */
 
+    private boolean success;
     private String code;
     private String message;
     private String mobile;
-    private boolean success;
-    private String uToken;
+    private String utoken;
     private String goldAmount;
 
     public String getGoldAmount() {
@@ -23,6 +24,14 @@ public class LoginInfo {
 
     public void setGoldAmount(String goldAmount) {
         this.goldAmount = goldAmount;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     public String getCode() {
@@ -49,19 +58,11 @@ public class LoginInfo {
         this.mobile = mobile;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public String getUtoken() {
+        return utoken;
     }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getUToken() {
-        return uToken;
-    }
-
-    public void setUToken(String uToken) {
-        this.uToken = uToken;
+    public void setUtoken(String utoken) {
+        this.utoken = utoken;
     }
 }

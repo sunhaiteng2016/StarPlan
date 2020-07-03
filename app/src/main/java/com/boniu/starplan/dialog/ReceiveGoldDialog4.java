@@ -10,9 +10,12 @@ import androidx.annotation.NonNull;
 
 import com.boniu.starplan.R;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.entity.MessageWrap;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.Tip;
+
+import org.greenrobot.eventbus.EventBus;
 
 import rxhttp.wrapper.param.RxHttp;
 
@@ -23,14 +26,7 @@ public class ReceiveGoldDialog4 extends Dialog {
     private TextView tvPrice;
     private ReceiveCallback callback;
 
-    public ReceiveGoldDialog4(@NonNull Context context) {
-        super(context, R.style.CustomProgressDialog);
-    }
 
-    public ReceiveGoldDialog4(@NonNull Context context, int goldNumber) {
-        super(context, R.style.CustomProgressDialog);
-        this.goldNum = goldNumber;
-    }
 
     public ReceiveGoldDialog4(@NonNull Context context, int goldNumber, String id, ReceiveCallback callback) {
         super(context, R.style.CustomProgressDialog);
@@ -67,7 +63,6 @@ public class ReceiveGoldDialog4 extends Dialog {
                     } else {
                         Tip.show("领取失败");
                     }
-
                 }, (OnError) error -> {
                     error.show();
                 });
@@ -77,6 +72,7 @@ public class ReceiveGoldDialog4 extends Dialog {
         findViewById(R.id.iv_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                EventBus.getDefault().post(new MessageWrap(1));
                 dismiss();
             }
         });

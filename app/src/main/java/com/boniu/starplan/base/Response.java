@@ -1,12 +1,14 @@
 package com.boniu.starplan.base;
 
+import com.google.gson.Gson;
+
 public class Response<T> {
     private int errorCode;
     private String errorMsg;
     private T data;
     private boolean success;
     private int returnCode;
-    private String result;
+    private T result;
 
     public int getErrorCode() {
         return errorCode;
@@ -48,11 +50,11 @@ public class Response<T> {
         this.returnCode = returnCode;
     }
 
-    public String getResult() {
+    public T getResult() {
         return result;
     }
 
-    public void setResult(String result) {
+    public void setResult(T result) {
         this.result = result;
     }
 }

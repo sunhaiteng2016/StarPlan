@@ -133,8 +133,11 @@ public class ComParamContact {
         public final static String transferInfo = "api/gold/expend/transfer/info";
         //提现记录
         public final static String withdrawalList = "api/gold/withdrawal/list";
-
-
+        public final static String listAuditSchedule = "api/task/user/listAuditSchedule";
+        // 领取激励视频任务
+        public final static String addVideoAD = "api/task/user/addVideoAD";
+        //游戏
+        public final  static  String  gameUrl="api/game/getUrl";
     }
 }
 

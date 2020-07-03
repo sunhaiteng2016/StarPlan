@@ -20,17 +20,19 @@ import com.boniu.starplan.R;
 
 public class SignSuccessDialog extends Dialog {
 
-    private int flag;
+    private int flag,inCome;
     private SubMitCallBack subMitCallBack;
+    private TextView tvPrice;
 
     public SignSuccessDialog(@NonNull Context context) {
         super(context, R.style.CustomProgressDialog);
     }
 
-    public SignSuccessDialog(@NonNull Context context, int flag, SubMitCallBack subMitCallBack) {
+    public SignSuccessDialog(@NonNull Context context, int flag,int income , SubMitCallBack subMitCallBack) {
         super(context, R.style.CustomProgressDialog);
         this.flag = flag;
         this.subMitCallBack = subMitCallBack;
+        this.inCome=income;
     }
 
     @Override
@@ -61,6 +63,8 @@ public class SignSuccessDialog extends Dialog {
                 dismiss();
             }
         });
+        tvPrice=findViewById(R .id.tv_price);
+        tvPrice.setText(inCome+"");
 
     }
 

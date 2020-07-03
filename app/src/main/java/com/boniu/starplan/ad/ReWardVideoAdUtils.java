@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.ReceiveGoldDialog2;
 import com.boniu.starplan.ui.TTAdManagerHolder;
+import com.boniu.starplan.utils.SPUtils;
 import com.bytedance.sdk.openadsdk.AdSlot;
 import com.bytedance.sdk.openadsdk.TTAdConstant;
 import com.bytedance.sdk.openadsdk.TTAdNative;
@@ -16,16 +19,18 @@ public class ReWardVideoAdUtils {
     private static TTAdNative mTTAdNative;
     static TTRewardVideoAd newAd;
     private static String TAG="ReWardVideoAdUtils";
+    private static boolean isSuccess;
 
-    public static void initAd(Activity mContext) {
+
+    public static void initAd(Activity mContext,String code,int inCome) {
         mTTAdNative = TTAdManagerHolder.get().createAdNative(mContext);
 
         AdSlot adSlot = new AdSlot.Builder()
                 .setCodeId("945218666")
                 .setSupportDeepLink(true)
                 .setImageAcceptedSize(1080, 1920)
-                .setUserID("123")
-               // .setMediaExtra(extras)
+                .setUserID(SPUtils.getInstance().getString(ComParamContact.Common.TOKEN_KEY))
+               .setMediaExtra(code)
                 .setOrientation(TTAdConstant.VERTICAL)
                 .build();
         mTTAdNative.loadRewardVideoAd(adSlot, new TTAdNative.RewardVideoAdListener() {
@@ -55,7 +60,13 @@ public class ReWardVideoAdUtils {
                     @Override
                     public void onAdClose() {
                         Log.e(TAG, "onAdClose: " );
+                        int goldNumer = inCome * 2;
+                         if (isSuccess){
+                             ReceiveGoldDialog2 dialog2= new ReceiveGoldDialog2(mContext,goldNumer);
+                             dialog2.show();
+                         }else{
 
+                         }
                     }
 
                     //视频广告播放完成
@@ -72,6 +83,7 @@ public class ReWardVideoAdUtils {
                     @Override
                     public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName) {
                        /* SPUtils.getInstance(mContext).put(ConfigKeys.VIDEO_RETURN,rewardVerify);*/
+                        isSuccess=rewardVerify;
                         Log.e(TAG, "onRewardVerify: " + rewardVerify + "::" + rewardAmount + "::"  + rewardName );
                     }
 

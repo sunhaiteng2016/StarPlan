@@ -11,9 +11,10 @@
     android:paddingBottom="@dimen/dp12">
 
     <ImageView
+        android:id="@+id/iv_img"
         android:layout_width="@dimen/dp45"
         android:layout_height="@dimen/dp45"
-        android:src="@mipmap/bb" />
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,19 +28,19 @@
             android:layout_weight="1">
 
             <TextView
+                android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:maxLength="14"
-                android:text="试玩软件赚钱"
                 android:textColor="@color/text_33"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tv_income"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+5000 金币"
                 android:textColor="@color/text_33"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -51,19 +52,18 @@
             android:layout_weight="1">
 
             <TextView
+                android:id="@+id/tv_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:maxLength="14"
-                android:text="06/02 14:20:00"
                 android:textColor="@color/text_33"
                 android:textSize="12sp" />
 
             <TextView
-
+                android:id="@+id/tv_remark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="审核中，大约需要3个工作日"
                 android:textColor="#fffa6400"
                 android:textSize="12sp" />
         </LinearLayout>

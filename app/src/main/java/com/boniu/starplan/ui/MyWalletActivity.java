@@ -176,7 +176,7 @@ public class MyWalletActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, ProfitModel profitModel, int position) {
-                holder.setText(R.id.tv_title, profitModel.getUserTaskTypeName()).setText(R.id.tv_gold_num, "+" + profitModel.getGoldAmount()).setText(R.id.tv_time, profitModel.getMonth() + "月" + DateTimeUtils.format(profitModel.getCreateTime(), DateTimeUtils.FORMAT_LONG_CN));
+                holder.setText(R.id.tv_title, profitModel.getUserTaskTypeName()).setText(R.id.tv_gold_num, "+" + profitModel.getGoldAmount()).setText(R.id.tv_time,  DateTimeUtils.format(profitModel.getCreateTime(), DateTimeUtils.FORMAT_LONG_CN));
             }
         };
         rlv.setAdapter(rlvAdapter);

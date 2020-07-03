@@ -30,14 +30,13 @@ import com.boniu.starplan.entity.SubmitAuditModel;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.GlideUtils;
-import com.boniu.starplan.utils.PathFromUri;
+
 import com.boniu.starplan.utils.StringUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
+import com.huantansheng.easyphotos.EasyPhotos;
+import com.huantansheng.easyphotos.models.album.entity.Photo;
 import com.rxjava.rxlife.RxLife;
-import com.zhihu.matisse.Matisse;
-import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,6 +46,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rxhttp.wrapper.param.RxHttp;
+import top.zibin.luban.Luban;
+
 
 /**
  * 提交资料
@@ -81,10 +82,11 @@ public class FinishRegisterActivity extends BaseActivity {
     TextView tv2;
     @BindView(R.id.rl_ex2)
     RelativeLayout rlEx2;
-    private List<Uri> mSelected, mSelected7;
-    private Uri iv1, iv2;
+
     private String img1, img2;
     private int userTaskId;
+    private String ivPath;
+    private String ivPath2;
 
 
     @Override
@@ -105,16 +107,6 @@ public class FinishRegisterActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
-    public class userTaskImgsSaveParamSet {
-        public String imgUrl;
-        public String order;
-
-
-        public userTaskImgsSaveParamSet(String imgUrl, String order) {
-            this.imgUrl = imgUrl;
-            this.order = order;
-        }
-    }
 
     @OnClick({R.id.rl_back, R.id.tv_sub, R.id.rl_ex1, R.id.rl_ex2})
     public void onClick(View view) {
@@ -135,7 +127,7 @@ public class FinishRegisterActivity extends BaseActivity {
                     Tip.show("请输入姓名");
                     return;
                 }
-                if (iv1 == null || iv2 == null) {
+                if (img1 == null || img2 == null) {
                     Tip.show("请选择图片");
                     return;
                 }
@@ -158,34 +150,28 @@ public class FinishRegisterActivity extends BaseActivity {
                 //phone
                 RxHttp.postEncryptJson(ComParamContact.Main.submitAudit).addAll(newJson).asResponse(String.class).subscribe(s -> {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);
-                    Log.e("", "");
-                    ReceiveGoldDialog5 dialog5 = new ReceiveGoldDialog5(this);
-                    dialog5.show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ReceiveGoldDialog5 dialog5 = new ReceiveGoldDialog5(FinishRegisterActivity.this);
+                            dialog5.show();
+                        }
+                    });
+
                 }, (OnError) error -> {
                     error.show();
                 });
                 break;
             case R.id.rl_ex1:
-                Matisse.from(FinishRegisterActivity.this)
-                        .choose(MimeType.ofImage(), false) // 选择 mime 的类型
-                        .countable(true)
-                        .maxSelectable(1) // 图片选择的最多数量
-                        //.gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
-                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-                        .thumbnailScale(0.85f) // 缩略图的比例
-                        .imageEngine(new GlideEngine()) // 使用的图片加载引擎
-                        .forResult(10086); // 设置作为标记的请求码
+                EasyPhotos.createAlbum(this, true, NGlideEngine.getInstance())
+                        .setFileProviderAuthority("com.boniu.starplan.TTFileProvider")
+                        .start(101);
                 break;
             case R.id.rl_ex2:
-                Matisse.from(FinishRegisterActivity.this)
-                        .choose(MimeType.ofImage(), false) // 选择 mime 的类型
-                        .countable(true)
-                        .maxSelectable(1) // 图片选择的最多数量
-                        //.gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
-                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-                        .thumbnailScale(0.85f) // 缩略图的比例
-                        .imageEngine(new GlideEngine()) // 使用的图片加载引擎
-                        .forResult(10087); // 设置作为标记的请求码
+
+                EasyPhotos.createAlbum(this, true, NGlideEngine.getInstance())
+                        .setFileProviderAuthority("com.boniu.starplan.TTFileProvide")
+                        .start(102);
                 break;
         }
     }
@@ -193,81 +179,53 @@ public class FinishRegisterActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 10086 && resultCode == RESULT_OK) {
-            mSelected = Matisse.obtainResult(data);
-            iv1 = mSelected.get(0);
-            GlideUtils.getInstance().LoadContextRoundBitmap(this, PathFromUri.getPathFromUri(this, iv1), ivEx1, 8);
-            RxHttp.postForm(ComParamContact.Main.uploadAudit)
-                    .addFile("file", getFileFromUri(iv1, this))
-                    .asResponse(String.class) //from操作符，是异步操作
-                    .to(RxLife.toMain(this))  //感知生命周期，并在主线程回调
-                    .subscribe(s -> {
-                        //成功回调
-                        String result = AESUtil.decrypt(s, AESUtil.KEY);
-                        ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
-                        img1 = imgUpLoadModel.getValue();
-                    }, (OnError) error -> {
-                        //失败回调
-                        error.show("上传失败,请稍后再试!");
-                    });
-        }
-        if (requestCode == 10087 && resultCode == RESULT_OK) {
-            mSelected7 = Matisse.obtainResult(data);
-            iv2 = mSelected7.get(0);
-            GlideUtils.getInstance().LoadContextRoundBitmap(this, PathFromUri.getPathFromUri(this, iv2), ivEx2, 8);
-            RxHttp.postForm(ComParamContact.Main.uploadAudit)
-                    .addFile("file", getFileFromUri(iv1, this))
-                    .asResponse(String.class) //from操作符，是异步操作
-                    .to(RxLife.toMain(this))  //感知生命周期，并在主线程回调
-                    .subscribe(s -> {
-                        //成功回调
-                        String result = AESUtil.decrypt(s, AESUtil.KEY);
-                        ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
-                        img2 = imgUpLoadModel.getValue();
-                        Log.e("", "");
-                    }, (OnError) error -> {
-                        //失败回调
-                        error.show("上传失败,请稍后再试!");
-                    });
-        }
-    }
+        if (RESULT_OK == resultCode) {
+            //相机或相册回调
+            if (requestCode == 101) {
+                //返回对象集合：如果你需要了解图片的宽、高、大小、用户是否选中原图选项等信息，可以用这个
+                ArrayList<Photo> resultPhotos = data.getParcelableArrayListExtra(EasyPhotos.RESULT_PHOTOS);
+                ivPath = resultPhotos.get(0).path;
 
-    public File getFileFromUri(Uri uri, Context context) {
-        if (uri == null) {
-            return null;
-        }
-        switch (uri.getScheme()) {
-            case "content":
-                return getFileFromContentUri(uri, context);
-            case "file":
-                return new File(uri.getPath());
-            default:
-                return null;
-        }
-    }
+                RxHttp.postForm(ComParamContact.Main.uploadAudit)
+                        .addFile("file", new File(ivPath))
+                        .asResponse(String.class) //from操作符，是异步操作
+                        .to(RxLife.toMain(this))  //感知生命周期，并在主线程回调
+                        .subscribe(s -> {
+                            //成功回调
+                            String result = AESUtil.decrypt(s, AESUtil.KEY);
+                            ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
+                            img1 = imgUpLoadModel.getValue();
+                        }, (OnError) error -> {
+                            //失败回调
+                            error.show("上传失败,请稍后再试!");
+                        });
 
-    /**
-     * 通过内容解析中查询uri中的文件路径
-     */
-    private File getFileFromContentUri(Uri contentUri, Context context) {
-        if (contentUri == null) {
-            return null;
-        }
-        File file = null;
-        String filePath;
-        String[] filePathColumn = {MediaStore.MediaColumns.DATA};
-        ContentResolver contentResolver = context.getContentResolver();
-        Cursor cursor = contentResolver.query(contentUri, filePathColumn, null,
-                null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-            filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
-            cursor.close();
-            if (!TextUtils.isEmpty(filePath)) {
-                file = new File(filePath);
+                GlideUtils.getInstance().LoadContextRoundBitmap(this, ivPath, ivEx1, 8);
+
             }
+            if (requestCode == 102) {
+                //返回对象集合：如果你需要了解图片的宽、高、大小、用户是否选中原图选项等信息，可以用这个
+                ArrayList<Photo> resultPhotos = data.getParcelableArrayListExtra(EasyPhotos.RESULT_PHOTOS);
+                ivPath2 = resultPhotos.get(0).path;
+                GlideUtils.getInstance().LoadContextRoundBitmap(this, ivPath2, ivEx2, 8);
+                RxHttp.postForm(ComParamContact.Main.uploadAudit)
+                        .addFile("file", new File(ivPath2))
+                        .asResponse(String.class) //from操作符，是异步操作
+                        .to(RxLife.toMain(this))  //感知生命周期，并在主线程回调
+                        .subscribe(s -> {
+                            //成功回调
+                            String result = AESUtil.decrypt(s, AESUtil.KEY);
+                            ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
+                            img2 = imgUpLoadModel.getValue();
+                        }, (OnError) error -> {
+                            //失败回调
+                            error.show("上传失败,请稍后再试!");
+                        });
+                return;
+            }
+            return;
         }
-        return file;
-    }
 
+
+    }
 }

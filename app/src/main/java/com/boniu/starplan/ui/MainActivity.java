@@ -10,14 +10,14 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.ui.AppBarConfiguration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -27,6 +27,7 @@ import com.boniu.starplan.dialog.LoadingDialog;
 import com.boniu.starplan.dialog.NewPersonDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog2;
+import com.boniu.starplan.dialog.ReceiveGoldDialog3;
 import com.boniu.starplan.dialog.RunningTaskDialog;
 import com.boniu.starplan.dialog.SignSuccessDialog;
 import com.boniu.starplan.dialog.SignSuccessNormalDialog;
@@ -36,12 +37,13 @@ import com.boniu.starplan.entity.CollectTimeModel;
 import com.boniu.starplan.entity.IsSignModel;
 import com.boniu.starplan.entity.LoginInfo;
 import com.boniu.starplan.entity.MainTask;
+import com.boniu.starplan.entity.MessageWrap;
 import com.boniu.starplan.entity.NewUserInfo;
 import com.boniu.starplan.entity.TimeGoldModel;
+import com.boniu.starplan.helper.MainActivityHelper;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
-import com.boniu.starplan.base.Response;
 import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.dialog.EverydayLogDialog;
 import com.boniu.starplan.dialog.SignTimeDialog;
@@ -56,11 +58,15 @@ import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
 import com.boniu.starplan.utils.Validator;
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
-import com.wang.avi.AVLoadingIndicatorView;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,7 +76,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
-import kotlin.time.TimeMark;
 import pub.devrel.easypermissions.EasyPermissions;
 import rxhttp.wrapper.param.RxHttp;
 
@@ -144,18 +149,26 @@ public class MainActivity extends BaseActivity {
             Manifest.permission.WRITE_SETTINGS,
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
     };
     private int weekSign = 0;
     private boolean isTake = true;
-    private int userTaskId, clickTaskId;
+    private int userTaskId, clickTaskId ;
+    public  String clickAppSoure;
     private int type;
     private LoadingDialog loadingDialog;
+    private int income;
+    private AppBarConfiguration mAppBarConfiguration;
+    private NavigationView navigationView;
+    private RelativeLayout rlDrawerLayout;
+
 
 
     @Override
     public int getLayoutId() {
-        return R.layout.activity_main;
+        return R.layout.activity_draw;
     }
 
     @Override
@@ -171,11 +184,13 @@ public class MainActivity extends BaseActivity {
     @Override
     public void init() {
         requestMPermission();
-        loadingDialog = new LoadingDialog(MainActivity.this);
+
+        loadingDialog = new LoadingDialog(this);
         loadingDialog.show();
         GlideUtils.getInstance().LoadContextCircleBitmap(this, R.mipmap.touxiang, ivImg);
         //初始化
-        initNewUserInfo();
+        initDraws();
+        MainActivityHelper.newInstance().initNewUserInfo(this);
         initMenuView();
         initUserData();
         initNewUserTaskView();
@@ -186,46 +201,95 @@ public class MainActivity extends BaseActivity {
         tvGerMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ReWardVideoAdUtils.initAd(MainActivity.this);
+                MainActivityHelper.newInstance().AdLook(MainActivity.this);
             }
         });
+        if (!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
+
     }
 
-    /**
-     * 是否新用户
-     */
-    private void initNewUserInfo() {
-        RxHttp.postEncryptJson(ComParamContact.Main.isNewUserAndGetGoldWithoutToken)
-                .asResponse(String.class)
-                .subscribe(s -> {
-                    String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
-                    NewUserInfo userInfo = new Gson().fromJson(resultStr, NewUserInfo.class);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (userInfo.isIsNewUser()) {
-                                NewPersonDialog dialog = new NewPersonDialog(MainActivity.this);
-                                dialog.show();
-                            } else {
-                                Calendar cd = Calendar.getInstance();
-                                int month = cd.get(Calendar.MONTH) + 1;
-                                int months = SPUtils.getInstance().getInt("month");
-                                boolean isEvery = SPUtils.getInstance().getBoolean("isEvery", true);
-                                if (month != months) {
-                                    EverydayLogDialog dialog = new EverydayLogDialog(MainActivity.this);
-                                    dialog.show();
-                                } else {
-                                    if (isEvery) {
-                                        EverydayLogDialog dialog = new EverydayLogDialog(MainActivity.this);
-                                        dialog.show();
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }, (OnError) error -> {
-                });
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        getData();
+    }
 
+    private void initDraws() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        View headView = navigationView.getHeaderView(0);
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                .setDrawerLayout(drawer)
+                .build();
+        rlDrawerLayout=findViewById(R.id.rl_drawerLayout);
+        rlDrawerLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (drawer.isDrawerOpen(navigationView)){
+                    drawer.closeDrawer(navigationView);
+                }else{
+                    drawer.openDrawer(navigationView);
+                }
+            }
+        });
+
+        ImageView imageDraw = headView.findViewById(R.id.imageView_draw);
+        TextView tvPhone = headView.findViewById(R.id.tv_phone);
+        LinearLayout draw1 = headView.findViewById(R.id.draw1);
+        LinearLayout draw2 = headView.findViewById(R.id.draw2);
+        LinearLayout draw3 = headView.findViewById(R.id.draw3);
+        TextView login_out = headView.findViewById(R.id.login_out);
+        GlideUtils.getInstance().LoadContextCircleBitmap(this, R.mipmap.touxiang, imageDraw);
+        tvPhone.setText(SPUtils.getInstance().getString(ComParamContact.Login.MOBILE));
+
+        draw1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        draw2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        draw3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        login_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawer.closeDrawer(navigationView);
+                SPUtils.getInstance().put(ComParamContact.Common.TOKEN_KEY, "");
+                SPUtils.getInstance().put(ComParamContact.Login.MOBILE, "");
+                ARouter.getInstance().build("/ui/LoginActivity").navigation();
+            }
+        });
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onGetStickyEvent(MessageWrap message) {
+        if (message.flag==1){
+            MainActivityHelper.newInstance().getUserInfo(MainActivity.this,tvPhone,tvMoney);
+        }
+        if (message.flag==2){
+            MainActivityHelper.newInstance().IsSign(MainActivity.this,tvSign,tvMoreSign);
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     /**
@@ -241,16 +305,19 @@ public class MainActivity extends BaseActivity {
             @Override
             protected void convert(ViewHolder holder, TaskMode taskMode, int position) {
                 if (position == 0) {
-                    holder.setText(R.id.main_title, "休闲游戏赚").setText(R.id.sub_title, "闯关玩金币，简单好玩").setText(R.id.gold, "500");
+                    holder.setText(R.id.main_title, "休闲游戏赚").setText(R.id.sub_title, "闯关玩金币，简单好玩").setText(R.id.gold, "50000");
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.xiuxian, holder.getView(R.id.iv_img), 8);
+                    holder.setText(R .id.tv_complete,"立即闯关");
                 }
                 if (position == 1) {
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.gaoe, holder.getView(R.id.iv_img), 8);
-                    holder.setText(R.id.main_title, "高额赚钱").setText(R.id.sub_title, "点击右侧“去完成”按钮，下载App《童 话故事社》并打开此App，即可领取奖励").setText(R.id.gold, "500");
+                    holder.setText(R.id.main_title, "高额赚钱").setText(R.id.sub_title, "最高月入100元现金红包").setText(R.id.gold, "90000");
+                    holder.setText(R .id.tv_complete,"立即赚钱");
                 }
                 if (position == 2) {
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.shiwan, holder.getView(R.id.iv_img), 8);
-                    holder.setText(R.id.main_title, "试玩软件赚钱").setText(R.id.sub_title, "点击右侧“去完成”按钮，参与一款游戏 的试玩，即可领取奖励").setText(R.id.gold, "500");
+                    holder.setText(R.id.main_title, "试玩软件赚钱").setText(R.id.sub_title, "安装软件，打开赚高额奖励").setText(R.id.gold, "20000");
+                    holder.setText(R .id.tv_complete,"立即试玩");
                 }
             }
         };
@@ -301,9 +368,10 @@ public class MainActivity extends BaseActivity {
                 int viewStatus = dayTaskList.get(i).getTaskViewStatus();
                 type = dayTaskList.get(i).getType();
                 clickTaskId = dayTaskList.get(i).getTaskId();
+                clickAppSoure=dayTaskList.get(i).getApplySource();
                 loadingDialog.show();
                 if (viewStatus == 0) {
-                    ReceiveTask(dayTaskList.get(i).getTaskId(), type);
+                    ReceiveTask(dayTaskList.get(i).getTaskId(), type ,clickAppSoure);
                 }
             }
 
@@ -342,8 +410,9 @@ public class MainActivity extends BaseActivity {
                 type = newUserTaskList.get(i).getType();
                 clickTaskId = newUserTaskList.get(i).getTaskId();
                 loadingDialog.show();
+                clickAppSoure=newUserTaskList.get(i).getApplySource();
                 if (viewStatus == 0) {
-                    ReceiveTask(newUserTaskList.get(i).getTaskId(), type);
+                    ReceiveTask(newUserTaskList.get(i).getTaskId(), type,clickAppSoure);
                 }
             }
 
@@ -354,9 +423,9 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void ReceiveTask(int taskId, int type) {
+    private void ReceiveTask(int taskId, int type,String applySource) {
 
-        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).add("applySource",applySource).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             ApplyTask applyTask = new Gson().fromJson(result, ApplyTask.class);
             userTaskId = applyTask.getUserTaskId();
@@ -433,7 +502,7 @@ public class MainActivity extends BaseActivity {
                         RunningTaskDialog dialog = new RunningTaskDialog(MainActivity.this, 2, new RunningTaskDialog.RunningCallback() {
                             @Override
                             public void running() {
-                                ReceiveTask(clickTaskId, type);
+                                ReceiveTask(clickTaskId, type,clickAppSoure);
                             }
                         });
                         dialog.show();
@@ -498,7 +567,10 @@ public class MainActivity extends BaseActivity {
                         ARouter.getInstance().build("/ui/ReceiveGoldCoinActivity").navigation();
                         break;
                     case 2:
-                        ARouter.getInstance().build("/ui/LoginActivity").navigation();
+                        ARouter.getInstance().build("/ui/GameWebViewActivity").navigation();
+                        break;
+                    case  3:
+                        MainActivityHelper.newInstance().AdLook(MainActivity.this);
                         break;
                     default:
                         break;
@@ -527,6 +599,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, SignModel.ListBean listBean, int position) {
+                income=listBean.getWeekSignGold();
                 if (listBean.isIsSign()) {
                     holder.setTextColor(R.id.tv_circle, mContext.getResources().getColor(R.color.FEC50B));
                     if (listBean.getType().equals("gif")) {
@@ -570,32 +643,28 @@ public class MainActivity extends BaseActivity {
         signAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
-                if (i == 2) {
-                    if (signList.get(2).getIsReceive() != 0) return;
-                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(MainActivity.this, signList.get(2).getDoubleGold(), signList.get(2).getBoxId() + "", new ReceiveGoldDialog.ReceiveCallback() {
+                    if (signList.get(i).getIsReceive() != 0) return;
+                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(MainActivity.this, signList.get(i).getDoubleGold(), signList.get(i).getBoxId() + "",signList.get(i).isIsDouble(), new ReceiveGoldDialog.ReceiveCallback() {
                         @Override
                         public void receive(int flag, String applyId) {
-                            //开启激励视频
-                            if (flag == 1) {
-                                getSign();
-                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //开启激励视频
+                                    if (flag == 1){
+                                        getData();
+                                    }
+                                    if (flag==2){
+                                        ReWardVideoAdUtils.initAd(MainActivity.this,applyId,signList.get(i).getDoubleGold());
+                                    }
+                                }
+                            });
+
                         }
                     });
                     dialog.show();
-                }
-                if (i == 6) {
-                    if (signList.get(6).getIsReceive() != 0) return;
-                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(MainActivity.this, signList.get(6).getDoubleGold(), signList.get(6).getBoxId() + "", new ReceiveGoldDialog.ReceiveCallback() {
-                        @Override
-                        public void receive(int flag, String applyId) {
-                            //开启激励视频
-                            if (flag == 1) {
-                                getSign();
-                            }
-                        }
-                    });
-                    dialog.show();
-                }
+
+
             }
 
             @Override
@@ -606,82 +675,20 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getData() {
-        //用户数据
-        RxHttp.postEncryptJson(ComParamContact.Main.getUserInfo)
-                .asResponse(String.class)
-                .subscribe(s -> {
-                    String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
-                    LoginInfo loginInfo = new Gson().fromJson(resultStr, LoginInfo.class);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            tvPhone.setText(Validator.Md5Phone(loginInfo.getMobile()));
-                            tvMoney.setText(loginInfo.getGoldAmount());
-                        }
-                    });
-                }, (OnError) error -> {
-                });
-        //签到相关
-        RxHttp.postEncryptJson(ComParamContact.Main.IS_SIGN)
-                .asString()
-                .subscribe(s -> {
-                    Response result = new Gson().fromJson(s, Response.class);
-                    String resultStr = AESUtil.decrypt(result.getResult(), AESUtil.KEY);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (resultStr.equals("1")) {
-                                tvSign.setVisibility(View.GONE);
-                                tvMoreSign.setVisibility(View.VISIBLE);
-                            } else {
-                                tvMoreSign.setVisibility(View.GONE);
-                                tvSign.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    });
-
-                }, (OnError) error -> {
-
-                });
+        MainActivityHelper.newInstance().getUserInfo(this,tvPhone,tvMoney);
+        MainActivityHelper.newInstance().IsSign(this,tvSign,tvMoreSign);
         getSign();
-        //任务列表
-        RxHttp.postEncryptJson(ComParamContact.Main.queryTaskMarketList)
-                .asString().subscribe(s -> {
-            Response result = new Gson().fromJson(s, Response.class);
-            String resultStr = AESUtil.decrypt(result.getResult(), AESUtil.KEY);
-            MainTask mainTask = new Gson().fromJson(resultStr, MainTask.class);
-            //每日任务
-            dayTaskList.addAll(mainTask.getDayTask());
-            //新手任务
-            newUserTaskList.addAll(mainTask.getNewUserTask());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    loadingDialog.dismiss();
-                    if (newUserTaskList.size() <= 0) {
-                        new_user_title_rl.setVisibility(View.GONE);
-                        rlvNewUserTask.setVisibility(View.GONE);
-                    }
-                    dayTaskAdapter.notifyDataSetChanged();
-                    newUserTaskAdapter.notifyDataSetChanged();
-                    setStr();
-                }
-            });
-        }, (OnError) error -> {
-            loadingDialog.dismiss();
-        });
-
+        MainActivityHelper.newInstance().mainTaskList(this,loadingDialog,dayTaskList,newUserTaskList,dayTaskAdapter,newUserTaskAdapter,new_user_title_rl,rlvNewUserTask,tvDes,ivBx);
         getTimer();
-
     }
 
     private void getTimer() {
         //获取领取时间
         RxHttp.postEncryptJson(ComParamContact.Main.checkCollectTime)
                 .add("source", "0")
-                .asString().subscribe(s -> {
-            Response result = new Gson().fromJson(s, Response.class);
-            String resultStr = AESUtil.decrypt(result.getResult(), AESUtil.KEY);
+                .asResponse(String.class).subscribe(s -> {
+
+            String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
             CollectTimeModel collectTimeModel = new Gson().fromJson(resultStr, CollectTimeModel.class);
             long startTime = collectTimeModel.getStartTime();
             long finishTime = collectTimeModel.getFinishTime();
@@ -718,45 +725,34 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getSign() {
-        //签到数据
-        RxHttp.postEncryptJson(ComParamContact.Main.getSignAmount)
-                .asResponse(String.class)
-                .subscribe(s -> {
-                    String resultStr = AESUtil.decrypt((String) s, AESUtil.KEY);
-                    SignModel sigModel = new Gson().fromJson(resultStr, SignModel.class);
-                    weekSign = 0;
-                    for (SignModel.ListBean list : sigModel.getList()) {
-                        if (list.isIsSign()) {
-                            weekSign++;
-                        }
-                    }
-                    signList.clear();
-                    signList.addAll(sigModel.getList());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            tvSignDes.setText("已连续签到 " + weekSign + "/7 天");
-                            signAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    //设置签到数据
-                }, (OnError) error -> {
-                    error.show();
-                });
+        MainActivityHelper.newInstance().signData(this,signList,tvSignDes,signAdapter);
     }
 
-
-    private void showSignDialog(int i) {
-        SignSuccessDialog dialog = new SignSuccessDialog(this, i + 1, new SignSuccessDialog.SubMitCallBack() {
+    /**
+     *  签到成功的弹窗
+     * @param i
+     */
+    private void showSignDialog(int i,boolean isDouble) {
+        SignSuccessDialog dialog = new SignSuccessDialog(this, i + 1, income,new SignSuccessDialog.SubMitCallBack() {
             @Override
             public void onSuccess() {
-                ReceiveGoldDialog dialog = new ReceiveGoldDialog(MainActivity.this, signList.get(i).getDoubleGold(), signList.get(i).getBoxId() + "", new ReceiveGoldDialog.ReceiveCallback() {
+                ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(MainActivity.this, signList.get(i).getDoubleGold(), signList.get(i).getBoxId() + "",i,isDouble, new ReceiveGoldDialog3.ReceiveCallback() {
                     @Override
                     public void receive(int flag, String applyId) {
-                        //开启激励视频
-                        if (flag == 1) {
-                            getSign();
-                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (flag == 1) {
+                                    getData();
+                                }
+                                if (flag==2) {
+                                    // 开启激励视频
+                                    ReWardVideoAdUtils.initAd(MainActivity.this,applyId,income);
+                                }
+                            }
+                        });
+
+
                     }
                 });
                 dialog.show();
@@ -779,37 +775,7 @@ public class MainActivity extends BaseActivity {
         switch (view.getId()) {
             case R.id.tv_sign:
                 loadingDialog.show();
-                RxHttp.postEncryptJson(ComParamContact.Main.GET_SIGN).asResponse(String.class).subscribe(
-                        s -> {
-                            String result = AESUtil.decrypt(s, AESUtil.KEY);
-                            IsSignModel isSignModel = new Gson().fromJson(result, IsSignModel.class);
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    loadingDialog.dismiss();
-                                    if (isSignModel.isSuccess()) {
-                                        tvSign.setVisibility(View.GONE);
-                                        tvMoreSign.setVisibility(View.VISIBLE);
-                                        if (weekSign == 2) {
-                                            //第三天签到
-                                            showSignDialog(2);
-                                        } else if (weekSign == 6) {
-                                            //第四天签到
-                                            showSignDialog(6);
-                                        } else {
-                                            showNormalDialog();
-                                        }
-                                        getSign();
-                                    } else {
-                                        Tip.show("签到失败！");
-                                        tvSign.setVisibility(View.VISIBLE);
-                                        tvMoreSign.setVisibility(View.GONE);
-                                    }
-                                }
-                            });
-                        }, throwable -> {
-                        });
+                gotoSign();
                 break;
             case R.id.tv_with_draw:
                 ARouter.getInstance().build("/ui/MyWalletActivity").navigation();
@@ -850,77 +816,44 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void showNormalDialog() {
-        SignSuccessNormalDialog dialog = new SignSuccessNormalDialog(MainActivity.this, weekSign);
+    private void gotoSign() {
+        RxHttp.postEncryptJson(ComParamContact.Main.GET_SIGN).asResponse(String.class).subscribe(
+                s -> {
+                    String result = AESUtil.decrypt(s, AESUtil.KEY);
+                    IsSignModel isSignModel = new Gson().fromJson(result, IsSignModel.class);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingDialog.dismiss();
+                            if (isSignModel.isSuccess()) {
+                                tvSign.setVisibility(View.GONE);
+                                tvMoreSign.setVisibility(View.VISIBLE);
+                                if (weekSign == 2) {
+                                    //第三天签到
+                                    showSignDialog(2,isSignModel.isIsDouble());
+                                } else if (weekSign == 6) {
+                                    showSignDialog(6,isSignModel.isIsDouble());
+                                } else {
+                                    showNormalDialog(isSignModel.getWeekSign(),income);
+                                }
+                                getSign();
+                                EventBus.getDefault().post(new MessageWrap(1));
+                            } else {
+                                Tip.show("签到失败！");
+                                tvSign.setVisibility(View.VISIBLE);
+                                tvMoreSign.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }, throwable -> {
+                });
+    }
+
+    private void showNormalDialog(int weekSigns ,int inCome) {
+        SignSuccessNormalDialog dialog = new SignSuccessNormalDialog(MainActivity.this, weekSigns,inCome);
         dialog.show();
     }
 
-    private void setStr() {
-        int i = 0;
-        for (MainTask.DayTaskBean bean : dayTaskList) {
-            if (bean.getTaskViewStatus() == 0) {
-                i++;
-            }
-        }
-
-        SpannableStringBuilder spannableString = new SpannableStringBuilder();
-        if (i == 0) {
-            spannableString.append("任务达成，点击领取宝箱");
-        } else {
-            spannableString.append("还差" + i + "个任务，开启宝箱领金币");
-            /**
-             * 颜色
-             */
-            ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#FB4E42"));
-            spannableString.setSpan(colorSpan, 2, 3, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        }
-        tvDes.setText(spannableString);
-        if (i == 0) {
-            //生成宝箱
-            ObjectAnimator animator = AnimatorUtil.sway(ivBx);
-            animator.setRepeatCount(ValueAnimator.INFINITE);
-            animator.start();
-            ivBx.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //查询每日任务宝箱状态
-                    RxHttp.postEncryptJson(ComParamContact.Main.queryTreasureBoxTaskStatus).add("type", "1").add("typeValue", "dayTask").asResponse(String.class).subscribe(s -> {
-                        String result = AESUtil.decrypt(s, AESUtil.KEY);
-                        BoxState boxState = new Gson().fromJson(result, BoxState.class);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ReceiveGoldDialog dialog = new ReceiveGoldDialog(MainActivity.this, boxState.getGoldCount(), boxState.getId() + "", new ReceiveGoldDialog.ReceiveCallback() {
-                                    @Override
-                                    public void receive(int flag, String applyId) {
-                                        //开启激励视频
-                                        if (flag == 1) {
-                                            ivBx.setVisibility(View.GONE);
-                                            tvDes.setVisibility(View.GONE);
-                                        }
-                                        if (flag == 2) {
-
-                                        }
-                                    }
-                                });
-                                dialog.show();
-                            }
-                        });
-
-                    }, (OnError) error -> {
-                        error.show();
-                    });
-
-                }
-            });
-        } else {
-            ivBx.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Tip.show("任务未达标，请先完成任务");
-                }
-            });
-        }
-    }
 
 }

@@ -97,7 +97,7 @@ public class WithdrawalActivity extends BaseActivity {
     @Override
     public void init() {
         tvBarTitle.setText("提现中心");
-        tvSubmit.setText("审核进度");
+        tvSubmit.setText("提现记录");
         tvSubmit.setVisibility(View.VISIBLE);
         initView();
         getDates();
@@ -249,6 +249,11 @@ public class WithdrawalActivity extends BaseActivity {
                     holder.setBackgroundRes(R.id.ll_bg, R.mipmap.duibk2);
                 } else {
                     holder.setBackgroundRes(R.id.ll_bg, R.drawable.shape_board_f3);
+                }
+                if (list1 .get(position).getCode().equals("new_user")){
+                    holder.setText(R.id.tv_content," 新用户专享");
+                }else{
+                    holder.setText(R.id.tv_content," 连续活跃专享");
                 }
 
             }
