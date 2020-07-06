@@ -80,6 +80,19 @@ public class ReviewProgressActivity extends BaseActivity {
         });
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     private void initView() {
         RlvManagerUtils.createLinearLayout(this, rlv);
         list.add(new ReviewProgressModel());
