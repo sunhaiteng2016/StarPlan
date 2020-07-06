@@ -1,8 +1,10 @@
 package com.boniu.starplan.ui;
 
 
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.KeyEvent;
+import android.widget.FrameLayout;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
@@ -11,10 +13,16 @@ import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.dialog.AgreementDialog;
 import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.StringUtils;
+import com.boniu.starplan.utils.Tip;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class LauncherActivity extends BaseActivity {
 
     AgreementDialog dialog;
+    @BindView(R.id.fl_layout)
+    FrameLayout flLayout;
     private String token;
 
     @Override
@@ -31,24 +39,14 @@ public class LauncherActivity extends BaseActivity {
                 dialog = new AgreementDialog(mContext, new AgreementDialog.CallBlack() {
                     @Override
                     public void onDismiss() {
-                        if (StringUtils.isEmpty(token)) {
-                            ARouter.getInstance().build("/ui/LoginActivity").navigation();
-                        } else {
-                            ARouter.getInstance().build("/ui/MainActivity").navigation();
-                        }
-                        finish();
+                        gotoMain();
                     }
                 });
                 dialog.setCanceledOnTouchOutside(false);
             }
             dialog.show();
         } else {
-            if (StringUtils.isEmpty(token)) {
-                ARouter.getInstance().build("/ui/LoginActivity").navigation();
-            } else {
-                ARouter.getInstance().build("/ui/MainActivity").navigation();
-            }
-            finish();
+            gotoMain();
         }
     }
 
@@ -57,14 +55,19 @@ public class LauncherActivity extends BaseActivity {
 
             @Override
             public void onTick(long l) {
-
+               // Tip.show("dsd");
             }
 
             @Override
             public void onFinish() {
-
+                if (StringUtils.isEmpty(token)) {
+                    ARouter.getInstance().build("/ui/LoginActivity").navigation();
+                } else {
+                    ARouter.getInstance().build("/ui/MainActivity").navigation();
+                }
+                finish();
             }
-        };
+        }.start();
     }
 
     public void exitApp() {
@@ -75,5 +78,12 @@ public class LauncherActivity extends BaseActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         finish();
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO: add setContentView(...) invocation
+        ButterKnife.bind(this);
     }
 }

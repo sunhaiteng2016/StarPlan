@@ -44,6 +44,15 @@ public class ExpendModel {
         private String state;
         private String stateDes;
         private String userTaskType;
+        private String remark;
+
+        public String getRemark() {
+            return remark;
+        }
+
+        public void setRemark(String remark) {
+            this.remark = remark;
+        }
 
         public long getCreateTime() {
             return createTime;

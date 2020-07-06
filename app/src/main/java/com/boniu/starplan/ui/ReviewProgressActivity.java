@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -18,9 +19,13 @@ import com.boniu.starplan.entity.ApplyTask;
 import com.boniu.starplan.entity.ReviewProgressModel;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
+import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
 
@@ -45,11 +50,15 @@ public class ReviewProgressActivity extends BaseActivity {
     TextView tvBarTitle;
     @BindView(R.id.tv_submit)
     TextView tvSubmit;
+    @BindView(R.id.refreshLayout)
+    RefreshLayout refreshLayout;
     @BindView(R.id.rlv)
     RecyclerView rlv;
-    private List<ReviewProgressModel> list = new ArrayList<>();
-    private CommonAdapter<ReviewProgressModel> adapter;
+    private List<ReviewProgressModel.RowsBean> list = new ArrayList<>();
+    private CommonAdapter<ReviewProgressModel.RowsBean> adapter;
     private LoadingDialog loadingDialog;
+    private int page=1;
+    private int pageSize=10;
 
     @Override
     public int getLayoutId() {
@@ -66,9 +75,21 @@ public class ReviewProgressActivity extends BaseActivity {
     }
 
     private void getDates() {
-        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.listAuditSchedule) .add("page",page).add("pageSize",pageSize).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
-
+            ReviewProgressModel reviewProgressModel = new Gson().fromJson(result, ReviewProgressModel.class);
+            List<ReviewProgressModel.RowsBean> rows = reviewProgressModel.getRows();
+            if (page==1){
+                list.clear();
+            }
+            list.addAll(rows);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadingDialog.dismiss();
+                    adapter.notifyDataSetChanged();
+                }
+            });
         }, (OnError) error -> {
             runOnUiThread(new Runnable() {
                 @Override
@@ -95,17 +116,35 @@ public class ReviewProgressActivity extends BaseActivity {
 
     private void initView() {
         RlvManagerUtils.createLinearLayout(this, rlv);
-        list.add(new ReviewProgressModel());
-        list.add(new ReviewProgressModel());
-        list.add(new ReviewProgressModel());
-        adapter = new CommonAdapter<ReviewProgressModel>(this, R.layout.item_review_progress, list) {
+
+        adapter = new CommonAdapter<ReviewProgressModel.RowsBean>(this, R.layout.item_review_progress, list) {
 
             @Override
-            protected void convert(ViewHolder holder, ReviewProgressModel reviewProgressModel, int position) {
-
+            protected void convert(ViewHolder holder, ReviewProgressModel.RowsBean reviewProgressModel, int position) {
+                GlideUtils.getInstance().LoadContextRoundBitmap(ReviewProgressActivity.this,reviewProgressModel.getIcon(),holder.getView(R.id.iv_img),8);
+                holder.setText(R.id.tv_title,reviewProgressModel.getMainTitle())
+                        .setText(R .id.tv_income,reviewProgressModel.getIncome()+"")
+                        .setText(R.id.tv_time,reviewProgressModel.getCreateDate()).setText(R .id.tv_remark,reviewProgressModel.getRemark());
             }
         };
         rlv.setAdapter(adapter);
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshlayout) {
+                refreshlayout.finishLoadMore(1000/*,false*/);//传入false表示加载失败
+                page++;
+                getDates();
+            }
+        });
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                refreshLayout .finishRefresh();
+                page=1;
+                getDates();
+            }
+        });
     }
 
     @Override

@@ -127,7 +127,7 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
     }
 
     private void getData() {
-        RxHttp.postEncryptJson(ComParamContact.Main.GET_TASK).add("userTaskId", userTaskId).add("type", "2").asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.GET_TASK).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             receiveGoldModel = new Gson().fromJson(result, ReceiveGoldModel.class);
             ReceiveGoldModel.TaskDetailVOBean.AuditTaskVOBean auditTaskVO = receiveGoldModel.getTaskDetailVO().getAuditTaskVO();
@@ -205,11 +205,17 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                     SPUtils.getInstance().put("taskID", taskId);
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl()));
                     startActivity(browserIntent);
+                     tvEndTask.setBackgroundResource(R.drawable.shape_round_green_22);
+                     tvEndTask.setTextColor(getResources().getColor(R.color.white));
                 } else {
                     Tip.show("链接失效，请退出重试！");
                 }
                 break;
             case R.id.tv_end_task:
+                if (SPUtils.getInstance().getInt("taskID",-1)==-1){
+                    Tip.show("请先开始任务！");
+                    return;
+                }
                 ARouter.getInstance().build("/ui/FinishRegisterActivity").withInt("userTaskId", userTaskId).navigation();
                 break;
             case R.id.rl_back:

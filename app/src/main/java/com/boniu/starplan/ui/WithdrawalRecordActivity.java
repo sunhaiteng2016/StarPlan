@@ -113,8 +113,15 @@ public class WithdrawalRecordActivity extends BaseActivity {
             @Override
             protected void convert(ViewHolder holder, WithDrawalListBean recordBean, int position) {
                 holder.setText(R.id.tv_time, DateTimeUtils.format(recordBean.getCreateTime(), DateTimeUtils.FORMAT_LONG_CN))
-                        .setText(R.id.tv_price, recordBean.getWithdrawalAmount() + "元")
-                        .setText(R.id.tv_state, recordBean.getStateDes() + "");
+                        .setText(R.id.tv_price, recordBean.getGoldAmount()/1000 + "元")
+                        .setText(R.id.tv_state, recordBean.getStateDes() + "").setText(R.id.tv_err,recordBean.getRemark());
+
+                String state = recordBean.getState();
+                if (state.equals("1")){
+
+                }else{
+
+                }
             }
         };
         recyclerView.setAdapter(adapter);

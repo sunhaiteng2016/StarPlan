@@ -9,7 +9,10 @@ import androidx.annotation.NonNull;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
+import com.boniu.starplan.entity.MessageWrap;
 import com.boniu.starplan.utils.SPUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
 
@@ -31,7 +34,7 @@ public class EverydayLogDialog extends Dialog {
             @Override
             public void onClick(View view) {
                 dismiss();
-                ARouter.getInstance().build("/ui/MyWalletActivity").navigation();
+                EventBus.getDefault().post(new MessageWrap(2));
             }
         });
         findViewById(R.id.tv_no_remind).setOnClickListener(new View.OnClickListener() {

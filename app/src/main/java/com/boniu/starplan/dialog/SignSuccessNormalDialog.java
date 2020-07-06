@@ -4,6 +4,7 @@ package com.boniu.starplan.dialog;
  * 签到成功
  */
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -13,27 +14,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.boniu.starplan.R;
+import com.boniu.starplan.ad.ReWardVideoAdUtils;
+import com.boniu.starplan.entity.MessageWrap;
+import com.boniu.starplan.helper.MainActivityHelper;
+
+import org.greenrobot.eventbus.EventBus;
 
 
 public class SignSuccessNormalDialog extends Dialog {
 
-    private int flag;
+    private int flag,inCome;
     private SubMitCallBack subMitCallBack;
+    private TextView tvPrice;
 
-    public SignSuccessNormalDialog(@NonNull Context context) {
-        super(context, R.style.CustomProgressDialog);
-    }
 
-    public SignSuccessNormalDialog(@NonNull Context context, int flag, SubMitCallBack subMitCallBack) {
+    public SignSuccessNormalDialog(@NonNull Context context, int flag,int inCome) {
         super(context, R.style.CustomProgressDialog);
         this.flag = flag;
-        this.subMitCallBack = subMitCallBack;
-    }
-
-    public SignSuccessNormalDialog(@NonNull Context context, int flag) {
-        super(context, R.style.CustomProgressDialog);
-        this.flag = flag;
-        this.subMitCallBack = subMitCallBack;
+        this.inCome = inCome;
     }
 
     @Override
@@ -45,34 +43,28 @@ public class SignSuccessNormalDialog extends Dialog {
         if (flag == 0) {
             flag = 1;
         }
-        tv2.setText("已签到" + flag + "天，召唤大礼包");
+        tv2.setText("已签到" + flag + "天,继续签到可获得大礼包");
         tvSubmit.setText("看视频领取更多");
-        /*RelativeLayout rl = findViewById(R.id.rl);
-        Animation rotate = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
-        if (rotate != null) {
-            rl.startAnimation(rotate);
-        } else {
-            rl.setAnimation(rotate);
-            rl.startAnimation(rotate);
-        }*/
+
         tvSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MainActivityHelper.newInstance().AdLook((Activity) getContext());
                 //领取签到奖励
-                if (subMitCallBack != null) {
-                    subMitCallBack.onSuccess();
-                } else {
-
-                }
+                //看视频
 
             }
         });
         findViewById(R.id.iv_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                EventBus.getDefault().post(new MessageWrap(1));
                 dismiss();
             }
         });
+
+        tvPrice=findViewById(R .id.tv_price);
+        tvPrice.setText(inCome+"");
 
     }
 

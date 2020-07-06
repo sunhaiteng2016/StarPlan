@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.boniu.starplan.R;
+import com.boniu.starplan.ad.ReWardVideoAdUtils;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.base.Response;
 import com.boniu.starplan.constant.ComParamContact;
@@ -138,7 +139,7 @@ public class SignInRewardActivity extends BaseActivity {
                             if (continuityList.get(6).getIsReceive() == 0) {
                                 tvTake7.setText("领取奖励");
                                 tvTake7.setBackgroundResource(R.drawable.shape_round_22_red);
-                            } else if (continuityList.get(6).getIsReceive() == 0) {
+                            } else if (continuityList.get(6).getIsReceive() == 1) {
                                 tvTake7.setText("已领取");
                                 tvTake7.setBackgroundResource(R.drawable.shape_round_16_c3);
                             } else {
@@ -242,6 +243,7 @@ public class SignInRewardActivity extends BaseActivity {
                         holder.setVisible(R.id.tv_hb_open, false);
                         holder.setVisible(R.id.tv_hb_close, false);
                         holder.setVisible(R.id.tv_circle, true);
+                        holder.setBackgroundColor(R.id.tv_circle,R.mipmap.signjinbi);
                     }
                 }
 
@@ -323,10 +325,22 @@ public class SignInRewardActivity extends BaseActivity {
             case R.id.tv_take:
                 if (continuityList == null) return;
                 if (continuityList.get(2).getIsReceive() == 0) {
-                    ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(SignInRewardActivity.this, continuityList.get(2).getDoubleGold(), continuityList.get(2).getBoxId() + "", new ReceiveGoldDialog3.ReceiveCallback() {
+                    ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(SignInRewardActivity.this, continuityList.get(2).getDoubleGold(), continuityList.get(2).getBoxId() + "",2,continuityList.get(2).isIsDouble(), new ReceiveGoldDialog3.ReceiveCallback() {
                         @Override
                         public void receive(int flag, String applyId) {
-                            //开启激励视频
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (flag==1){
+                                        getData();
+                                    }
+                                    //开启激励视频
+                                    if (flag==2){
+                                        ReWardVideoAdUtils.initAd(SignInRewardActivity.this,applyId,continuityList.get(2).getDoubleGold());
+                                    }
+                                }
+                            });
+
                         }
                     });
                     dialog.show();
@@ -337,10 +351,21 @@ public class SignInRewardActivity extends BaseActivity {
             case R.id.tv_take7:
                 if (continuityList == null) return;
                 if (continuityList.get(6).getIsReceive() == 0) {
-                    ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(SignInRewardActivity.this, continuityList.get(6).getDoubleGold(), continuityList.get(6).getBoxId() + "", new ReceiveGoldDialog3.ReceiveCallback() {
+                    ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(SignInRewardActivity.this, continuityList.get(6).getDoubleGold(), continuityList.get(6).getBoxId() + "",6,continuityList.get(6).isIsDouble(), new ReceiveGoldDialog3.ReceiveCallback() {
                         @Override
                         public void receive(int flag, String applyId) {
-                            //开启激励视频
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (flag==1){
+                                        getData();
+                                    }
+                                    //开启激励视频
+                                    if (flag==2){
+                                        ReWardVideoAdUtils.initAd(SignInRewardActivity.this,applyId,continuityList.get(6).getDoubleGold());
+                                    }
+                                }
+                            });
                         }
                     });
                     dialog.show();

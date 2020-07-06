@@ -3,12 +3,14 @@ package com.boniu.starplan.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
@@ -49,33 +51,25 @@ public class OpenApp {
         }
     }
 
-    //检测Android版本--是否具有安装文件的权限
-    public static void checkInstallApkPermission(Context context, String filePath) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (context.getPackageManager().canRequestPackageInstalls()) {
-                installApk(context, new File(filePath));
+
+    public static  void installApk(Context context, File file) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Uri apkUri = FileProvider.getUriForFile(context, "com.boniu.starplan.TTFileProvider", file);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
             } else {
-                installApk(context, new File(filePath));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Uri uri = Uri.fromFile(file);
+                intent.setDataAndType(uri, "application/vnd.android.package-archive");
             }
-        } else {
-            installApk(context, new File(filePath));
+            context.startActivity(intent);
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
-
-    private static void installApk(Context mContext, File apk) {
-        Uri uri = null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            uri = Uri.fromFile(apk);
-        } else {
-            uri = FileProvider.getUriForFile(mContext, mContext.getPackageName() + ".fileprovider", apk);
-        }
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(uri, "application/vnd.android.package-archive");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        mContext.startActivity(intent);
-    }
-
     /**
      * 打开外部浏览器
      */
@@ -112,5 +106,22 @@ public class OpenApp {
             }
         }
         return hasInstalled;
+    }
+
+    public static boolean isBackground(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.processName.equals(context.getPackageName())) {
+                if (appProcess.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    Log.e("asd", "后台"+ appProcess.processName);
+                    return true;
+                } else {
+                    Log.e("asd", "前台"+ appProcess.processName);
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 }

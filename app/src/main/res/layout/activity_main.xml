@@ -101,6 +101,7 @@
                             android:paddingRight="@dimen/dp8">
 
                             <RelativeLayout
+                                android:id="@+id/rl_drawerLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp">
 

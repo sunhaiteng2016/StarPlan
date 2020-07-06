@@ -81,23 +81,29 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
         TextView tvDes = childView.findViewById(R.id.tv_des);
 
         tvTitle.setText(list.get(i).getList().get(i1).getUserTaskType());
-        tvGoldNum.setText("-" + list.get(i).getList().get(i1).getGoldAmount());
+        tvGoldNum.setText("-" + list.get(i).getList().get(i1).getGoldAmount()+"金币");
         tvTime.setText(DateTimeUtils.format(list.get(i).getList().get(i1).getCreateTime(), DateTimeUtils.FORMAT_LONG_CN));
         tvDes.setText(list.get(i).getList().get(i1).getStateDes());
         String state = list.get(i).getList().get(i1).getState();
+        if (state.equals("1")){
+            tvDes.setVisibility(View.VISIBLE);
+        }else{
+            tvDes.setVisibility(View.GONE);
+        }
+        tvState.setText(list.get(i).getList().get(i1).getRemark());
         switch (state) {
             case "2":
             case "5":
-                tvState.setTextColor(context.getResources().getColor(R.color.black));
-                tvState.setText("兑换成功");
+                tvDes.setTextColor(context.getResources().getColor(R.color.black));
+                tvDes.setText("兑换成功");
                 break;
             case "1":
-                tvState.setTextColor(context.getResources().getColor(R.color.FA6400));
-                tvState.setText("审核中");
+                tvDes.setTextColor(context.getResources().getColor(R.color.FA6400));
+                tvDes.setText("审核中");
                 break;
             default:
-                tvState.setTextColor(context.getResources().getColor(R.color.FF5151));
-                tvState.setText("兑换失败");
+                tvDes.setTextColor(context.getResources().getColor(R.color.FF5151));
+                tvDes.setText("兑换失败");
                 break;
         }
         return childView;

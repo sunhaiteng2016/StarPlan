@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp6"
             android:paddingLeft="@dimen/dp16"
+            android:paddingRight="@dimen/dp16"
             android:paddingBottom="@dimen/dp16"
             android:textSize="13sp"
             android:text="每次只能做一个任务，确认放弃进行中任务，并开始当前任务吗？"

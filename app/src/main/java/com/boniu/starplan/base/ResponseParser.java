@@ -9,6 +9,9 @@ import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 
@@ -33,10 +36,7 @@ public class ResponseParser<T> extends AbstractParser<T> {
     public T onParse(okhttp3.Response response) throws IOException {
         final Type type = ParameterizedTypeImpl.get(Response.class, mType); //获取泛型类型
         Response<T> data = convert(response, type);
-        String t = data.getResult(); //获取data字段
-        if (null == t) {
-            t = "";
-        }
+        T t = (T) data.getResult(); //获取data字段
         Log.e("sht", "code->" + data.getReturnCode());
         if (data.getReturnCode() == -400) {
             //清空token

@@ -100,23 +100,19 @@ public class LoginActivity extends BaseActivity {
                 RxHttp.postEncryptJson(ComParamContact.Login.LOGIN)
                         .add(ComParamContact.Login.MOBILE, phone)
                         .add(ComParamContact.Login.CODE, code)
-                        .asString()
+                        .asResponse(String .class)
                         .subscribe(s -> {
                             loadingDialog.dismiss();
-                            Response codeBean = new Gson().fromJson(s, Response.class);
-                            if (codeBean.getSuccess()) {
-                                String result = AESUtil.decrypt((String) codeBean.getResult(), AESUtil.KEY);
+                                String result = AESUtil.decrypt(s, AESUtil.KEY);
                                 LoginInfo loginInfo = new Gson().fromJson(result, LoginInfo.class);
                                 SPUtils.getInstance().put(ComParamContact.Login.MOBILE, loginInfo.getMobile());
-                                SPUtils.getInstance().put(ComParamContact.Common.TOKEN_KEY, loginInfo.getUToken());
+                                SPUtils.getInstance().put(ComParamContact.Common.TOKEN_KEY, loginInfo.getUtoken());
                                 Tip.show("登录成功！");
                                 ARouter.getInstance().build("/ui/MainActivity").navigation();
                                 finish();
-                            } else {
-                                Tip.show(codeBean.getErrorMsg());
-                            }
                         }, (OnError) error -> {
                             error.show();
+                            loadingDialog.dismiss();
                         });
                 break;
         }

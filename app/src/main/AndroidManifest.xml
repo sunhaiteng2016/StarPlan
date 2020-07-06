@@ -7,14 +7,11 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <!--可选，穿山甲提供“获取地理位置权限”和“不给予地理位置权限，开发者传入地理位置参数”两种方式上报用户位置，两种方式均可不选，添加位置权限或参数将帮助投放定位广告-->
-    <!--请注意：无论通过何种方式提供给穿山甲用户地理位置，均需向用户声明地理位置权限将应用于穿山甲广告投放，穿山甲不强制获取地理位置信息-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- 如果有视频相关的广告且使用textureView播放，请务必添加，否则黑屏 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 可选，穿山甲提供“获取地理位置权限”和“不给予地理位置权限，开发者传入地理位置参数”两种方式上报用户位置，两种方式均可不选，添加位置权限或参数将帮助投放定位广告 -->
+    <!-- 请注意：无论通过何种方式提供给穿山甲用户地理位置，均需向用户声明地理位置权限将应用于穿山甲广告投放，穿山甲不强制获取地理位置信息 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 如果有视频相关的广告且使用textureView播放，请务必添加，否则黑屏 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".ui.ApplicationUtils"
@@ -25,17 +22,7 @@
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.boniu.starplan.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_path" />
-        </provider>
-
+        <activity android:name=".ui.GameWebViewActivity"/>
         <activity android:name=".ui.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,8 +30,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LoginActivity"
-            android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".ui.LoginActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ui.FinishRegisterActivity" />
         <activity android:name=".ui.ReceiveGoldDetailsActivity" />
         <activity android:name=".ui.ReceiveGoldCoinActivity" />
@@ -57,13 +46,10 @@
         <activity android:name=".ui.WebViewActivity" />
         <activity android:name=".ui.MyWalletActivity" />
         <activity android:name=".ui.ReviewProgressActivity" />
-        <activity android:name=".ui.DownLoadWebViewActivity" />
-
-        <!--value的值填写你在友盟后台申请的应用Appkey-->
+        <activity android:name=".ui.DownLoadWebViewActivity" /> <!-- value的值填写你在友盟后台申请的应用Appkey -->
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="5a910933f29d986f35000064" />
-        <!--value的值填写渠道名称，例如yingyongbao。这里设置动态渠道变量-->
+            android:value="5a910933f29d986f35000064" /> <!-- value的值填写渠道名称，例如yingyongbao。这里设置动态渠道变量 -->
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="${UMENG_CHANNEL_VALUE}" />

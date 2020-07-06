@@ -222,12 +222,13 @@ public class TryToEarnActivity extends BaseActivity {
                     @Override
                     public void run() {
                         loadingDialog1.dismiss();
+                        isRunningTask = false;
+                        rlRunningTask.setVisibility(View.GONE);
                         //是否开始新的任务
                         RunningTaskDialog dialog = new RunningTaskDialog(TryToEarnActivity.this, 2, new RunningTaskDialog.RunningCallback() {
                             @Override
                             public void running() {
-                                isRunningTask = false;
-                                rlRunningTask.setVisibility(View.GONE);
+
                                 ReceiveTask(clickTaskId);
                             }
                         });
@@ -257,7 +258,7 @@ public class TryToEarnActivity extends BaseActivity {
      */
     private void ReceiveTask(int taskId) {
         loadingDialog1.show();
-        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).add("applySource","1").asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             ApplyTask applyTask = new Gson().fromJson(result, ApplyTask.class);
             userTaskId = applyTask.getUserTaskId();
