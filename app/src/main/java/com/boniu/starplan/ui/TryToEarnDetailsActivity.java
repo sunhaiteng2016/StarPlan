@@ -3,6 +3,7 @@ package com.boniu.starplan.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Path;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -199,6 +200,8 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     SPUtils.getInstance().put("taskID", taskId);
                     SPUtils.getInstance().put("beginTime", System.currentTimeMillis());
                     //还要开始任务
+                    OpenApp.OpenApp(this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
+
                 } else {
                     Tip.show("请安装后， 再试玩！");
                 }
@@ -210,10 +213,17 @@ public class TryToEarnDetailsActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        long aLong = SPUtils.getInstance().getLong("beginTime", 0);
+        boolean background = OpenApp.isBackground(mContext);
+        if (background){
+            long aLong = SPUtils.getInstance().getLong("taskTime", 0);
+            if (System.currentTimeMillis() - aLong < 5000){
+                begin();
+            }
+        }
+       /* long aLong = SPUtils.getInstance().getLong("beginTime", 0);
         if (System.currentTimeMillis() - aLong < 5000){
             begin();
-        }
+        }*/
     }
 
 
@@ -221,7 +231,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
         RxHttp.postEncryptJson(ComParamContact.Main.TASK_BEGIN).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             if (result.equals("1")) {
-                OpenApp.OpenApp(this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
+                Tip.show("开始任务！");
             } else {
                 Tip.show("开始失败，请重试！");
             }
@@ -296,12 +306,6 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     }else{
                         OpenApp.installApk(mContext,destPath);
                     }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            OpenApp.installApk(TryToEarnDetailsActivity.this,destPath);
-                        }
-                    });
 
                     //下载成功，处理相关逻辑
                 }, (OnError) error -> {

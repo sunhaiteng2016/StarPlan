@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.boniu.starplan.R;
 import com.boniu.starplan.ad.ReWardVideoAdUtils;
 import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.dialog.EverydayLogDialog;
@@ -203,6 +204,7 @@ public class MainActivityHelper {
                                 }
                             }
 
+
                             SpannableStringBuilder spannableString = new SpannableStringBuilder();
                             if (i == 0) {
                                 spannableString.append("任务达成，点击领取宝箱");
@@ -241,8 +243,8 @@ public class MainActivityHelper {
                                                                 @Override
                                                                 public void run() {
                                                                     if (flag == 1) {
-                                                                                ivBx.setVisibility(View.GONE);
-                                                                                tvDes.setVisibility(View.GONE);
+                                                                                ivBx.setBackgroundResource(R.mipmap.baoxiang);
+                                                                                tvDes.setText("宝箱已领取");
                                                                     }
                                                                     if (flag == 2) {
                                                                         ReWardVideoAdUtils.initAd(context,applyId,boxState.getGoldCount());

@@ -243,6 +243,7 @@ public class SignInRewardActivity extends BaseActivity {
                         holder.setVisible(R.id.tv_hb_open, false);
                         holder.setVisible(R.id.tv_hb_close, false);
                         holder.setVisible(R.id.tv_circle, true);
+                        holder.setBackgroundColor(R.id.tv_circle,R.mipmap.signjinbi);
                     }
                 }
 

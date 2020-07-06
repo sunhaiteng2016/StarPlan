@@ -6,6 +6,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.RequiresApi;
@@ -61,7 +62,12 @@ public class GameWebViewActivity extends BaseActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-
+                webView.requestLayout();
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) webView.getLayoutParams();
+                layoutParams.leftMargin = dp2px(12);
+                layoutParams.rightMargin = dp2px(12);
+                webView.setLayoutParams(layoutParams);
+                //replaceLicenseAppName(webview);
 
             }
         };
@@ -73,13 +79,13 @@ public class GameWebViewActivity extends BaseActivity {
         settings.setDisplayZoomControls(false);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
-        webView.loadUrl("http://www.baidu.com");
+        webView.loadUrl("https://www.baidu.com/");
     }
 
     private void getData() {
         LoadingDialog dialog = new LoadingDialog(this);
         dialog.show();
-        RxHttp.postEncryptJson(ComParamContact.Main.gameUrl).add("gameChannel","1")
+        RxHttp.postEncryptJson(ComParamContact.Main.gameUrl).add("gameChannel","1").add("deviceId","")
                 .asResponse(String.class)
                 .subscribe(s -> {
                     String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
@@ -106,5 +112,9 @@ public class GameWebViewActivity extends BaseActivity {
     @OnClick(R.id.rl_back)
     public void onViewClicked() {
         finish();
+    }
+    public static int dp2px(float dipValue) {
+        float scale = ApplicationUtils.getContext().getResources().getDisplayMetrics().density;
+        return (int)(dipValue * scale + 0.5F);
     }
 }

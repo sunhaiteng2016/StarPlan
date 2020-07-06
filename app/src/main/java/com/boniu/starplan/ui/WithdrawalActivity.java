@@ -1,6 +1,7 @@
 package com.boniu.starplan.ui;
 
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,10 +18,15 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.DialogReturnInterfaces;
+import com.boniu.starplan.dialog.GeneralFailDialog;
+import com.boniu.starplan.dialog.LoadingDialog;
+import com.boniu.starplan.dialog.SubmitReviewDialog;
 import com.boniu.starplan.dialog.Withdrawal2Dialog;
 import com.boniu.starplan.dialog.WithdrawalDialog;
 import com.boniu.starplan.entity.ExclusModel;
 import com.boniu.starplan.entity.MyGoldBean;
+import com.boniu.starplan.entity.NoticeBean;
 import com.boniu.starplan.entity.PriceModel;
 import com.boniu.starplan.entity.ProgressModel;
 import com.boniu.starplan.entity.TransferInfoBean;
@@ -88,7 +94,7 @@ public class WithdrawalActivity extends BaseActivity {
     private String clickType = "";
     private Long withdrwaalMoney = 0L;
     private MyGoldBean myGoldBean;
-
+    private String putongTixian = "ordinary_withdrawal";
     @Override
     public int getLayoutId() {
         return R.layout.activity_withdrawal;
@@ -195,7 +201,6 @@ public class WithdrawalActivity extends BaseActivity {
                     //设置签到数据
                 }, (OnError) error -> {
                     error.show();
-
                 });
 
     }
@@ -222,6 +227,7 @@ public class WithdrawalActivity extends BaseActivity {
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
                 withdrwaalMoney = Long.parseLong(list.get(i).price);
                 list.get(i).isSel = true;
+                clickType=putongTixian;
                 clearExclusiveSel();
                 //其他的都不选中
                 for (int j = 0; j < list.size(); j++) {
@@ -297,6 +303,12 @@ public class WithdrawalActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        getDates();
+    }
+
     @OnClick({R.id.tv_submit, R.id.tv_submit_s})
     public void onClick(View view) {
         switch (view.getId()) {
@@ -305,15 +317,19 @@ public class WithdrawalActivity extends BaseActivity {
                 break;
             case R.id.tv_submit_s:
                 // 查看是那个提现
-                if (!StringUtils.isEmpty(clickType)) {
-                    if (withdrwaalMoney > myGoldBean.getAvailableBalance()) {
+                if ("error".equals(clickType)){
+                    Tip.show("活跃度提现未满足规则");
+                    return;
+                }else if(StringUtils.isEmpty(clickType)){
+                    Tip.show("还未选择提现方式");
+                    return;
+                }else{
+                    if ( withdrwaalMoney > myGoldBean.getAvailableBalance() ){
                         Tip.show("提现金额不足");
                         return;
                     }
-                } else {
-                    Tip.show("提现规则不满足");
-                    return;
                 }
+
                 transferInfo();
                 break;
         }
@@ -323,30 +339,37 @@ public class WithdrawalActivity extends BaseActivity {
      * 提现
      */
     private void transferInfo() {
-
+        LoadingDialog dialog=new LoadingDialog(this);
+        dialog.show();
         RxHttp.postEncryptJson(ComParamContact.Main.transferInfo)
                 .asResponse(String.class)
                 .subscribe(s -> {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);
                     TransferInfoBean transferInfoBean = new Gson().fromJson(result, TransferInfoBean.class);
-                    if ("YES".equals(transferInfoBean.getChangeFlag())) {
-                        WithdrawalDialog withdrawalDialog = new WithdrawalDialog(mContext, withdrwaalMoney + "", new Withdrawal2Dialog.WithdrawalInterfaces() {
-                            @Override
-                            public void startWithdrawal(String name, String zhanghao) {
-                                withdrawalMoney(name, zhanghao);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            if ("YES".equals(transferInfoBean.getChangeFlag())) {
+                                WithdrawalDialog withdrawalDialog = new WithdrawalDialog(mContext, withdrwaalMoney + "", new Withdrawal2Dialog.WithdrawalInterfaces() {
+                                    @Override
+                                    public void startWithdrawal(String name, String zhanghao) {
+                                        withdrawalMoney(name, zhanghao);
+                                    }
+                                });
+                                withdrawalDialog.show();
+                            } else {
+                                Withdrawal2Dialog withdrawal2Dialog = new Withdrawal2Dialog(mContext, transferInfoBean.getReceivedAccount(), transferInfoBean.getRealName(), withdrwaalMoney + "", new Withdrawal2Dialog.WithdrawalInterfaces() {
+                                    @Override
+                                    public void startWithdrawal(String name, String zhanghao) {
+                                        withdrawalMoney(name, zhanghao);
+                                    }
+                                });
+                                withdrawal2Dialog.show();
                             }
-                        });
-                        withdrawalDialog.show();
-                    } else {
-                        Withdrawal2Dialog withdrawal2Dialog = new Withdrawal2Dialog(mContext, transferInfoBean.getReceivedAccount(), transferInfoBean.getRealName(), withdrwaalMoney + "", new Withdrawal2Dialog.WithdrawalInterfaces() {
-                            @Override
-                            public void startWithdrawal(String name, String zhanghao) {
-                                withdrawalMoney(name, zhanghao);
-                            }
-                        });
-                        withdrawal2Dialog.show();
+                        }
+                    });
 
-                    }
                     //设置签到数据
                 }, (OnError) error -> {
                     error.show();
@@ -363,8 +386,8 @@ public class WithdrawalActivity extends BaseActivity {
     private void withdrawalMoney(String name, String zhanghao) {
         RxHttp.postEncryptJson(ComParamContact.Main.transferInfo)
                 .add("appID", "test")
-                .add("expendAccountID", "aomgdv1151@sandbox.com")
-                .add("expendAccountName", "沙箱环境")
+                .add("expendAccountID", zhanghao)
+                .add("expendAccountName",name)
                 .add("expendAccountType", "1")
                 .add("expendType", clickType + "")
                 .add("goldAmount", withdrwaalMoney + "")
@@ -372,10 +395,45 @@ public class WithdrawalActivity extends BaseActivity {
                 .asResponse(String.class)
                 .subscribe(s -> {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);
+                    NoticeBean noticeBean = new NoticeBean();
+                    noticeBean.setTitle("您已经提交审核");
+                    noticeBean.setContent("可以通过 提现中心 > 提现记录 进行查询");
+                    noticeBean.setClickText("确定");
+                    Dialog dialog = new SubmitReviewDialog(mContext, noticeBean, new DialogReturnInterfaces() {
+                        @Override
+                        public void dismiss() {
 
+                        }
+                        @Override
+                        public void clickType(String clickType) {
+
+
+                        }
+                    });
+                    dialog.show();
+                    withdrwaalMoney=0L;
+                    getDates();
                     //设置签到数据
                 }, (OnError) error -> {
                     error.show();
+
+                    NoticeBean noticeBean = new NoticeBean();
+                    noticeBean.setTitle("提现失败");
+                    noticeBean.setContent(error+"");
+                    noticeBean.setClickText("返回我的钱包");
+                    Dialog dialog = new GeneralFailDialog(mContext, noticeBean, new DialogReturnInterfaces() {
+                        @Override
+                        public void dismiss() {
+
+                        }
+
+                        @Override
+                        public void clickType(String clickType) {
+                            finish();
+                        }
+                    });
+                    dialog.show();
+
 
                 });
     }

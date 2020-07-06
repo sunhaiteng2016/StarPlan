@@ -184,10 +184,8 @@ public class MyWalletActivity extends BaseActivity {
         elvAdapter = new ExpandableListViewAdapter(this, expendList1);
         elv.setAdapter(elvAdapter);
         elv.setGroupIndicator(null);
+        elv.expandGroup(0);
 
-        for (int i = 0; i < 3; i++) {
-            elv.expandGroup(i);
-        }
 
     }
 
@@ -227,5 +225,11 @@ public class MyWalletActivity extends BaseActivity {
                 ARouter.getInstance().build("/ui/WithdrawalActivity").navigation();
                 break;
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        getDates();
     }
 }

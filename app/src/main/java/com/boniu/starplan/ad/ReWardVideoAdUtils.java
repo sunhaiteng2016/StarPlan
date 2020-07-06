@@ -8,6 +8,7 @@ import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.dialog.ReceiveGoldDialog2;
 import com.boniu.starplan.ui.TTAdManagerHolder;
 import com.boniu.starplan.utils.SPUtils;
+import com.boniu.starplan.utils.Tip;
 import com.bytedance.sdk.openadsdk.AdSlot;
 import com.bytedance.sdk.openadsdk.TTAdConstant;
 import com.bytedance.sdk.openadsdk.TTAdNative;
@@ -65,7 +66,7 @@ public class ReWardVideoAdUtils {
                              ReceiveGoldDialog2 dialog2= new ReceiveGoldDialog2(mContext,goldNumer);
                              dialog2.show();
                          }else{
-
+                             Tip.show("奖励获取失败！");
                          }
                     }
 

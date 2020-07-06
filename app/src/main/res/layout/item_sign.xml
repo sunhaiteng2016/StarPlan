@@ -26,7 +26,6 @@
             android:layout_height="@dimen/dp28"
             android:background="@mipmap/hb"
             android:gravity="center|bottom"
-            android:text="888"
             android:padding="@dimen/dp1"
             android:textColor="@color/white"
             android:textSize="12sp" />

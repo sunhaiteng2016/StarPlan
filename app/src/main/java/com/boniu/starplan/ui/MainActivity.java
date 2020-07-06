@@ -163,7 +163,7 @@ public class MainActivity extends BaseActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private NavigationView navigationView;
     private RelativeLayout rlDrawerLayout;
-
+    private int clickSignAdapterPosition;
 
 
     @Override
@@ -635,6 +635,7 @@ public class MainActivity extends BaseActivity {
                         holder.setVisible(R.id.tv_hb_open, false);
                         holder.setVisible(R.id.tv_hb_close, false);
                         holder.setVisible(R.id.tv_circle, true);
+                       holder.setBackgroundRes(R.id.tv_circle,R.drawable.shape_circle_withe);
                     }
                 }
             }
@@ -644,6 +645,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
                     if (signList.get(i).getIsReceive() != 0) return;
+                    clickSignAdapterPosition=i;
                     ReceiveGoldDialog dialog = new ReceiveGoldDialog(MainActivity.this, signList.get(i).getDoubleGold(), signList.get(i).getBoxId() + "",signList.get(i).isIsDouble(), new ReceiveGoldDialog.ReceiveCallback() {
                         @Override
                         public void receive(int flag, String applyId) {
@@ -829,13 +831,15 @@ public class MainActivity extends BaseActivity {
                             if (isSignModel.isSuccess()) {
                                 tvSign.setVisibility(View.GONE);
                                 tvMoreSign.setVisibility(View.VISIBLE);
-                                if (weekSign == 2) {
-                                    //第三天签到
-                                    showSignDialog(2,isSignModel.isIsDouble());
-                                } else if (weekSign == 6) {
-                                    showSignDialog(6,isSignModel.isIsDouble());
-                                } else {
-                                    showNormalDialog(isSignModel.getWeekSign(),income);
+                                isSignModel.getList();
+                                for (int i=0;i<isSignModel.getList().size();i++){
+                                    if (clickSignAdapterPosition==i){
+                                        if (isSignModel.getList().get(i).getType().equals("gif")){
+                                            showSignDialog(i,isSignModel.getList().get(i).isIsDouble());
+                                        }else {
+                                            showNormalDialog(isSignModel.getList().get(i).getWeekSign(),income);
+                                        }
+                                    }
                                 }
                                 getSign();
                                 EventBus.getDefault().post(new MessageWrap(1));

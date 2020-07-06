@@ -34,13 +34,16 @@
             android:textSize="14sp" />
 
         <ImageView
+            android:id="@+id/iv_i_know"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/dp20"
-            android:src="@mipmap/an" />
+            android:layout_marginBottom="@dimen/dp4"
+            android:src="@mipmap/iknow" />
     </LinearLayout>
     <ImageView
+        android:id="@+id/iv_cancel"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/dp38"
         android:layout_below="@+id/top_layout"

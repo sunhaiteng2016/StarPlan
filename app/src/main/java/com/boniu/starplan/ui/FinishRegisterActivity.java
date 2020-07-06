@@ -1,16 +1,7 @@
 package com.boniu.starplan.ui;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,13 +9,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
+
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
-import com.boniu.starplan.base.Response;
+
 import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.dialog.ReceiveGoldDialog5;
-import com.boniu.starplan.entity.ApplyTask;
+
 import com.boniu.starplan.entity.ImgUpLoadModel;
 import com.boniu.starplan.entity.SubmitAuditModel;
 import com.boniu.starplan.http.OnError;
