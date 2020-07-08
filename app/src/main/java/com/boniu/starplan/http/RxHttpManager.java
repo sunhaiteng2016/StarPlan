@@ -10,6 +10,7 @@ import com.boniu.starplan.oaid.UuidCreator;
 import com.boniu.starplan.ui.ApplicationUtils;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.SPUtils;
+import com.boniu.starplan.utils.StringUtils;
 import com.boniu.starplan.utils.SystemInfoUtils;
 import com.google.gson.Gson;
 
@@ -86,7 +87,7 @@ public class RxHttpManager {
             String uuid = UuidCreator.getInstance(context).getDeviceId();
             String version = SystemInfoUtils.getAppVersionName(context);
             Map<String, String> map = new HashMap<>();
-            map.put("accountId", accountId);
+                map.put("accountId", accountId);
             map.put("brand", brand);
             map.put("channel", channel);
             map.put("deviceModel", deviceModel);

@@ -22,7 +22,7 @@
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.PublicWbActivity"></activity>
+        <activity android:name=".ui.PublicWbActivity"/>
         <activity android:name=".ui.GameWebViewActivity" />
         <activity android:name=".ui.LauncherActivity">
             <intent-filter>

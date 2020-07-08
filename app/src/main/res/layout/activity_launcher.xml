@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
     <RelativeLayout
-        android:background="@color/f3f3f3"
+        android:background="@color/white"
         android:paddingLeft="@dimen/dp60"
         android:paddingRight="@dimen/dp60"
         android:paddingTop="@dimen/dp40"
@@ -22,7 +22,7 @@
         <ImageView
             android:scaleType="fitCenter"
             android:src="@mipmap/ydy"
-            android:layout_width="600dp"
+            android:layout_width="300dp"
             android:layout_height="@dimen/dp50"/>
     </RelativeLayout>
 

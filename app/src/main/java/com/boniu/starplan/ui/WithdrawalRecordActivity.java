@@ -89,7 +89,7 @@ public class WithdrawalRecordActivity extends BaseActivity {
                         @Override
                         public void run() {
                             tvAllMoney.setText(myGoldBean.getAccumulateExpendGoldAmount()/10000 + "元");
-                            tvTodayMoney.setText(myGoldBean.getTodayExpendGoldAmount() + "元");
+                            tvTodayMoney.setText(myGoldBean.getTodayExpendGoldAmount()/10000 + "元");
                         }
                     });
                     //设置签到数据
