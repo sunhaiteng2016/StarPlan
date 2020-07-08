@@ -17,6 +17,14 @@ public class LoginInfo {
     private String mobile;
     private String utoken;
     private String goldAmount;
+    private String accountStatus;
+    public String getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(String goldAmount) {
+        this.accountStatus = accountStatus;
+    }
 
     public String getGoldAmount() {
         return goldAmount;

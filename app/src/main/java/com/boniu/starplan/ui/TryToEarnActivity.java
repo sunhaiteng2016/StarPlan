@@ -98,12 +98,13 @@ public class TryToEarnActivity extends BaseActivity {
         tvSubmit.setText("审核进度");
         tvBarTitle.setText("试玩赚");
         initView();
+        getData();
         loadingDialog1 = new LoadingDialog(this);
         loadingDialog1.show();
-        getData();
     }
 
     private void getData() {
+
         RxHttp.postEncryptJson(ComParamContact.Main.TASk_LIST).add("page", page).add("pageSize", pageSize).add("type", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             TaskMode taskModel = new Gson().fromJson(result, TaskMode.class);
@@ -153,6 +154,7 @@ public class TryToEarnActivity extends BaseActivity {
         });
     }
 
+
     private void initView() {
         RlvManagerUtils.createLinearLayout(this, rlvTask);
         adapter = new CommonAdapter<TaskMode.RowsBean>(this, R.layout.item_task_try_to_earn, taskList) {
@@ -161,7 +163,7 @@ public class TryToEarnActivity extends BaseActivity {
             protected void convert(ViewHolder holder, TaskMode.RowsBean taskMode, int position) {
                 GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnActivity.this, taskMode.getIcon(), holder.getView(R.id.tv1), 8);
                 holder.setText(R.id.main_title, taskMode.getMainTitle()).setText(R.id.sub_title, taskMode.getSubTitle());
-                holder.setText(R.id.gradient_tv, taskMode.getIncome() + "");
+                holder.setText(R.id.gradient_tv, "+"+taskMode.getIncome() );
             }
         };
         rlvTask.setAdapter(adapter);

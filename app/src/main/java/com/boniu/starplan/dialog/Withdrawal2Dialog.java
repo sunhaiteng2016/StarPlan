@@ -22,10 +22,12 @@ public class Withdrawal2Dialog extends Dialog {
     private ImageView imgClose;
     private TextView edtZhanghao;
     private TextView edtName;
+    private TextView tvPrice;
 
-    private String zhanghao,name,price;
-    private WithdrawalInterfaces withdrawalInterfaces;
-    public Withdrawal2Dialog(@NonNull Context context,String zhanghao,String name,String price,WithdrawalInterfaces withdrawalInterfaces) {
+    private String zhanghao, name, price;
+    private WithDrawalVerCodeDialog.WithDrawalInterfaces withdrawalInterfaces;
+
+    public Withdrawal2Dialog(@NonNull Context context, String zhanghao, String name, String price, WithDrawalVerCodeDialog.WithDrawalInterfaces withdrawalInterfaces) {
         super(context, R.style.CustomProgressDialog);
         this.zhanghao = zhanghao;
         this.name = name;
@@ -41,7 +43,8 @@ public class Withdrawal2Dialog extends Dialog {
         tvSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                withdrawalInterfaces.startWithdrawal(name,zhanghao);
+                WithDrawalVerCodeDialog withDrawalVerCodeDialog = new WithDrawalVerCodeDialog(getContext(),zhanghao,name,price,withdrawalInterfaces);
+                withDrawalVerCodeDialog.show();
                 dismiss();
             }
         });
@@ -57,13 +60,15 @@ public class Withdrawal2Dialog extends Dialog {
         tvSubmit = ((TextView) findViewById(R.id.tv_submit));
         imgClose = ((ImageView) findViewById(R.id.img_close));
         edtZhanghao = ((TextView) findViewById(R.id.edt_zhanghao));
+        tvPrice = ((TextView) findViewById(R.id.tv_price));
         edtName = ((TextView) findViewById(R.id.edt_name));
 
+        tvPrice.setText( Integer.parseInt(price)/10000+"元");
         edtName.setText(Html.fromHtml("<font color='#999999'>支付宝真实姓名：</font><font color='#333333'>" + name + "</font>"));
         edtZhanghao.setText(Html.fromHtml("<font color='#999999'>支付宝账号：</font><font color='#333333'>" + zhanghao + "</font>"));
     }
 
-    public interface WithdrawalInterfaces{
+    public interface WithdrawalInterfaces {
         void startWithdrawal(String name, String zhanghao);
 
     }

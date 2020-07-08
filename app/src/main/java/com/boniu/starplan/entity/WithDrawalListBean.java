@@ -1,64 +1,31 @@
 package com.boniu.starplan.entity;
 
+//提现记录
 public class WithDrawalListBean {
 
     /**
-     * createTime : 1592895602000
-     * goldAmount : 1
-     * month : 06
-     * state : 1
-     * stateDes : 审核中
-     * userTaskType : 最近连续签到5天并且每天完成5个任务的用户，即可获得提现机会，提现后可重新获得提现机会
-     * withdrawalAmount : 0.0
+     * createTime : 2020-06-23T07:49:34.501Z
+     * goldAmount : 0
+     * remark : string
+     * state : string
+     * userTaskType : string
      */
 
     private long createTime;
-    private int goldAmount;
-    private String month;
+    private long goldAmount;
+    private String remark = "";
     private String state;
     private String stateDes;
     private String userTaskType;
-    private String remark;
-    private double withdrawalAmount;
+    private String withdrawalAmount;
+    private boolean isempty = false;
 
-    public String getRemark() {
-        return remark;
+    public boolean isIsempty() {
+        return isempty;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
-    }
-
-    public int getGoldAmount() {
-        return goldAmount;
-    }
-
-    public void setGoldAmount(int goldAmount) {
-        this.goldAmount = goldAmount;
-    }
-
-    public String getMonth() {
-        return month;
-    }
-
-    public void setMonth(String month) {
-        this.month = month;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
+    public void setIsempty(boolean isempty) {
+        this.isempty = isempty;
     }
 
     public String getStateDes() {
@@ -69,19 +36,51 @@ public class WithDrawalListBean {
         this.stateDes = stateDes;
     }
 
+    public String getWithdrawalAmount() {
+        return withdrawalAmount;
+    }
+
+    public void setWithdrawalAmount(String withdrawalAmount) {
+        this.withdrawalAmount = withdrawalAmount;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
+
+    public long getGoldAmount() {
+        return goldAmount;
+    }
+
+    public void setGoldAmount(long goldAmount) {
+        this.goldAmount = goldAmount;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     public String getUserTaskType() {
         return userTaskType;
     }
 
     public void setUserTaskType(String userTaskType) {
         this.userTaskType = userTaskType;
-    }
-
-    public double getWithdrawalAmount() {
-        return withdrawalAmount;
-    }
-
-    public void setWithdrawalAmount(double withdrawalAmount) {
-        this.withdrawalAmount = withdrawalAmount;
     }
 }

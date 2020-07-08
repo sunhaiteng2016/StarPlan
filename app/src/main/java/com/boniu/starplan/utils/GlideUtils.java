@@ -139,8 +139,8 @@ public class GlideUtils {
     public void LoadContextBitmap(Context context, String path, ImageView imageView, String bitmapOrgif) {
         if (bitmapOrgif == null || bitmapOrgif.equals(LOAD_BITMAP)) {
             RequestOptions options = new RequestOptions();
-           /* options.placeholder(R.drawable.ic_launcher);
-            options.error(R.drawable.ic_launcher);*/
+           /* options.placeholder(R.drawable.default_placeholder);
+            options.error(R.drawable.default_placeholder);*/
 
             Glide.with(context).load(path).apply(options).into(imageView);
         } else if (bitmapOrgif.equals(LOAD_GIF)) {
@@ -151,8 +151,8 @@ public class GlideUtils {
 
     public void LoadContextBitmap(Context context, int path, ImageView imageView) {
      /*   RequestOptions options = new RequestOptions();
-        options.placeholder(R.drawable.ic_launcher);
-        options.error(R.drawable.ic_launcher);*/
+        options.placeholder(R.drawable.default_placeholder);
+        options.error(R.drawable.default_placeholder);*/
 
         Glide.with(context).load(path).into(imageView);
     }
@@ -204,8 +204,8 @@ public class GlideUtils {
     public void LoadContextCircleBitmap(Context context, String path, ImageView imageView) {
         RequestOptions options = new RequestOptions()
                 .circleCrop();
-        options.placeholder(R.mipmap.ic_launcher);
-        options.error(R.mipmap.ic_launcher);
+        options.placeholder(R.mipmap.default_placeholder);
+        options.error(R.mipmap.default_placeholder);
         Glide.with(context).load(path).apply(options).into(imageView);
     }
 
@@ -252,8 +252,8 @@ public class GlideUtils {
     public void LoadContextRoundBitmap(Context context, String path, ImageView imageView, int roundradius) {
         RequestOptions myOptions = new RequestOptions()
                 .centerCrop()
-                .error(R.mipmap.bb)
-                .placeholder(R.mipmap.bb)
+                .error(R.mipmap.default_placeholder)
+                .placeholder(R.mipmap.default_placeholder)
                 .transform(new GlideRoundTransform(context, roundradius));
         Glide.with(context).load(path).apply(myOptions).into(imageView);
     }
@@ -261,8 +261,8 @@ public class GlideUtils {
     public void LoadContextRoundBitmapInt(Context context, int img, ImageView imageView, int roundradius) {
         RequestOptions myOptions = new RequestOptions()
                 .centerCrop()
-                .error(R.mipmap.ic_launcher)
-                .placeholder(R.mipmap.ic_launcher)
+                .error(R.mipmap.default_placeholder)
+                .placeholder(R.mipmap.default_placeholder)
                 .transform(new GlideRoundTransform(context, roundradius));
         Glide.with(context).load(img).apply(myOptions).into(imageView);
     }
@@ -270,8 +270,8 @@ public class GlideUtils {
     public void LoadContextRoundBitmaps(Context context, String path, ImageView imageView, int roundradius) {
         RequestOptions myOptions = new RequestOptions()
                 .centerCrop()
-                .placeholder(R.mipmap.ic_launcher)
-                .error(R.mipmap.ic_launcher)
+                .placeholder(R.mipmap.default_placeholder)
+                .error(R.mipmap.default_placeholder)
                 .transform(new GlideRoundTransform(context, roundradius));
         Glide.with(context).load(path).apply(myOptions).into(imageView);
     }

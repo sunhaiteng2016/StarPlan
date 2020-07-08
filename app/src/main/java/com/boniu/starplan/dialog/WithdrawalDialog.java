@@ -23,8 +23,8 @@ public class WithdrawalDialog extends Dialog {
     private EditText edtZhanghao;
     private EditText edtName;
     private String price;
-    private Withdrawal2Dialog.WithdrawalInterfaces withdrawalInterfaces;
-    public WithdrawalDialog(@NonNull Context context, String price, Withdrawal2Dialog.WithdrawalInterfaces withdrawalInterfaces) {
+    private WithDrawalVerCodeDialog.WithDrawalInterfaces withdrawalInterfaces;
+    public WithdrawalDialog(@NonNull Context context, String price, WithDrawalVerCodeDialog.WithDrawalInterfaces withdrawalInterfaces) {
         super(context, R.style.CustomProgressDialog);
         this.price = price;
         this.withdrawalInterfaces = withdrawalInterfaces;

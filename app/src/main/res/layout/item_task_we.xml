@@ -24,7 +24,6 @@
                 android:id="@+id/iv_img"
                 android:layout_width="@dimen/dp40"
                 android:layout_height="@dimen/dp40"
-                android:background="@mipmap/bb"
                 android:gravity="center"
                 android:scaleType="centerCrop"
                 android:textColor="@color/white"

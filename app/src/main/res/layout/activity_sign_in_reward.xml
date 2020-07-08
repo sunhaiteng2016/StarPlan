@@ -221,12 +221,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="累计签到福利:活动时间截止2020-10-01"
-                    android:textColor="#ff999999" />
 
                 <TextView
                     android:id="@+id/tv_get_more"

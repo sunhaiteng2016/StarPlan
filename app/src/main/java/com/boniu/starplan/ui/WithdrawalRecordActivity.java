@@ -3,6 +3,7 @@ package com.boniu.starplan.ui;
 
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.LoadingDialog;
 import com.boniu.starplan.entity.MyGoldBean;
 import com.boniu.starplan.entity.RecordBean;
 import com.boniu.starplan.entity.WithDrawalListBean;
@@ -64,8 +66,16 @@ public class WithdrawalRecordActivity extends BaseActivity {
     @Override
     public void init() {
         tvBarTitle.setText("提现记录");
+        tvSubmit.setVisibility(View.VISIBLE);
+        tvSubmit.setText("刷新");
         initView();
         getDate();
+        tvSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDate();
+            }
+        });
     }
 
     private void getDate() {
@@ -78,14 +88,16 @@ public class WithdrawalRecordActivity extends BaseActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            tvAllMoney.setText(myGoldBean.getAccumulateExpendGoldAmount() + "");
-                            tvTodayMoney.setText(myGoldBean.getTodayEarnGoldAmount() + "");
+                            tvAllMoney.setText(myGoldBean.getAccumulateExpendGoldAmount()/10000 + "元");
+                            tvTodayMoney.setText(myGoldBean.getTodayExpendGoldAmount() + "元");
                         }
                     });
                     //设置签到数据
                 }, (OnError) error -> {
                     error.show();
                 });
+        LoadingDialog dialog = new LoadingDialog(this);
+        dialog.show();
         RxHttp.postEncryptJson(ComParamContact.Main.withdrawalList)
                 .asResponse(String.class)
                 .subscribe(s -> {
@@ -97,10 +109,10 @@ public class WithdrawalRecordActivity extends BaseActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            dialog.dismiss();
                             adapter.notifyDataSetChanged();
                         }
                     });
-                    //设置签到数据
                 }, (OnError) error -> {
                     error.show();
                 });
@@ -113,7 +125,7 @@ public class WithdrawalRecordActivity extends BaseActivity {
             @Override
             protected void convert(ViewHolder holder, WithDrawalListBean recordBean, int position) {
                 holder.setText(R.id.tv_time, DateTimeUtils.format(recordBean.getCreateTime(), DateTimeUtils.FORMAT_LONG_CN))
-                        .setText(R.id.tv_price, recordBean.getGoldAmount()/1000 + "元")
+                        .setText(R.id.tv_price, recordBean.getGoldAmount()/10000 + "元")
                         .setText(R.id.tv_state, recordBean.getStateDes() + "").setText(R.id.tv_err,recordBean.getRemark());
 
                 String state = recordBean.getState();

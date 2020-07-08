@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/dp8"
+    android:layout_marginRight="@dimen/dp10"
     app:cardCornerRadius="@dimen/dp8">
 
     <RelativeLayout
@@ -12,6 +13,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
+            android:scaleType="centerCrop"
             android:id="@+id/iv_img"
             android:layout_width="@dimen/dp70"
             android:layout_height="@dimen/dp70" />

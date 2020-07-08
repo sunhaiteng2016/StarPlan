@@ -28,6 +28,7 @@ import com.boniu.starplan.entity.SignModel.ListBean;
 import com.boniu.starplan.entity.NumberDay;
 import com.boniu.starplan.entity.SignModel;
 import com.boniu.starplan.entity.WelfareBean;
+import com.boniu.starplan.helper.MainActivityHelper;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.AnimatorUtil;
@@ -243,7 +244,7 @@ public class SignInRewardActivity extends BaseActivity {
                         holder.setVisible(R.id.tv_hb_open, false);
                         holder.setVisible(R.id.tv_hb_close, false);
                         holder.setVisible(R.id.tv_circle, true);
-                        holder.setBackgroundColor(R.id.tv_circle,R.mipmap.signjinbi);
+                        holder.setBackgroundRes(R.id.tv_circle,R.mipmap.signjinbi);
                     }
                 }
 
@@ -257,8 +258,16 @@ public class SignInRewardActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, WelfareBean.CumulativeSignConfigListBean welfareBean1, int position) {
-                holder.setText(R.id.tv_title, "累计签到" + welfareBean1.getCumulativeSignAmount() + "天").setText(R.id.tv_gold, welfareBean1.getGoldAmount() + "");
+                holder.setText(R.id.tv_title, "累计签到" + welfareBean1.getCumulativeSignAmount() + "天");
                 income = welfareBean1.getGoldAmount();
+                if (position==0){
+                    holder.setText(R.id.tv_gold, welfareBean1.getGoldAmount() + "");
+                }else{
+                   String number= welfareBean1.getGoldAmount()+"";
+                    String startStr = number.substring(0,2);
+                    String endSt = number.substring(startStr.length() - 1, startStr.length());
+                    holder.setText(R.id.tv_gold,startStr+"***"+endSt);
+                }
                 if (welfareBean.getGetRewardsList().get(position).getStatus() == 1) {
                     holder.setText(R.id.iv_right, "可领取");
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(SignInRewardActivity.this, R.mipmap.lxqdklq, holder.getView(R.id.iv_img), 0);
@@ -275,6 +284,7 @@ public class SignInRewardActivity extends BaseActivity {
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(SignInRewardActivity.this, R.mipmap.bndj, holder.getView(R.id.iv_bndj), 0);
                     holder.setTextColor(R.id.tv_title, mContext.getResources().getColor(R.color.text_99)).setTextColor(R.id.tv_gold, mContext.getResources().getColor(R.color.text_99));
                 }
+
             }
         };
         rlvWelfare.setAdapter(welfareAdapter);
@@ -313,9 +323,12 @@ public class SignInRewardActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.rl_back, R.id.tv_submit, R.id.tv_take, R.id.tv_take7})
+    @OnClick({R.id.rl_back, R.id.tv_submit, R.id.tv_take, R.id.tv_take7,R.id.tv_get_more})
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.tv_get_more:
+                MainActivityHelper.newInstance().AdLook(this);
+                break;
             case R.id.rl_back:
                 finish();
                 break;

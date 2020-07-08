@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.recyclerview.widget.RecyclerView;
@@ -57,9 +58,12 @@ import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
+
 import com.boniu.starplan.utils.Validator;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
@@ -69,7 +73,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -129,6 +133,11 @@ public class MainActivity extends BaseActivity {
     TextView timeGold;
     @BindView(R.id.new_user_title_rl)
     RelativeLayout new_user_title_rl;
+    @BindView(R.id.refreshLayout)
+    RefreshLayout refreshLayout;
+    @BindView(R.id.tv_yc)
+    TextView tv_yc;
+
 
     //初始化首页相关数据
     private List<HomeMenu> menuList = new ArrayList<>();
@@ -153,17 +162,16 @@ public class MainActivity extends BaseActivity {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
-    private int weekSign = 0;
+    public static int weekSign = 0;
     private boolean isTake = true;
-    private int userTaskId, clickTaskId ;
-    public  String clickAppSoure;
+    private int userTaskId, clickTaskId;
+    public String clickAppSoure;
     private int type;
     private LoadingDialog loadingDialog;
     private int income;
     private AppBarConfiguration mAppBarConfiguration;
     private NavigationView navigationView;
     private RelativeLayout rlDrawerLayout;
-    private int clickSignAdapterPosition;
 
 
     @Override
@@ -204,17 +212,19 @@ public class MainActivity extends BaseActivity {
                 MainActivityHelper.newInstance().AdLook(MainActivity.this);
             }
         });
-        if (!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
-
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                refreshLayout.finishRefresh();
+                getData();
+            }
+        });
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        getData();
-    }
+
 
     private void initDraws() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -224,13 +234,13 @@ public class MainActivity extends BaseActivity {
                 R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
                 .setDrawerLayout(drawer)
                 .build();
-        rlDrawerLayout=findViewById(R.id.rl_drawerLayout);
+        rlDrawerLayout = findViewById(R.id.rl_drawerLayout);
         rlDrawerLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (drawer.isDrawerOpen(navigationView)){
+                if (drawer.isDrawerOpen(navigationView)) {
                     drawer.closeDrawer(navigationView);
-                }else{
+                } else {
                     drawer.openDrawer(navigationView);
                 }
             }
@@ -243,24 +253,27 @@ public class MainActivity extends BaseActivity {
         LinearLayout draw3 = headView.findViewById(R.id.draw3);
         TextView login_out = headView.findViewById(R.id.login_out);
         GlideUtils.getInstance().LoadContextCircleBitmap(this, R.mipmap.touxiang, imageDraw);
-        tvPhone.setText(SPUtils.getInstance().getString(ComParamContact.Login.MOBILE));
-
+        tvPhone.setText(Validator.Md5Phone(SPUtils.getInstance().getString(ComParamContact.Login.MOBILE)));
         draw1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                drawer.closeDrawers();
             }
         });
         draw2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                ARouter.getInstance().build("/home/WebActivity")
+                        .withString("WEB_TYPE", "1").navigation();
+                drawer.closeDrawers();
             }
         });
         draw3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                ARouter.getInstance().build("/home/WebActivity")
+                        .withString("WEB_TYPE", "1").navigation();
+                drawer.closeDrawers();
             }
         });
         login_out.setOnClickListener(new View.OnClickListener() {
@@ -277,11 +290,11 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onGetStickyEvent(MessageWrap message) {
-        if (message.flag==1){
-            MainActivityHelper.newInstance().getUserInfo(MainActivity.this,tvPhone,tvMoney);
+        if (message.flag == 1) {
+            MainActivityHelper.newInstance().getUserInfo(MainActivity.this, tvPhone, tvMoney,tv_yc);
         }
-        if (message.flag==2){
-            MainActivityHelper.newInstance().IsSign(MainActivity.this,tvSign,tvMoreSign);
+        if (message.flag == 2) {
+            MainActivityHelper.newInstance().IsSign(MainActivity.this, tvSign, tvMoreSign);
         }
 
     }
@@ -307,17 +320,17 @@ public class MainActivity extends BaseActivity {
                 if (position == 0) {
                     holder.setText(R.id.main_title, "休闲游戏赚").setText(R.id.sub_title, "闯关玩金币，简单好玩").setText(R.id.gold, "50000");
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.xiuxian, holder.getView(R.id.iv_img), 8);
-                    holder.setText(R .id.tv_complete,"立即闯关");
+                    holder.setText(R.id.tv_complete, "立即闯关");
                 }
                 if (position == 1) {
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.gaoe, holder.getView(R.id.iv_img), 8);
                     holder.setText(R.id.main_title, "高额赚钱").setText(R.id.sub_title, "最高月入100元现金红包").setText(R.id.gold, "90000");
-                    holder.setText(R .id.tv_complete,"立即赚钱");
+                    holder.setText(R.id.tv_complete, "立即赚钱");
                 }
                 if (position == 2) {
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.shiwan, holder.getView(R.id.iv_img), 8);
                     holder.setText(R.id.main_title, "试玩软件赚钱").setText(R.id.sub_title, "安装软件，打开赚高额奖励").setText(R.id.gold, "20000");
-                    holder.setText(R .id.tv_complete,"立即试玩");
+                    holder.setText(R.id.tv_complete, "立即试玩");
                 }
             }
         };
@@ -326,13 +339,13 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
                 if (i == 0) {
-
+                    ARouter.getInstance().build("/ui/GameWebViewActivity").navigation();
                 }
                 if (i == 1) {
-                    ARouter.getInstance().build("/ui/TryToEarnActivity").navigation();
+                    ARouter.getInstance().build("/ui/ReceiveGoldCoinActivity").navigation();
                 }
                 if (i == 2) {
-                    ARouter.getInstance().build("/ui/ReceiveGoldCoinActivity").navigation();
+                    ARouter.getInstance().build("/ui/TryToEarnActivity").navigation();
                 }
             }
 
@@ -349,6 +362,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, MainTask.DayTaskBean taskMode, int position) {
+                GlideUtils.getInstance().LoadContextRoundBitmap(MainActivity.this,taskMode.getIcon(),holder.getView(R.id.iv_img),8);
                 holder.setText(R.id.main_title, taskMode.getTaskName()).setText(R.id.sub_title, taskMode.getSubTitle()).setText(R.id.gold, taskMode.getTodayRemain() + "");
                 int viewStatus = dayTaskList.get(position).getTaskViewStatus();
                 if (viewStatus == 0) {
@@ -368,10 +382,10 @@ public class MainActivity extends BaseActivity {
                 int viewStatus = dayTaskList.get(i).getTaskViewStatus();
                 type = dayTaskList.get(i).getType();
                 clickTaskId = dayTaskList.get(i).getTaskId();
-                clickAppSoure=dayTaskList.get(i).getApplySource();
+                clickAppSoure = dayTaskList.get(i).getApplySource();
                 loadingDialog.show();
                 if (viewStatus == 0) {
-                    ReceiveTask(dayTaskList.get(i).getTaskId(), type ,clickAppSoure);
+                    ReceiveTask(dayTaskList.get(i).getTaskId(), type, clickAppSoure);
                 }
             }
 
@@ -410,9 +424,9 @@ public class MainActivity extends BaseActivity {
                 type = newUserTaskList.get(i).getType();
                 clickTaskId = newUserTaskList.get(i).getTaskId();
                 loadingDialog.show();
-                clickAppSoure=newUserTaskList.get(i).getApplySource();
+                clickAppSoure = newUserTaskList.get(i).getApplySource();
                 if (viewStatus == 0) {
-                    ReceiveTask(newUserTaskList.get(i).getTaskId(), type,clickAppSoure);
+                    ReceiveTask(newUserTaskList.get(i).getTaskId(), type, clickAppSoure);
                 }
             }
 
@@ -423,9 +437,9 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void ReceiveTask(int taskId, int type,String applySource) {
+    private void ReceiveTask(int taskId, int type, String applySource) {
 
-        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).add("applySource",applySource).asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).add("applySource", applySource).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             ApplyTask applyTask = new Gson().fromJson(result, ApplyTask.class);
             userTaskId = applyTask.getUserTaskId();
@@ -437,17 +451,17 @@ public class MainActivity extends BaseActivity {
                     if (applyTask.isIsSucceed()) {
                         Tip.showCancer1("领取成功，跳转中。。。");
                         if (type == 1) {
-                            ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
+                            ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("flag", 1).withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
                         } else {
-                            ARouter.getInstance().build("/ui/ReceiveGoldDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
+                            ARouter.getInstance().build("/ui/ReceiveGoldDetailsActivity").withInt("flag", 1).withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
                         }
 
                     } else {
                         if (clickTaskId == applyTask.getTaskId()) {
                             if (type == 1) {
-                                ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
+                                ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("flag", 1).withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
                             } else {
-                                ARouter.getInstance().build("/ui/ReceiveGoldDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
+                                ARouter.getInstance().build("/ui/ReceiveGoldDetailsActivity").withInt("flag", 1).withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
                             }
                             return;
                         }
@@ -502,7 +516,7 @@ public class MainActivity extends BaseActivity {
                         RunningTaskDialog dialog = new RunningTaskDialog(MainActivity.this, 2, new RunningTaskDialog.RunningCallback() {
                             @Override
                             public void running() {
-                                ReceiveTask(clickTaskId, type,clickAppSoure);
+                                ReceiveTask(clickTaskId, type, clickAppSoure);
                             }
                         });
                         dialog.show();
@@ -569,7 +583,7 @@ public class MainActivity extends BaseActivity {
                     case 2:
                         ARouter.getInstance().build("/ui/GameWebViewActivity").navigation();
                         break;
-                    case  3:
+                    case 3:
                         MainActivityHelper.newInstance().AdLook(MainActivity.this);
                         break;
                     default:
@@ -599,10 +613,18 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, SignModel.ListBean listBean, int position) {
-                income=listBean.getWeekSignGold();
+
+                if (position == 6) {
+                    holder.setVisible(R.id.line1, false);
+                } else {
+                    holder.setVisible(R.id.line1, true);
+                }
+                income = listBean.getWeekSignGold();
                 if (listBean.isIsSign()) {
+                    holder.setText(R.id.tv_hb_close, listBean.getWeekSignGold() + "");
                     holder.setTextColor(R.id.tv_circle, mContext.getResources().getColor(R.color.FEC50B));
                     if (listBean.getType().equals("gif")) {
+
                         if (listBean.getIsReceive() == 0) {//签到未领取
                             holder.setVisible(R.id.tv_hb_close, true);
                             holder.setVisible(R.id.tv_hb_open, false);
@@ -627,6 +649,7 @@ public class MainActivity extends BaseActivity {
                 } else {
                     //没签到
                     holder.setText(R.id.tv_circle, listBean.getWeekSignGold() + "");
+                    holder.setText(R.id.tv_hb_close, listBean.getWeekSignGold() + "");
                     if (listBean.getType().equals("gif")) {
                         holder.setVisible(R.id.tv_hb_open, false);
                         holder.setVisible(R.id.tv_hb_close, true);
@@ -635,36 +658,38 @@ public class MainActivity extends BaseActivity {
                         holder.setVisible(R.id.tv_hb_open, false);
                         holder.setVisible(R.id.tv_hb_close, false);
                         holder.setVisible(R.id.tv_circle, true);
-                       holder.setBackgroundRes(R.id.tv_circle,R.drawable.shape_circle_withe);
+                        holder.setBackgroundRes(R.id.tv_circle, R.drawable.shape_circle_withe);
                     }
                 }
             }
+
+
         };
         rlvSign.setAdapter(signAdapter);
         signAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
-                    if (signList.get(i).getIsReceive() != 0) return;
-                    clickSignAdapterPosition=i;
-                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(MainActivity.this, signList.get(i).getDoubleGold(), signList.get(i).getBoxId() + "",signList.get(i).isIsDouble(), new ReceiveGoldDialog.ReceiveCallback() {
-                        @Override
-                        public void receive(int flag, String applyId) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //开启激励视频
-                                    if (flag == 1){
-                                        getData();
-                                    }
-                                    if (flag==2){
-                                        ReWardVideoAdUtils.initAd(MainActivity.this,applyId,signList.get(i).getDoubleGold());
-                                    }
-                                }
-                            });
+                if (signList.get(i).getIsReceive() != 0) return;
 
-                        }
-                    });
-                    dialog.show();
+                ReceiveGoldDialog dialog = new ReceiveGoldDialog(MainActivity.this, signList.get(i).getDoubleGold(), signList.get(i).getBoxId() + "", signList.get(i).isIsDouble(), new ReceiveGoldDialog.ReceiveCallback() {
+                    @Override
+                    public void receive(int flag, String applyId) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //开启激励视频
+                                if (flag == 1) {
+                                    getData();
+                                }
+                                if (flag == 2) {
+                                    ReWardVideoAdUtils.initAd(MainActivity.this, applyId, signList.get(i).getDoubleGold());
+                                }
+                            }
+                        });
+
+                    }
+                });
+                dialog.show();
 
 
             }
@@ -677,10 +702,10 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getData() {
-        MainActivityHelper.newInstance().getUserInfo(this,tvPhone,tvMoney);
-        MainActivityHelper.newInstance().IsSign(this,tvSign,tvMoreSign);
+        MainActivityHelper.newInstance().getUserInfo(this, tvPhone, tvMoney,tv_yc);
+        MainActivityHelper.newInstance().IsSign(this, tvSign, tvMoreSign);
         getSign();
-        MainActivityHelper.newInstance().mainTaskList(this,loadingDialog,dayTaskList,newUserTaskList,dayTaskAdapter,newUserTaskAdapter,new_user_title_rl,rlvNewUserTask,tvDes,ivBx);
+        MainActivityHelper.newInstance().mainTaskList(this, loadingDialog, dayTaskList, newUserTaskList, dayTaskAdapter, newUserTaskAdapter, new_user_title_rl, rlvNewUserTask, tvDes, ivBx);
         getTimer();
     }
 
@@ -727,18 +752,19 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getSign() {
-        MainActivityHelper.newInstance().signData(this,signList,tvSignDes,signAdapter);
+        MainActivityHelper.newInstance().signData(this, signList, tvSignDes, signAdapter);
     }
 
     /**
-     *  签到成功的弹窗
+     * 签到成功的弹窗
+     *
      * @param i
      */
-    private void showSignDialog(int i,boolean isDouble) {
-        SignSuccessDialog dialog = new SignSuccessDialog(this, i + 1, income,new SignSuccessDialog.SubMitCallBack() {
+    private void showSignDialog(int i, boolean isDouble,int incomes) {
+        SignSuccessDialog dialog = new SignSuccessDialog(this, i + 1, incomes, new SignSuccessDialog.SubMitCallBack() {
             @Override
             public void onSuccess() {
-                ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(MainActivity.this, signList.get(i).getDoubleGold(), signList.get(i).getBoxId() + "",i,isDouble, new ReceiveGoldDialog3.ReceiveCallback() {
+                ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(MainActivity.this, signList.get(i).getDoubleGold(), signList.get(i).getBoxId() + "", i, isDouble, new ReceiveGoldDialog3.ReceiveCallback() {
                     @Override
                     public void receive(int flag, String applyId) {
                         runOnUiThread(new Runnable() {
@@ -747,9 +773,9 @@ public class MainActivity extends BaseActivity {
                                 if (flag == 1) {
                                     getData();
                                 }
-                                if (flag==2) {
+                                if (flag == 2) {
                                     // 开启激励视频
-                                    ReWardVideoAdUtils.initAd(MainActivity.this,applyId,income);
+                                    ReWardVideoAdUtils.initAd(MainActivity.this, applyId, income);
                                 }
                             }
                         });
@@ -831,18 +857,16 @@ public class MainActivity extends BaseActivity {
                             if (isSignModel.isSuccess()) {
                                 tvSign.setVisibility(View.GONE);
                                 tvMoreSign.setVisibility(View.VISIBLE);
-                                isSignModel.getList();
-                                for (int i=0;i<isSignModel.getList().size();i++){
-                                    if (clickSignAdapterPosition==i){
-                                        if (isSignModel.getList().get(i).getType().equals("gif")){
-                                            showSignDialog(i,isSignModel.getList().get(i).isIsDouble());
-                                        }else {
-                                            showNormalDialog(isSignModel.getList().get(i).getWeekSign(),income);
-                                        }
-                                    }
+                                if (weekSign == 2) {
+                                    //第三天签到
+                                    showSignDialog(2, isSignModel.getList().get(2).isIsDouble(),isSignModel.getList().get(2).getWeekSignGold());
+                                } else if (weekSign == 6) {
+                                    //第四天签到
+                                    showSignDialog(6, isSignModel.getList().get(6).isIsDouble(),isSignModel.getList().get(6).getWeekSignGold());
+                                } else {
+                                    showNormalDialog(weekSign + 1, isSignModel.getList().get(weekSign).getWeekSignGold());
                                 }
                                 getSign();
-                                EventBus.getDefault().post(new MessageWrap(1));
                             } else {
                                 Tip.show("签到失败！");
                                 tvSign.setVisibility(View.VISIBLE);
@@ -854,8 +878,8 @@ public class MainActivity extends BaseActivity {
                 });
     }
 
-    private void showNormalDialog(int weekSigns ,int inCome) {
-        SignSuccessNormalDialog dialog = new SignSuccessNormalDialog(MainActivity.this, weekSigns,inCome);
+    private void showNormalDialog(int weekSigns, int inCome) {
+        SignSuccessNormalDialog dialog = new SignSuccessNormalDialog(MainActivity.this, weekSigns, inCome);
         dialog.show();
     }
 

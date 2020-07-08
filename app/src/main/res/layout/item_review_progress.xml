@@ -11,6 +11,7 @@
     android:paddingBottom="@dimen/dp12">
 
     <ImageView
+        android:scaleType="centerCrop"
         android:id="@+id/iv_img"
         android:layout_width="@dimen/dp45"
         android:layout_height="@dimen/dp45"
@@ -41,7 +42,7 @@
                 android:id="@+id/tv_income"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_33"
+                android:textColor="@color/black"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -52,11 +53,11 @@
             android:layout_weight="1">
 
             <TextView
+                android:text="2017-12-22 10：1111111"
                 android:id="@+id/tv_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:maxLength="14"
                 android:textColor="@color/text_33"
                 android:textSize="12sp" />
 

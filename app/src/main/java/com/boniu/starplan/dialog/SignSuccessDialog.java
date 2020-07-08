@@ -24,9 +24,7 @@ public class SignSuccessDialog extends Dialog {
     private SubMitCallBack subMitCallBack;
     private TextView tvPrice;
 
-    public SignSuccessDialog(@NonNull Context context) {
-        super(context, R.style.CustomProgressDialog);
-    }
+
 
     public SignSuccessDialog(@NonNull Context context, int flag,int income , SubMitCallBack subMitCallBack) {
         super(context, R.style.CustomProgressDialog);

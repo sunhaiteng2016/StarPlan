@@ -4,7 +4,9 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -23,6 +25,7 @@ import com.boniu.starplan.dialog.EverydayLogDialog;
 import com.boniu.starplan.dialog.LoadingDialog;
 import com.boniu.starplan.dialog.NewPersonDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog;
+import com.boniu.starplan.dialog.UpdateAppDialog;
 import com.boniu.starplan.entity.ApplyTask;
 import com.boniu.starplan.entity.BoxState;
 import com.boniu.starplan.entity.LoginInfo;
@@ -60,21 +63,37 @@ public class MainActivityHelper {
     /**
      * 观看视频
      */
-    public void AdLook(Activity context){
+    public void AdLook(Activity context) {
 
         //创建激励视频翻倍任务
-        RxHttp.postEncryptJson(ComParamContact.Main.addVideoAD).asResponse(String.class).subscribe(s->{
+        RxHttp.postEncryptJson(ComParamContact.Main.addVideoAD).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.encrypt(s, AESUtil.KEY);
             VideoAdModel adModel = new Gson().fromJson(result, VideoAdModel.class);
             //然后在观看激励视频
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ReWardVideoAdUtils.initAd(context,adModel.getApplyId(),adModel.getIncome());
+                    ReWardVideoAdUtils.initAd(context, adModel.getApplyId(), adModel.getIncome());
                 }
             });
+        }, (OnError) error -> {
+            error.show();
+        });
+    }
 
-        },(OnError) error->{
+    public void downLoad(Activity context) {
+
+        RxHttp.postEncryptJson(ComParamContact.DownLoad.PATH).asResponse(String.class).subscribe(s -> {
+            String result = AESUtil.encrypt(s, AESUtil.KEY);
+            //然后在观看激励视频
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    UpdateAppDialog dialog = new UpdateAppDialog(context);
+                    dialog.show();
+                }
+            });
+        }, (OnError) error -> {
             error.show();
         });
     }
@@ -82,17 +101,21 @@ public class MainActivityHelper {
     /**
      * 获取用户信息
      */
-    public void getUserInfo(Activity context, TextView tvPhone,TextView tvMoney){
+    public void getUserInfo(Activity context, TextView tvPhone, TextView tvMoney, TextView tvyc) {
         RxHttp.postEncryptJson(ComParamContact.Main.getUserInfo)
                 .asResponse(String.class)
                 .subscribe(s -> {
                     String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
                     LoginInfo loginInfo = new Gson().fromJson(resultStr, LoginInfo.class);
-                    context. runOnUiThread(new Runnable() {
+                    context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            SPUtils.getInstance().put("accountStatus", loginInfo.getAccountStatus());
                             tvPhone.setText(Validator.Md5Phone(loginInfo.getMobile()));
                             tvMoney.setText(loginInfo.getGoldAmount());
+                            if (!loginInfo.getAccountStatus().equals("0")) {
+                                tvyc.setVisibility(View.VISIBLE);
+                            }
                         }
                     });
                 }, (OnError) error -> {
@@ -101,11 +124,12 @@ public class MainActivityHelper {
 
     /**
      * 是否签到
+     *
      * @param context
      * @param tvSign
      * @param tvMoreSign
      */
-    public void IsSign(Activity context,TextView tvSign,TextView tvMoreSign){
+    public void IsSign(Activity context, TextView tvSign, TextView tvMoreSign) {
         //签到相关
         RxHttp.postEncryptJson(ComParamContact.Main.IS_SIGN)
                 .asResponse(String.class)
@@ -132,13 +156,14 @@ public class MainActivityHelper {
     /**
      * 获取签到数据
      */
-    public void signData(Activity context,  List<SignModel.ListBean> signList, TextView tvSignDes, CommonAdapter<SignModel.ListBean> signAdapter ){
+    public void signData(Activity context, List<SignModel.ListBean> signList, TextView tvSignDes, CommonAdapter<SignModel.ListBean> signAdapter) {
         RxHttp.postEncryptJson(ComParamContact.Main.getSignAmount)
                 .asResponse(String.class)
                 .subscribe(s -> {
                     String resultStr = AESUtil.decrypt((String) s, AESUtil.KEY);
                     SignModel sigModel = new Gson().fromJson(resultStr, SignModel.class);
                     weekSign = 0;
+
                     for (SignModel.ListBean list : sigModel.getList()) {
                         if (list.isIsSign()) {
                             weekSign++;
@@ -149,6 +174,7 @@ public class MainActivityHelper {
                     context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            MainActivity.weekSign = weekSign;
                             tvSignDes.setText("已连续签到 " + weekSign + "/7 天");
                             signAdapter.notifyDataSetChanged();
                         }
@@ -160,7 +186,8 @@ public class MainActivityHelper {
     }
 
     /**
-     *  首页任务列表
+     * 首页任务列表
+     *
      * @param context
      * @param dayTaskList
      * @param newUserTaskList
@@ -171,10 +198,10 @@ public class MainActivityHelper {
      * @param tvDes
      * @param ivBx
      */
-    public  void mainTaskList(Activity context,LoadingDialog loadingDialog, List<MainTask.DayTaskBean> dayTaskList, List<MainTask.NewUserTaskBean> newUserTaskList,
-                              CommonAdapter<MainTask.DayTaskBean> dayTaskAdapter, CommonAdapter<MainTask.NewUserTaskBean> newUserTaskAdapter,
-                              RelativeLayout new_user_title_rl, RecyclerView rlvNewUserTask, TextView tvDes, ImageView ivBx){
-
+    public void mainTaskList(Activity context, LoadingDialog loadingDialog, List<MainTask.DayTaskBean> dayTaskList, List<MainTask.NewUserTaskBean> newUserTaskList,
+                             CommonAdapter<MainTask.DayTaskBean> dayTaskAdapter, CommonAdapter<MainTask.NewUserTaskBean> newUserTaskAdapter,
+                             RelativeLayout new_user_title_rl, RecyclerView rlvNewUserTask, TextView tvDes, ImageView ivBx) {
+        loadingDialog.show();
         //任务列表
         RxHttp.postEncryptJson(ComParamContact.Main.queryTaskMarketList)
                 .asResponse(String.class)
@@ -235,7 +262,7 @@ public class MainActivityHelper {
                                                 @Override
                                                 public void run() {
                                                     loadingDialog1.dismiss();
-                                                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(context, boxState.getGoldCount(), boxState.getId() + "", true,new ReceiveGoldDialog.ReceiveCallback() {
+                                                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(context, boxState.getGoldCount(), boxState.getId() + "", true, new ReceiveGoldDialog.ReceiveCallback() {
                                                         @Override
                                                         public void receive(int flag, String applyId) {
                                                             //开启激励视频
@@ -243,11 +270,11 @@ public class MainActivityHelper {
                                                                 @Override
                                                                 public void run() {
                                                                     if (flag == 1) {
-                                                                                ivBx.setBackgroundResource(R.mipmap.baoxiang);
-                                                                                tvDes.setText("宝箱已领取");
+                                                                        ivBx.setBackgroundResource(R.mipmap.baoxiang);
+                                                                        tvDes.setText("宝箱已领取");
                                                                     }
                                                                     if (flag == 2) {
-                                                                        ReWardVideoAdUtils.initAd(context,applyId,boxState.getGoldCount());
+                                                                        ReWardVideoAdUtils.initAd(context, applyId, boxState.getGoldCount());
                                                                     }
                                                                 }
                                                             });
@@ -315,9 +342,6 @@ public class MainActivityHelper {
                 });
 
     }
-
-
-
 
 
 }

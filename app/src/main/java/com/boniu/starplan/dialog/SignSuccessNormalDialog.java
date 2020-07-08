@@ -49,10 +49,8 @@ public class SignSuccessNormalDialog extends Dialog {
         tvSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivityHelper.newInstance().AdLook((Activity) getContext());
-                //领取签到奖励
-                //看视频
-
+                dismiss();
+                EventBus.getDefault().post(new MessageWrap(1));
             }
         });
         findViewById(R.id.iv_cancel).setOnClickListener(new View.OnClickListener() {

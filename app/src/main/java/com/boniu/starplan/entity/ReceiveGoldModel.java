@@ -1,5 +1,6 @@
 package com.boniu.starplan.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class ReceiveGoldModel {
@@ -349,14 +350,14 @@ public class ReceiveGoldModel {
             }
         }
 
-        public static class TaskImgsVOBean {
+        public static class TaskImgsVOBean implements Serializable {
             /**
              * id : 209
              * imgUrl : https://image.baidu.com/search/detail?ct=503316480&z=0&ipn=d&word=%E8%8C%85%E5%8F%B0%E9%85%92&step_word=&hs=0&pn=4&spn=0&di=29370&pi=0&rn=1&tn=baiduimagedetail&is=0%2C0&istype=0&ie=utf-8&oe=utf-8&in=&cl=2&lm=-1&st=undefined&cs=1875709657%2C876678375&os=3718617004%2C1108180257&simid=4047389678%2C539813287&adpicid=0&lpn=0&ln=1777&fr=&fmq=1591933671017_R&fm=&ic=undefined&s=undefined&hd=undefined&latest=undefined&copyright=undefined&se=&sme=&tab=0&width=undefined&height=undefined&face=undefined&ist=&jit=&cg=&bdtype=0&oriquery=&objurl=http%3A%2F%2Fimage.yun-file.com%3A9191%2Fgroup1%2FM00%2F07%2FCA%2FrBMKKFvlMH7Ex3KUAAJsTomOT1c098.jpg&fromurl=ippr_z2C%24qAzdH3FAzdH3Fooo_z%26e3Bkwthj_z%26e3Bv54AzdH3Fuwk7AzdH3Fw88rvKxtpg-8db-8b8dbd88bl_z%26e3Bip4s&gsm=5&rpstart=0&rpnum=0&islist=&querylist=&force=undefined
              * sortId : 0
              * taskId : 311
              */
-
+            private static final long serialVersionUID = 1L;
             private int id;
             private String imgUrl;
             private int sortId;

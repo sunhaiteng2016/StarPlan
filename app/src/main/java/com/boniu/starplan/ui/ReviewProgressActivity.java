@@ -3,6 +3,7 @@ package com.boniu.starplan.ui;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import com.boniu.starplan.entity.ApplyTask;
 import com.boniu.starplan.entity.ReviewProgressModel;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
+import com.boniu.starplan.utils.DateTimeUtils;
 import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.Tip;
@@ -54,11 +56,13 @@ public class ReviewProgressActivity extends BaseActivity {
     RefreshLayout refreshLayout;
     @BindView(R.id.rlv)
     RecyclerView rlv;
+    @BindView(R.id.ll_nodata)
+    LinearLayout llNodata;
     private List<ReviewProgressModel.RowsBean> list = new ArrayList<>();
     private CommonAdapter<ReviewProgressModel.RowsBean> adapter;
     private LoadingDialog loadingDialog;
-    private int page=1;
-    private int pageSize=10;
+    private int page = 1;
+    private int pageSize = 10;
 
     @Override
     public int getLayoutId() {
@@ -75,17 +79,24 @@ public class ReviewProgressActivity extends BaseActivity {
     }
 
     private void getDates() {
-        RxHttp.postEncryptJson(ComParamContact.Main.listAuditSchedule) .add("page",page).add("pageSize",pageSize).asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.listAuditSchedule).add("page", page).add("pageSize", pageSize).asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             ReviewProgressModel reviewProgressModel = new Gson().fromJson(result, ReviewProgressModel.class);
             List<ReviewProgressModel.RowsBean> rows = reviewProgressModel.getRows();
-            if (page==1){
+            if (page == 1) {
                 list.clear();
             }
             list.addAll(rows);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (page == 1) {
+                        if (list.size() == 0) {
+                            llNodata.setVisibility(View.VISIBLE);
+                        } else {
+                            llNodata.setVisibility(View.GONE);
+                        }
+                    }
                     loadingDialog.dismiss();
                     adapter.notifyDataSetChanged();
                 }
@@ -101,19 +112,6 @@ public class ReviewProgressActivity extends BaseActivity {
         });
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     private void initView() {
         RlvManagerUtils.createLinearLayout(this, rlv);
 
@@ -121,10 +119,19 @@ public class ReviewProgressActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, ReviewProgressModel.RowsBean reviewProgressModel, int position) {
-                GlideUtils.getInstance().LoadContextRoundBitmap(ReviewProgressActivity.this,reviewProgressModel.getIcon(),holder.getView(R.id.iv_img),8);
-                holder.setText(R.id.tv_title,reviewProgressModel.getMainTitle())
-                        .setText(R .id.tv_income,reviewProgressModel.getIncome()+"")
-                        .setText(R.id.tv_time,reviewProgressModel.getCreateDate()).setText(R .id.tv_remark,reviewProgressModel.getRemark());
+                GlideUtils.getInstance().LoadContextRoundBitmap(ReviewProgressActivity.this, reviewProgressModel.getIcon(), holder.getView(R.id.iv_img), 8);
+                holder.setText(R.id.tv_title, reviewProgressModel.getMainTitle())
+                        .setText(R.id.tv_income, reviewProgressModel.getIncome() + "金币")
+                        .setText(R.id.tv_time, DateTimeUtils.getDate(reviewProgressModel.getCreateDate(),"yyyy-MM-dd HH:mm"));
+                if (reviewProgressModel.getStatus()==3){
+                    holder.setText(R.id.tv_remark, reviewProgressModel.getStatusDesc());
+                }
+                if (reviewProgressModel.getStatus()==4){
+                    holder.setText(R.id.tv_remark, "审核失败");
+                }
+                if (reviewProgressModel.getStatus()==9){
+                    holder.setText(R.id.tv_remark, "审核通过");
+                }
             }
         };
         rlv.setAdapter(adapter);
@@ -140,8 +147,8 @@ public class ReviewProgressActivity extends BaseActivity {
 
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-                refreshLayout .finishRefresh();
-                page=1;
+                refreshLayout.finishRefresh();
+                page = 1;
                 getDates();
             }
         });

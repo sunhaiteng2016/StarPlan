@@ -107,8 +107,8 @@ public class AgreementDialog extends Dialog {
             @Override
             public void onClick(View view) {
                 //用户协议
-               /* ARouter.getInstance().build("/home/WebActivity")
-                        .withString(WebActivity.WEB_TYPE, "1").navigation();*/
+                ARouter.getInstance().build("/home/WebActivity")
+                        .withString("WEB_TYPE", "1").navigation();
             }
         };
         spannableString.setSpan(clickableSpan, 33, 39, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
@@ -130,8 +130,8 @@ public class AgreementDialog extends Dialog {
             @Override
             public void onClick(View view) {
                 //隐私协议
-              /*  ARouter.getInstance().build("/home/WebActivity")
-                        .withString(WebActivity.WEB_TYPE, "2").navigation();*/
+               ARouter.getInstance().build("/home/WebActivity")
+                        .withString("WEB_TYPE", "2").navigation();
             }
         };
         spannableString.setSpan(clickableSpan1, 40, 46, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);

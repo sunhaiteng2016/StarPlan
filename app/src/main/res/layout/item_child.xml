@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -7,68 +7,86 @@
     android:paddingTop="@dimen/dp17"
     android:paddingRight="@dimen/dp16">
 
-
     <LinearLayout
+        android:id="@+id/ll_ll"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="会员卡兑换"
-            android:textColor="@color/text_33"
-            android:textSize="14sp" />
+            android:orientation="horizontal">
 
-        <TextView
+            <TextView
+                android:layout_weight="1"
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="会员卡兑换"
+                android:textColor="@color/text_33"
+                android:textSize="14sp" />
 
-            android:id="@+id/tv_gold_num"
-            android:layout_width="wrap_content"
+            <TextView
+                android:text="-10000"
+                android:textFontWeight="1"
+                android:id="@+id/tv_gold_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp40"
+                android:layout_weight="1"
+                android:textColor="@color/text_33"
+                android:textSize="14sp" />
+
+            <TextView
+                android:text="兑换成功"
+                android:layout_weight="1"
+                android:id="@+id/tv_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginLeft="@dimen/dp20"
+                android:textColor="@color/text_33"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/dp40"
-            android:layout_weight="1"
-            android:textColor="@color/text_33"
-            android:textSize="14sp" />
+            android:layout_marginTop="@dimen/dp8"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_marginLeft="@dimen/dp20"
-            android:textColor="@color/text_33"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/text_33"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_des"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginLeft="@dimen/dp20"
+                android:textColor="@color/FF5151"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/dp17" />
     </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/tv_no_data"
+        android:paddingLeft="@dimen/dp20"
+        android:gravity="left|center_vertical"
+        android:text="当月无支出明细"
+        android:layout_centerInParent="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp8"
-        android:orientation="horizontal">
+        android:layout_height="@dimen/dp30"/>
 
-        <TextView
-            android:id="@+id/tv_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/text_33"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tv_des"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_marginLeft="@dimen/dp20"
-            android:textColor="@color/FF5151"
-            android:textSize="13sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/dp17" />
-</LinearLayout>
+</RelativeLayout>

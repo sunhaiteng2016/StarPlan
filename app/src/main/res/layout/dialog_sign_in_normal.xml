@@ -91,7 +91,7 @@
             android:paddingRight="@dimen/dp48"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/dp30"
-            android:text="点击拆大礼包"
+            android:text="我知道了"
             android:textColor="#ff996002"
             android:textSize="16sp"
             />

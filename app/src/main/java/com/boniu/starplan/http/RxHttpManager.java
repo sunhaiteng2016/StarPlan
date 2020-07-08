@@ -6,6 +6,8 @@ import android.app.Application;
 
 import com.boniu.starplan.BuildConfig;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.oaid.UuidCreator;
+import com.boniu.starplan.ui.ApplicationUtils;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.SystemInfoUtils;
@@ -76,12 +78,12 @@ public class RxHttpManager {
             /*根据不同请求添加不同参数，子线程执行，每次发送请求前都会被回调
             如果希望部分请求不回调这里，发请求前调用Param.setAssemblyEnabled(false)即可
              */
-            String accountId = SPUtils.getInstance().getString(ComParamContact.Common.TOKEN_KEY);
+            String accountId = ApplicationUtils.newInstance().accountId == null ? SPUtils.getInstance().getString(ComParamContact.Common.TOKEN_KEY) : ApplicationUtils.newInstance().accountId;
             String brand = SystemInfoUtils.getBrandName();
             String channel = SystemInfoUtils.getAppSource(context, "UMENG_CHANNEL");
             String deviceModel = SystemInfoUtils.getProductName();
             String deviceType = "Android";
-            String uuid = "dsfasdfasfasfasf";
+            String uuid = UuidCreator.getInstance(context).getDeviceId();
             String version = SystemInfoUtils.getAppVersionName(context);
             Map<String, String> map = new HashMap<>();
             map.put("accountId", accountId);

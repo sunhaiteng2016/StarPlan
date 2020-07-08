@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_title"
-        android:layout_marginTop="@dimen/dp4"
+        android:layout_marginTop="@dimen/dp6"
         android:text="5月10号 17:00:34"
         android:textColor="#999"
         android:textSize="12sp" />
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp1"
         android:layout_below="@+id/tv_time"
-        android:layout_marginTop="@dimen/dp16" />
+        android:layout_marginTop="@dimen/dp10" />
 
     <TextView
         android:id="@+id/tv_gold_num"
@@ -39,6 +39,6 @@
         android:layout_marginRight="@dimen/dp20"
         android:text="+38金币"
         android:textColor="@color/FF5151"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold" />
 </RelativeLayout>

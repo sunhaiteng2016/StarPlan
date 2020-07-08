@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="4dp"
         android:background="@color/f3f3f3" />
-
+    <include layout="@layout/public_yc"/>
     <androidx.core.widget.NestedScrollView
         android:layout_below="@+id/rl1"
         android:layout_marginTop="@dimen/dp4"
@@ -48,6 +48,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_cjwt"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:layout_gravity="center_vertical"
@@ -143,6 +144,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:visibility="invisible"
                     android:layout_marginRight="@dimen/dp20"
                     android:layout_width="100dp"
                     android:layout_height="@dimen/dp40"
@@ -213,6 +215,8 @@
                     android:layout_height="wrap_content"/>
 
                 <RelativeLayout
+                    android:id="@+id/rl_gz"
+                    android:visibility="gone"
                     android:layout_marginBottom="@dimen/dp10"
                     android:layout_marginLeft="@dimen/dp16"
                     android:layout_marginRight="@dimen/dp16"
@@ -223,8 +227,8 @@
                     android:background="#fff1f1f1"
                     android:orientation="horizontal">
                     <LinearLayout
-                        android:id="@+id/ll_huoyuedu"
                         android:visibility="gone"
+                        android:id="@+id/ll_huoyuedu"
                         android:layout_marginTop="@dimen/dp10"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
@@ -251,27 +255,33 @@
                             android:layout_marginRight="@dimen/dp5"
                             android:gravity="left" />
                     </LinearLayout>
-                    <ImageView
-                        android:id="@+id/left_img"
-                        android:layout_marginTop="@dimen/dp10"
+                    <LinearLayout
+                        android:layout_marginTop="@dimen/dp8"
+                        android:layout_marginBottom="@dimen/dp4"
                         android:layout_below="@+id/ll_huoyuedu"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:src="@mipmap/start2" />
+                        android:id="@+id/ll1"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/left_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:src="@mipmap/start2" />
+                        <TextView
+                            android:id="@+id/tv_desc"
+                            android:layout_toRightOf="@+id/left_img"
+                            android:layout_alignTop="@+id/left_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="10dp"
+                            android:text="您已达到条件，可以立即提现"
+                            android:textColor="@color/text_33"
+                            android:textSize="12sp" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tv_desc"
-                        android:layout_toRightOf="@+id/left_img"
-                        android:layout_marginBottom="@dimen/dp10"
-                        android:layout_alignTop="@+id/left_img"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="10dp"
-                        android:text="您已达到条件，可以立即提现"
-                        android:textColor="@color/text_33"
-                        android:textSize="12sp" />
                 </RelativeLayout>
 
             </LinearLayout>

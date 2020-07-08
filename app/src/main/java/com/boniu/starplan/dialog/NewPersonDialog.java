@@ -33,6 +33,12 @@ public class NewPersonDialog extends Dialog {
                 dismiss();
             }
         });
+        findViewById(R.id.img_qx).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+            }
+        });
     }
 
 }

@@ -22,6 +22,15 @@ public class TaskDetailsModel {
     private int taskId;
     private int taskType;
     private int userId;
+    private boolean  isDouble;
+
+    public boolean isDouble() {
+        return isDouble;
+    }
+
+    public void setDouble(boolean aDouble) {
+        isDouble = aDouble;
+    }
 
     public String getApplyId() {
         return applyId;

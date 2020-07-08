@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.boniu.starplan.R;
@@ -75,38 +76,84 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
     public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
         childView = LayoutInflater.from(context).inflate(R.layout.item_child, null);
         TextView tvTitle = childView.findViewById(R.id.tv_title);
+        LinearLayout ll_ll = childView.findViewById(R.id.ll_ll);
         TextView tvGoldNum = childView.findViewById(R.id.tv_gold_num);
         TextView tvState = childView.findViewById(R.id.tv_state);
         TextView tvTime = childView.findViewById(R.id.tv_time);
         TextView tvDes = childView.findViewById(R.id.tv_des);
-
-        tvTitle.setText(list.get(i).getList().get(i1).getUserTaskType());
-        tvGoldNum.setText("-" + list.get(i).getList().get(i1).getGoldAmount()+"金币");
-        tvTime.setText(DateTimeUtils.format(list.get(i).getList().get(i1).getCreateTime(), DateTimeUtils.FORMAT_LONG_CN));
-        tvDes.setText(list.get(i).getList().get(i1).getStateDes());
-        String state = list.get(i).getList().get(i1).getState();
-        if (state.equals("1")){
-            tvDes.setVisibility(View.VISIBLE);
-        }else{
-            tvDes.setVisibility(View.GONE);
+        TextView tv_no_data = childView.findViewById(R.id.tv_no_data);
+        if (null == list.get(i).getList().get(i1).getState()) {
+            tv_no_data.setVisibility(View.VISIBLE);
+            ll_ll.setVisibility(View.GONE);
+        } else {
+            ll_ll.setVisibility(View.VISIBLE);
+            tv_no_data.setVisibility(View.GONE);
+            tvTitle.setText(list.get(i).getList().get(i1).getUserTaskType());
+            tvGoldNum.setText("-" + list.get(i).getList().get(i1).getGoldAmount() + "金币");
+            tvTime.setText(DateTimeUtils.format(list.get(i).getList().get(i1).getCreateTime(), "yyyy-MM-dd HH:mm"));
+            tvDes.setText(list.get(i).getList().get(i1).getRemark());
+            String state = list.get(i).getList().get(i1).getState();
+            if (state.equals("1") || state.equals("4")) {
+                tvDes.setVisibility(View.VISIBLE);
+            } else {
+                tvDes.setVisibility(View.GONE);
+            }
+            tvState.setText(list.get(i).getList().get(i1).getStateDes());
+            setStateColor(context, state, tvState);
         }
-        tvState.setText(list.get(i).getList().get(i1).getRemark());
+
+        return childView;
+    }
+
+    public static void setStateColor(Context mContext, String state, TextView textview) {
         switch (state) {
             case "2":
-            case "5":
-                tvDes.setTextColor(context.getResources().getColor(R.color.black));
-                tvDes.setText("兑换成功");
-                break;
+            case "4":
             case "1":
-                tvDes.setTextColor(context.getResources().getColor(R.color.FA6400));
-                tvDes.setText("审核中");
+                textview.setText("兑换中");
+                textview.setTextColor(mContext.getResources().getColor(R.color.FA6400));
+                break;
+            case "5":
+                textview.setText("兑换成功");
+                textview.setTextColor(mContext.getResources().getColor(R.color.black));
                 break;
             default:
-                tvDes.setTextColor(context.getResources().getColor(R.color.FF5151));
-                tvDes.setText("兑换失败");
+                textview.setText("兑换失败");
+                textview.setTextColor(mContext.getResources().getColor(R.color.FF5151));
                 break;
         }
-        return childView;
+    }
+
+    /**
+     * 提现记录
+     *
+     * @param mContext
+     * @param state
+     * @param textview 提现记录： 审核中，审核失败，提现中，提现成功，提现失败
+     */
+    public static void setTixianRecordStateColor(Context mContext, String state, TextView textview) {
+        switch (state) {
+            case "2":
+            case "4":
+                textview.setText("提现中");
+                textview.setTextColor(mContext.getResources().getColor(R.color.FA6400));
+                break;
+            case "1":
+                textview.setText("审核中");
+                textview.setTextColor(mContext.getResources().getColor(R.color.FA6400));
+                break;
+            case "3":
+                textview.setText("审核失败");
+                textview.setTextColor(mContext.getResources().getColor(R.color.FF5151));
+                break;
+            case "5":
+                textview.setTextColor(mContext.getResources().getColor(R.color.black));
+                break;
+            default:
+                textview.setText("兑换失败");
+                textview.setTextColor(mContext.getResources().getColor(R.color.FF5151));
+                break;
+        }
     }
 
     @Override

@@ -56,7 +56,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@color/white"
-                            android:padding="@dimen/dp10"
+                            android:paddingLeft="@dimen/dp15"
+                            android:paddingTop="@dimen/dp8"
+                            android:paddingBottom="@dimen/dp8"
                             android:text="进行中"
                             android:textColor="@color/text_33"
                             android:textSize="16sp"
@@ -84,9 +86,9 @@
                                     android:layout_width="45dp"
                                     android:layout_height="45dp"
                                     android:layout_centerVertical="true"
-                                    android:background="@mipmap/bb"
                                     android:gravity="center"
                                     android:text="1"
+                                    android:scaleType="centerCrop"
                                     android:textColor="@color/white"
                                     android:textSize="12sp" />
                             </androidx.cardview.widget.CardView>
@@ -157,16 +159,14 @@
                         </RelativeLayout>
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/dp4"
-                        android:background="@color/eeeeee" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/white"
-                        android:padding="@dimen/dp10"
+                        android:paddingLeft="@dimen/dp15"
+                        android:paddingTop="@dimen/dp8"
+                        android:paddingBottom="@dimen/dp8"
                         android:text="投放中"
                         android:textColor="@color/text_33"
                         android:textSize="16sp"

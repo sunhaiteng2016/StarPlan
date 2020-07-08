@@ -2,9 +2,12 @@ package com.boniu.starplan.ui;
 
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -37,10 +40,12 @@ public class LoginActivity extends BaseActivity {
     EditText edCode;
     @BindView(R.id.tv_get_code)
     TextView tvGetCode;
-    @BindView(R.id.tv_agreement)
-    TextView tvAgreement;
     @BindView(R.id.tv_login)
     TextView tvLogin;
+    @BindView(R.id.tv_agreement1)
+    TextView tv_agreement1;
+    @BindView(R.id.tv_agreement2)
+    TextView tv_agreement2;
     private String phone, code;
     private LoadingDialog loadingDialog;
 
@@ -54,6 +59,20 @@ public class LoginActivity extends BaseActivity {
         StatusBarUtil.setTranslucentStatus(this);
         StatusBarUtil.setRootViewFitsSystemWindows(this, false);
         loadingDialog = new LoadingDialog(this);
+        tv_agreement1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ARouter.getInstance().build("/home/WebActivity")
+                        .withString("WEB_TYPE", "1").navigation();
+            }
+        });
+        tv_agreement2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ARouter.getInstance().build("/home/WebActivity")
+                        .withString("WEB_TYPE", "2").navigation();
+            }
+        });
     }
 
     @Override
@@ -100,16 +119,17 @@ public class LoginActivity extends BaseActivity {
                 RxHttp.postEncryptJson(ComParamContact.Login.LOGIN)
                         .add(ComParamContact.Login.MOBILE, phone)
                         .add(ComParamContact.Login.CODE, code)
-                        .asResponse(String .class)
+                        .asResponse(String.class)
                         .subscribe(s -> {
                             loadingDialog.dismiss();
-                                String result = AESUtil.decrypt(s, AESUtil.KEY);
-                                LoginInfo loginInfo = new Gson().fromJson(result, LoginInfo.class);
-                                SPUtils.getInstance().put(ComParamContact.Login.MOBILE, loginInfo.getMobile());
-                                SPUtils.getInstance().put(ComParamContact.Common.TOKEN_KEY, loginInfo.getUtoken());
-                                Tip.show("登录成功！");
-                                ARouter.getInstance().build("/ui/MainActivity").navigation();
-                                finish();
+                            String result = AESUtil.decrypt(s, AESUtil.KEY);
+                            LoginInfo loginInfo = new Gson().fromJson(result, LoginInfo.class);
+                            SPUtils.getInstance().put(ComParamContact.Login.MOBILE, loginInfo.getMobile());
+                            SPUtils.getInstance().put(ComParamContact.Common.TOKEN_KEY, loginInfo.getUtoken());
+                            ApplicationUtils.newInstance().accountId = loginInfo.getUtoken();
+                            Tip.show("登录成功！");
+                            ARouter.getInstance().build("/ui/MainActivity").navigation();
+                            finish();
                         }, (OnError) error -> {
                             error.show();
                             loadingDialog.dismiss();
@@ -121,5 +141,21 @@ public class LoginActivity extends BaseActivity {
     private void getInput() {
         phone = edPhone.getText().toString().trim();
         code = edCode.getText().toString().trim();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putString("phone", edPhone.getText().toString().trim());
+        outState.putString("code", edCode.getText().toString().trim());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        phone = savedInstanceState.getString("phone");
+        code = savedInstanceState.getString("code");
+        edPhone.setText(phone);
+        edCode.setText(code);
     }
 }

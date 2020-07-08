@@ -27,9 +27,9 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_centerVertical="true"
-                android:background="@mipmap/bb"
                 android:gravity="center"
                 android:text="1"
+                android:scaleType="centerCrop"
                 android:textColor="@color/white"
                 android:textSize="12sp" />
         </androidx.cardview.widget.CardView>
@@ -78,7 +78,7 @@
                 style="@style/AppTheme.Widget.TextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="22dp"
+                android:textSize="20dp"
                 android:textStyle="bold" />
 
             <com.boniu.starplan.view.GradientColorTextView

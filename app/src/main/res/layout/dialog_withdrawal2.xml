@@ -8,7 +8,7 @@
         android:paddingLeft="@dimen/dp20"
         android:paddingRight="@dimen/dp20"
         android:paddingTop="@dimen/dp24"
-        android:background="@drawable/shape_dialog_bg"
+        android:background="@drawable/shape_dialog_bg_white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView

@@ -22,6 +22,7 @@ import com.boniu.starplan.dialog.DialogReturnInterfaces;
 import com.boniu.starplan.dialog.GeneralFailDialog;
 import com.boniu.starplan.dialog.LoadingDialog;
 import com.boniu.starplan.dialog.SubmitReviewDialog;
+import com.boniu.starplan.dialog.WithDrawalVerCodeDialog;
 import com.boniu.starplan.dialog.Withdrawal2Dialog;
 import com.boniu.starplan.dialog.WithdrawalDialog;
 import com.boniu.starplan.entity.ExclusModel;
@@ -33,6 +34,7 @@ import com.boniu.starplan.entity.TransferInfoBean;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.RlvManagerUtils;
+import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.StringUtils;
 import com.boniu.starplan.utils.Tip;
 import com.boniu.starplan.utils.Utils;
@@ -79,12 +81,18 @@ public class WithdrawalActivity extends BaseActivity {
     ProgressBar progressbar;
     @BindView(R.id.tv_days)
     TextView tvDays;
+    @BindView(R.id.tv_cjwt)
+    TextView tv_cjwt;
     @BindView(R.id.ll_huoyuedu)
     LinearLayout llHuoyuedu;
+    @BindView(R.id.rl_gz)
+    RelativeLayout ll1;
     @BindView(R.id.left_img)
     ImageView leftImg;
     @BindView(R.id.tv_desc)
     TextView tvDesc;
+    @BindView(R.id.tv_yc)
+    TextView tv_yc;
     @BindView(R.id.putong_recycler)
     RecyclerView putongRecycler;
     private List<PriceModel> list = new ArrayList<>();
@@ -95,6 +103,8 @@ public class WithdrawalActivity extends BaseActivity {
     private Long withdrwaalMoney = 0L;
     private MyGoldBean myGoldBean;
     private String putongTixian = "ordinary_withdrawal";
+    private String accountStatus;
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_withdrawal;
@@ -107,7 +117,10 @@ public class WithdrawalActivity extends BaseActivity {
         tvSubmit.setVisibility(View.VISIBLE);
         initView();
         getDates();
-
+        accountStatus = SPUtils.getInstance().getString("accountStatus");
+        if (!accountStatus.equals("0")) {
+            tv_yc.setVisibility(View.VISIBLE);
+        }
     }
 
     private void getPreferential(String type) {
@@ -125,7 +138,7 @@ public class WithdrawalActivity extends BaseActivity {
                                 llHuoyuedu.setVisibility(View.GONE);
                                 tvDesc.setText("您已达到条件，可以立即提现");
                             } else {
-                                clickType = "";
+                                clickType = "error";
                                 withdrwaalMoney = 0L;
                                 llHuoyuedu.setVisibility(View.VISIBLE);
                                 tvDesc.setText(progressModel.getDesc() + "");
@@ -170,11 +183,14 @@ public class WithdrawalActivity extends BaseActivity {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);
                     List<ExclusModel> PriceList = new Gson().fromJson(result, new TypeToken<List<ExclusModel>>() {
                     }.getType());
+
                     list1.clear();
                     list1.addAll(PriceList);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
+
                             adapter1.notifyDataSetChanged();
                         }
                     });
@@ -227,7 +243,7 @@ public class WithdrawalActivity extends BaseActivity {
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
                 withdrwaalMoney = Long.parseLong(list.get(i).price);
                 list.get(i).isSel = true;
-                clickType=putongTixian;
+                clickType = putongTixian;
                 clearExclusiveSel();
                 //其他的都不选中
                 for (int j = 0; j < list.size(); j++) {
@@ -236,6 +252,7 @@ public class WithdrawalActivity extends BaseActivity {
                     }
                 }
                 adapter.notifyDataSetChanged();
+                ll1.setVisibility(View.GONE);
             }
 
             @Override
@@ -256,10 +273,10 @@ public class WithdrawalActivity extends BaseActivity {
                 } else {
                     holder.setBackgroundRes(R.id.ll_bg, R.drawable.shape_board_f3);
                 }
-                if (list1 .get(position).getCode().equals("new_user")){
-                    holder.setText(R.id.tv_content," 新用户专享");
-                }else{
-                    holder.setText(R.id.tv_content," 连续活跃专享");
+                if (list1.get(position).getCode().equals("new_user")) {
+                    holder.setText(R.id.tv_content, " 新用户专享");
+                } else {
+                    holder.setText(R.id.tv_content, " 连续活跃专享");
                 }
 
             }
@@ -278,6 +295,7 @@ public class WithdrawalActivity extends BaseActivity {
                 }
                 adapter1.notifyDataSetChanged();
                 clickType = list1.get(i).getCode();
+                ll1.setVisibility(View.VISIBLE);
                 if (!list1.get(i).getCode().equals("new_user")) {
                     getPreferential(clickType);
                 } else {
@@ -309,25 +327,32 @@ public class WithdrawalActivity extends BaseActivity {
         getDates();
     }
 
-    @OnClick({R.id.tv_submit, R.id.tv_submit_s})
+    @OnClick({R.id.tv_submit, R.id.tv_submit_s, R.id.tv_cjwt})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_submit:
                 ARouter.getInstance().build("/ui/WithdrawalRecordActivity").navigation();
                 break;
+            case R.id.tv_cjwt:
+                ARouter.getInstance().build("/ui/PublicWbActivity").withString("title", "常见问题").withString("url", "http://p.qiao.baidu.com/cps/chat?siteId=15297951&userId=27344127&siteToken=b5b83e10a5fabe9bb7aec2f75a375aa2").navigation();
+                break;
             case R.id.tv_submit_s:
+                if (!accountStatus.equals("0")) {
+                    Tip.show("异常账户，不能提现");
+                    return;
+                }
                 // 查看是那个提现
-                if ("error".equals(clickType)){
+                if (StringUtils.isEmpty(clickType)) {
+                    Tip.show("还未选择提现金额");
+                    return;
+                }
+                if ("error".equals(clickType)) {
                     Tip.show("活跃度提现未满足规则");
                     return;
-                }else if(StringUtils.isEmpty(clickType)){
-                    Tip.show("还未选择提现方式");
+                }
+                if (withdrwaalMoney > myGoldBean.getAvailableBalance()) {
+                    Tip.show("提现金额不足");
                     return;
-                }else{
-                    if ( withdrwaalMoney > myGoldBean.getAvailableBalance() ){
-                        Tip.show("提现金额不足");
-                        return;
-                    }
                 }
 
                 transferInfo();
@@ -339,7 +364,7 @@ public class WithdrawalActivity extends BaseActivity {
      * 提现
      */
     private void transferInfo() {
-        LoadingDialog dialog=new LoadingDialog(this);
+        LoadingDialog dialog = new LoadingDialog(this);
         dialog.show();
         RxHttp.postEncryptJson(ComParamContact.Main.transferInfo)
                 .asResponse(String.class)
@@ -351,18 +376,19 @@ public class WithdrawalActivity extends BaseActivity {
                         public void run() {
                             dialog.dismiss();
                             if ("YES".equals(transferInfoBean.getChangeFlag())) {
-                                WithdrawalDialog withdrawalDialog = new WithdrawalDialog(mContext, withdrwaalMoney + "", new Withdrawal2Dialog.WithdrawalInterfaces() {
+                                WithdrawalDialog withdrawalDialog = new WithdrawalDialog(mContext, withdrwaalMoney + "", new WithDrawalVerCodeDialog.WithDrawalInterfaces() {
                                     @Override
-                                    public void startWithdrawal(String name, String zhanghao) {
-                                        withdrawalMoney(name, zhanghao);
+                                    public void withDrawalRight(String code, String name, String zhanghao) {
+                                        withdrawalMoney(code, name, zhanghao);
                                     }
                                 });
                                 withdrawalDialog.show();
                             } else {
-                                Withdrawal2Dialog withdrawal2Dialog = new Withdrawal2Dialog(mContext, transferInfoBean.getReceivedAccount(), transferInfoBean.getRealName(), withdrwaalMoney + "", new Withdrawal2Dialog.WithdrawalInterfaces() {
+                                Withdrawal2Dialog withdrawal2Dialog = new Withdrawal2Dialog(mContext, transferInfoBean.getReceivedAccount(), transferInfoBean.getRealName(), withdrwaalMoney + "", new WithDrawalVerCodeDialog.WithDrawalInterfaces() {
+
                                     @Override
-                                    public void startWithdrawal(String name, String zhanghao) {
-                                        withdrawalMoney(name, zhanghao);
+                                    public void withDrawalRight(String code, String name, String zhanghao) {
+                                        withdrawalMoney(code, name, zhanghao);
                                     }
                                 });
                                 withdrawal2Dialog.show();
@@ -373,7 +399,12 @@ public class WithdrawalActivity extends BaseActivity {
                     //设置签到数据
                 }, (OnError) error -> {
                     error.show();
-
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                        }
+                    });
                 });
     }
 
@@ -383,11 +414,12 @@ public class WithdrawalActivity extends BaseActivity {
      * @param name
      * @param zhanghao
      */
-    private void withdrawalMoney(String name, String zhanghao) {
-        RxHttp.postEncryptJson(ComParamContact.Main.transferInfo)
+    private void withdrawalMoney(String code, String name, String zhanghao) {
+        RxHttp.postEncryptJson(ComParamContact.Main.goldLaunch)
                 .add("appID", "test")
+                .add("code", code)
                 .add("expendAccountID", zhanghao)
-                .add("expendAccountName",name)
+                .add("expendAccountName", name)
                 .add("expendAccountType", "1")
                 .add("expendType", clickType + "")
                 .add("goldAmount", withdrwaalMoney + "")
@@ -402,16 +434,17 @@ public class WithdrawalActivity extends BaseActivity {
                     Dialog dialog = new SubmitReviewDialog(mContext, noticeBean, new DialogReturnInterfaces() {
                         @Override
                         public void dismiss() {
-
+                            ARouter.getInstance().build("MyWalletActivity").navigation();
                         }
+
                         @Override
                         public void clickType(String clickType) {
 
-
+                            ARouter.getInstance().build("MyWalletActivity").navigation();
                         }
                     });
                     dialog.show();
-                    withdrwaalMoney=0L;
+                    withdrwaalMoney = 0L;
                     getDates();
                     //设置签到数据
                 }, (OnError) error -> {
@@ -419,16 +452,17 @@ public class WithdrawalActivity extends BaseActivity {
 
                     NoticeBean noticeBean = new NoticeBean();
                     noticeBean.setTitle("提现失败");
-                    noticeBean.setContent(error+"");
+                    noticeBean.setContent(error + "");
                     noticeBean.setClickText("返回我的钱包");
                     Dialog dialog = new GeneralFailDialog(mContext, noticeBean, new DialogReturnInterfaces() {
                         @Override
                         public void dismiss() {
-
+                            ARouter.getInstance().build("MyWalletActivity").navigation();
                         }
 
                         @Override
                         public void clickType(String clickType) {
+                            ARouter.getInstance().build("MyWalletActivity").navigation();
                             finish();
                         }
                     });

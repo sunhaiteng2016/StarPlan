@@ -38,6 +38,10 @@ public class ComParamContact {
         public final static String AUTH_MODEL = "authModel";
     }
 
+    public final static class DownLoad {
+        public final static String PATH = "down";
+       // public final static String AUTH_MODEL = "authModel";
+    }
     public final static class Login {
         public final static String LOGIN = "api/user/login";
         public final static String GET_CODE = "api/user/sendMsg";
@@ -138,6 +142,7 @@ public class ComParamContact {
         public final static String addVideoAD = "api/task/user/addVideoAD";
         //游戏
         public final  static  String  gameUrl="api/game/getUrl";
+        public final  static  String  sendMsg="api/user/sendMsg";
     }
 }
 

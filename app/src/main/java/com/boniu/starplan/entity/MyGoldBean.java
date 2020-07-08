@@ -15,6 +15,15 @@ public class MyGoldBean {
     private long goldBalance;
     private long todayEarnGoldAmount;
     private long availableBalance;
+   private  long todayExpendGoldAmount;
+
+    public long getTodayExpendGoldAmount() {
+        return todayExpendGoldAmount;
+    }
+
+    public void setTodayExpendGoldAmount(long todayExpendGoldAmount) {
+        this.todayExpendGoldAmount = todayExpendGoldAmount;
+    }
 
     public long getAvailableBalance() {
         return availableBalance;

@@ -11,7 +11,6 @@
         android:orientation="vertical">
 
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -20,14 +19,31 @@
             android:text="更新内容"
             android:textColor="#333"
             android:textSize="16sp" />
-
         <TextView
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/dp15"
+        android:layout_marginTop="@dimen/dp4"
+        android:text="1.修复了bug"
+        android:textColor="#333"
+        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/tv_update"
+            android:layout_margin="@dimen/dp10"
+            android:paddingLeft="@dimen/dp20"
+            android:paddingRight="@dimen/dp20"
+            android:paddingTop="@dimen/dp10"
+            android:paddingBottom="@dimen/dp10"
+            android:background="@drawable/shape_round_yellow"
+           android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/dp15"
             android:layout_marginTop="@dimen/dp4"
-            android:text="1.修复了bug"
+            android:text="立即更新"
             android:textColor="#333"
             android:textSize="14sp" />
     </LinearLayout>

@@ -1,40 +1,44 @@
 package com.boniu.starplan.ui;
 
 
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+@Route(path = "/home/WebActivity")
 public class WebViewActivity extends BaseActivity {
 
-    @BindView(R.id.iv_black)
-    ImageView ivBlack;
-    @BindView(R.id.tv_title)
-    TextView tvTitle;
+    @BindView(R.id.rl_back)
+    RelativeLayout ivBlack;
+
     @BindView(R.id.tv_submit)
     TextView tvSubmit;
     @BindView(R.id.web_view)
     WebView webview;
     public static final String WEB_TYPE = "WEB_TYPE";
+    @BindView(R.id.tv_bar_title)
+    TextView tvBarTitle;
     private String type;
     private String url;
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_web_view;
@@ -42,16 +46,17 @@ public class WebViewActivity extends BaseActivity {
 
     @Override
     public void init() {
-            initWebView();
+        initWebView();
     }
+
     private void initWebView() {
         type = getIntent().getStringExtra(WEB_TYPE);
-        if ("1".equals(type)){
-            tvTitle.setText("用户协议");
-            url = "file:///android_asset/network.html";
-        }else{
-            tvTitle.setText("隐私协议");
-            url = "file:///android_asset/privacy.html";
+        if ("1".equals(type)) {
+            tvBarTitle.setText("用户协议");
+            url = "https://earth.rhinox.cn/html/network.html";
+        } else {
+            tvBarTitle.setText("隐私协议");
+            url = "https://earth.rhinox.cn/html/privacy.html";
         }
         tvSubmit.setVisibility(View.GONE);
         ivBlack.setOnClickListener(new View.OnClickListener() {
@@ -94,13 +99,20 @@ public class WebViewActivity extends BaseActivity {
         settings.setLoadWithOverviewMode(true);
         webview.loadUrl(url);
     }
+
     private void replaceLicenseAppName(WebView webView) {
         webView.loadUrl("javascript:setAppName('" + getString(R.string.app_name) + "')");
     }
 
     public static int dp2px(float dipValue) {
         float scale = ApplicationUtils.getContext().getResources().getDisplayMetrics().density;
-        return (int)(dipValue * scale + 0.5F);
+        return (int) (dipValue * scale + 0.5F);
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO: add setContentView(...) invocation
+        ButterKnife.bind(this);
+    }
 }

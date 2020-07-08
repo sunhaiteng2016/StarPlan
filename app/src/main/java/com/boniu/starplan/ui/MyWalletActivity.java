@@ -24,6 +24,7 @@ import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.DateTimeUtils;
 import com.boniu.starplan.utils.RlvManagerUtils;
+import com.boniu.starplan.utils.SPUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.zhy.adapter.recyclerview.CommonAdapter;
@@ -65,7 +66,7 @@ public class MyWalletActivity extends BaseActivity {
     @BindView(R.id.tv_accumulateEarnGoldAmount)
     TextView tvAccumulateEarnGoldAmount;
     @BindView(R.id.tv_accumulateExpendGoldAmount)
-    TextView tvAccumulateExpendGoldAmount;
+    TextView default_placeholder;
     RecyclerView recyclerView;
     @BindView(R.id.tv_1)
     TextView tv1;
@@ -75,6 +76,8 @@ public class MyWalletActivity extends BaseActivity {
     TextView tvShouyi;
     @BindView(R.id.tv_zhichu)
     TextView tvZhichu;
+    @BindView(R.id.tv_yc)
+    TextView tv_yc;
     @BindView(R.id.view_shouyi)
     View viewShouyi;
     @BindView(R.id.view_zhichu)
@@ -99,6 +102,10 @@ public class MyWalletActivity extends BaseActivity {
         loadingDialog = new LoadingDialog(this);
         initView();
         getDates();
+        String accountStatus = SPUtils.getInstance().getString("accountStatus");
+        if (!accountStatus.equals("0")) {
+            tv_yc.setVisibility(View.VISIBLE);
+        }
     }
 
     private void getDates() {
@@ -115,7 +122,7 @@ public class MyWalletActivity extends BaseActivity {
                             loadingDialog.dismiss();
                             tvGoldBalance.setText(myGoldBean.getGoldBalance() + "");
                             tvAccumulateEarnGoldAmount.setText(myGoldBean.getAccumulateEarnGoldAmount() + "");
-                            tvAccumulateExpendGoldAmount.setText(myGoldBean.getAccumulateExpendGoldAmount() + "");
+                            default_placeholder.setText(myGoldBean.getAccumulateExpendGoldAmount() + "");
                             tvAvailableBalance.setText("可提现金币：" + myGoldBean.getAvailableBalance());
                             tvTodayEarnGoldAmount.setText(myGoldBean.getTodayEarnGoldAmount() + "");
                         }
@@ -157,6 +164,11 @@ public class MyWalletActivity extends BaseActivity {
                     ArrayList<ExpendModel> expendlist = new Gson().fromJson(result, new TypeToken<List<ExpendModel>>() {
                     }.getType());
                     expendList1.clear();
+                    for (ExpendModel bean : expendlist) {
+                        if ( bean.getList().size()==0) {
+                            bean.getList().add(new ExpendModel.ListBean());
+                        }
+                    }
                     expendList1.addAll(expendlist);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -176,7 +188,7 @@ public class MyWalletActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, ProfitModel profitModel, int position) {
-                holder.setText(R.id.tv_title, profitModel.getUserTaskTypeName()).setText(R.id.tv_gold_num, "+" + profitModel.getGoldAmount()).setText(R.id.tv_time,  DateTimeUtils.format(profitModel.getCreateTime(), DateTimeUtils.FORMAT_LONG_CN));
+                holder.setText(R.id.tv_title, profitModel.getUserTaskTypeName()).setText(R.id.tv_gold_num, "+" + profitModel.getGoldAmount()+"金币").setText(R.id.tv_time, DateTimeUtils.format(profitModel.getCreateTime(), "MM月dd日 HH:mm:ss"));
             }
         };
         rlv.setAdapter(rlvAdapter);

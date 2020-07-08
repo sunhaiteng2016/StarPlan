@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.ui.ApplicationUtils;
 import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
@@ -42,12 +43,12 @@ public class ResponseParser<T> extends AbstractParser<T> {
             //清空token
             SPUtils.getInstance().put(ComParamContact.Common.TOKEN_KEY, "");
             SPUtils.getInstance().put(ComParamContact.Login.MOBILE, "");
+            ApplicationUtils.newInstance().accountId=null;
             ARouter.getInstance().build("/ui/LoginActivity").navigation();
         }
         if (data.getReturnCode() != 0 ) {//这里假设code不等于0，代表数据不正确，抛出异常
             throw new ParseException(String.valueOf(data.getReturnCode()), data.getErrorMsg(), response);
         }
-
         return (T) t;
     }
 }
