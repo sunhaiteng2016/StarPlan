@@ -378,7 +378,7 @@ public class MainActivityHelper {
 
                                         });
 
->>>>>>> 38143bc229e77283277a85e88fecd57bada74694
+
                             }
                         }
                     });
