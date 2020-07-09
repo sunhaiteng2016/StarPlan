@@ -347,23 +347,6 @@ public class MainActivityHelper {
                                 NewPersonDialog dialog = new NewPersonDialog(activity, userInfo.getNewUserAmount());
                                 dialog.show();
                             } else {
-<<<<<<< HEAD
-
-
-                                Calendar cd = Calendar.getInstance();
-                                int month = cd.get(Calendar.MONTH) + 1;
-                                int months = SPUtils.getInstance().getInt("month");
-                                boolean isEvery = SPUtils.getInstance().getBoolean("isEvery", true);
-                                if (month != months) {
-                                    EverydayLogDialog dialog = new EverydayLogDialog(activity, userInfo.getWeekSignGoldAmount());
-                                    dialog.show();
-                                } else {
-                                    if (isEvery) {
-                                        EverydayLogDialog dialog = new EverydayLogDialog(activity, userInfo.getWeekSignGoldAmount());
-                                        dialog.show();
-                                    }
-                                }
-=======
                                 //签到相关
                                 RxHttp.postEncryptJson(ComParamContact.Main.IS_SIGN)
                                         .asResponse(String.class)
