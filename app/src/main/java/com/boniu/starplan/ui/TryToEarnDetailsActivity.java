@@ -40,6 +40,7 @@ import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.HProgressDialogUtils;
 import com.boniu.starplan.utils.OpenApp;
 import com.boniu.starplan.utils.SPUtils;
+import com.boniu.starplan.utils.StringUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
 import com.google.gson.Gson;
@@ -246,7 +247,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     SPUtils.getInstance().put("taskID", taskId);
                     SPUtils.getInstance().put("beginTime", System.currentTimeMillis());
                     //还要开始任务
-                    if (!taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl().equals("")) {
+                    if (!StringUtils.isEmpty(taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl())) {
                         OpenApp.schemeUrl(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl());
                     } else {
                         OpenApp.OpenApp(this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
