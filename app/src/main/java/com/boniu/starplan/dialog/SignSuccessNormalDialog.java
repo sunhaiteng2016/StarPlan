@@ -44,7 +44,7 @@ public class SignSuccessNormalDialog extends Dialog {
             flag = 1;
         }
         tv2.setText("已签到" + flag + "天,继续签到可获得大礼包");
-        tvSubmit.setText("看视频领取更多");
+        tvSubmit.setText("我知道了");
 
         tvSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
