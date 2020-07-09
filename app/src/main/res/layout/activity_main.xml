@@ -216,7 +216,7 @@
                                         android:layout_marginRight="8dp">
 
                                         <TextView
-                                            android:layout_marginTop="@dimen/dp2"
+                                            android:layout_marginTop="@dimen/dp4"
                                             android:id="@+id/tv_sign"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
@@ -230,7 +230,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_centerInParent="true"
                                             android:paddingLeft="@dimen/dp4"
-                                            android:paddingTop="@dimen/dp4"
+                                            android:paddingTop="@dimen/dp10"
                                             android:paddingBottom="@dimen/dp4"
                                             android:text="更多福利 >"
                                             android:textSize="13sp"

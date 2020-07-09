@@ -299,7 +299,7 @@ public class MainActivity extends BaseActivity {
             MainActivityHelper.newInstance().getUserInfo(MainActivity.this, tvPhone, tvMoney, tv_yc);
         }
         if (message.flag == 2) {
-            MainActivityHelper.newInstance().IsSign(MainActivity.this, tvSign, tvMoreSign);
+            gotoSign();
         }
 
     }
@@ -368,7 +368,7 @@ public class MainActivity extends BaseActivity {
             @Override
             protected void convert(ViewHolder holder, MainTask.DayTaskBean taskMode, int position) {
                 GlideUtils.getInstance().LoadContextRoundBitmap(MainActivity.this, taskMode.getIcon(), holder.getView(R.id.iv_img), 8);
-                holder.setText(R.id.main_title, taskMode.getTaskName()).setText(R.id.sub_title, taskMode.getSubTitle()).setText(R.id.gold, taskMode.getTodayRemain() + "");
+                holder.setText(R.id.main_title, taskMode.getTaskName()).setText(R.id.sub_title, taskMode.getSubTitle()).setText(R.id.gold, taskMode.getIncome() + "");
                 int viewStatus = dayTaskList.get(position).getTaskViewStatus();
                 if (viewStatus == 0) {
                     holder.setBackgroundRes(R.id.tv_complete, R.drawable.shape_round_16_red);
@@ -814,7 +814,7 @@ public class MainActivity extends BaseActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_sign:
-                loadingDialog.show();
+
                 gotoSign();
                 break;
             case R.id.tv_with_draw:
@@ -857,6 +857,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void gotoSign() {
+        loadingDialog.show();
         RxHttp.postEncryptJson(ComParamContact.Main.GET_SIGN).asResponse(String.class).subscribe(
                 s -> {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);

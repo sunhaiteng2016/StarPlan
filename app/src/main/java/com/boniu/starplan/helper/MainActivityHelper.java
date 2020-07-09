@@ -342,11 +342,7 @@ public class MainActivityHelper {
                         public void run() {
                             if (userInfo.isIsNewUser()) {
                                 ApplicationUtils.isNewUer = false;
-                            }
-                            if (userInfo.isPop()) {
-                                NewPersonDialog dialog = new NewPersonDialog(activity, userInfo.getNewUserAmount());
-                                dialog.show();
-                            } else {
+                            }else {
                                 //签到相关
                                 RxHttp.postEncryptJson(ComParamContact.Main.IS_SIGN)
                                         .asResponse(String.class)
@@ -355,7 +351,7 @@ public class MainActivityHelper {
                                             activity.runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    if (resultStr.equals("1")) {
+                                                    if (resultStr.equals("0")) {
                                                         Calendar cd = Calendar.getInstance();
                                                         int month = cd.get(Calendar.MONTH) + 1;
                                                         int months = SPUtils.getInstance().getInt("month");
@@ -379,6 +375,10 @@ public class MainActivityHelper {
                                         });
 
 
+                            }
+                            if (userInfo.isPop()) {
+                                NewPersonDialog dialog = new NewPersonDialog(activity, userInfo.getNewUserAmount());
+                                dialog.show();
                             }
                         }
                     });
