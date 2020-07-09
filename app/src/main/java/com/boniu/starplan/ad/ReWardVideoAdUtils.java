@@ -84,7 +84,6 @@ public class ReWardVideoAdUtils {
                         } else {
                             GeneralFailDialog2 dialog = new GeneralFailDialog2(mContext);
                             dialog.show();
-
                         }
                     }
 

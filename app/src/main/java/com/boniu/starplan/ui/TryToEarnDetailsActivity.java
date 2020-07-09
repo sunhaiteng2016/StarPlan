@@ -133,7 +133,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                                                     @Override
                                                     public void run() {
                                                         if (flag == 2) {
-                                                            ReWardVideoAdUtils.initAd(TryToEarnDetailsActivity.this, applyId, inCome);
+                                                            ReWardVideoAdUtils.initAd(TryToEarnDetailsActivity.this, applyId, inCome/2);
                                                         } else {
                                                             TryToEarnDetailsActivity.this.finish();
                                                         }
