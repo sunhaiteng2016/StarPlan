@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -40,6 +42,9 @@ public class LoadingView extends LinearLayout {
         progressBar = view.findViewById(R.id.progressBar);
         tv = findViewById(R.id.tv);
         iv = findViewById(R.id.iv);
+        Animation rotate = AnimationUtils.loadAnimation(context, R.anim.rotate);
+        progressBar.startAnimation(rotate);
+
     }
 
     /**

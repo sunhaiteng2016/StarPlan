@@ -81,7 +81,7 @@ public class MainActivityHelper {
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ReWardVideoAdUtils.initAd(context, adModel.getApplyId(), adModel.getIncome());
+                    ReWardVideoAdUtils.initAd(context, adModel.getApplyId(), adModel.getIncome()/2);
                 }
             });
         }, (OnError) error -> {

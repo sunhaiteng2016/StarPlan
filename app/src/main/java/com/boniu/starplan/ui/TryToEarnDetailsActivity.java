@@ -96,6 +96,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
     private File destPath;
     private int flag;
 
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_try_to_earn_details;
