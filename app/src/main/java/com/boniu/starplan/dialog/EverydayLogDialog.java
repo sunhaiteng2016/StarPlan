@@ -35,7 +35,7 @@ public class EverydayLogDialog extends Dialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_every_day_login);
         tvGold = findViewById(R.id.tv_gold);
-        tvGold.setText(inCome + "金币");
+        tvGold.setText("+"+inCome + "金币");
         findViewById(R.id.tv_go_to_look).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
