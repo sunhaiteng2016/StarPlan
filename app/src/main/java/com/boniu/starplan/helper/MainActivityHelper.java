@@ -347,6 +347,8 @@ public class MainActivityHelper {
                                 NewPersonDialog dialog = new NewPersonDialog(activity, userInfo.getNewUserAmount());
                                 dialog.show();
                             } else {
+
+
                                 Calendar cd = Calendar.getInstance();
                                 int month = cd.get(Calendar.MONTH) + 1;
                                 int months = SPUtils.getInstance().getInt("month");
