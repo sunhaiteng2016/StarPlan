@@ -12,6 +12,8 @@ import java.util.Date;
 
 
 public class TimerUtils {
+    private static CountDownTimer timer;
+
     public static void startTimer(final Context context, final TextView tvCode) {
         new CountDownTimer(60000, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -65,7 +67,7 @@ public class TimerUtils {
     }
 
     public static void startTimerHour(final Context context, long times, final TextView tvCode) {
-        new CountDownTimer(times, 1000) {
+         timer = new CountDownTimer(times, 1000) {
             public void onTick(long millisUntilFinished) {
                 String minutes = "";
                 String seconds = "";
@@ -83,13 +85,14 @@ public class TimerUtils {
                 } else {
                     seconds = second + "";
                 }
-                tvCode.setText("倒计时:" + minutes + ":" + seconds);
+                tvCode.setText(minutes + ":" + seconds);
             }
 
             public void onFinish() {
                 tvCode.setText("已过期");
             }
-        }.start();
+        };
+        timer.start();
 
     }
     public static void startTimerHour1(Activity context, long times, final TextView tvCode) {

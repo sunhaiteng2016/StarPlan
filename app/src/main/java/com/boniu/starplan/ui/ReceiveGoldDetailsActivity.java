@@ -99,6 +99,7 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
     public ImageBrowserConfig.IndicatorType indicatorType = ImageBrowserConfig.IndicatorType.Indicator_Number;
     public ImageBrowserConfig.ScreenOrientationType screenOrientationType = ImageBrowserConfig.ScreenOrientationType.Screenorientation_Default;
     private ImageEngine imageEngine = new GlideImageEngine();
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_receive_gold_details;
@@ -136,11 +137,16 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
         webView.setWebViewClient(webViewClient);
         settings.setJavaScriptEnabled(true);
         settings.setDefaultTextEncodingName("UTF-8");
-        settings.setSupportZoom(true);
-        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        if (dm.densityDpi > 240) {
+            settings.setDefaultFontSize(24); //可以取1-72之间的任意值，默认16
+        }
 
     }
 
@@ -159,13 +165,16 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                     tvPlaySm.setText(receiveGoldModel.getTaskDetailVO().getMajorDesc());
                     webView.loadDataWithBaseURL(null, auditTaskVO.getShowDesc(), "text/html", "utf-8", null);
                     tvGoldNum.setText(receiveGoldModel.getIncome() + "");
-                    imgList.clear();
-                    imgList.addAll(taskImgVo);
-                    for (ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean bean : imgList) {
-                        mThumbViewInfoList.add(bean.getImgUrl());
+                    if (null != taskImgVo) {
+                        imgList.clear();
+                        imgList.addAll(taskImgVo);
+                        for (ReceiveGoldModel.TaskDetailVOBean.TaskImgsVOBean bean : imgList) {
+                            mThumbViewInfoList.add(bean.getImgUrl());
+                        }
+                        tv_bz.setText("共" + receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getImgs() + "步教程  点击图片查看");
+                        adapter.notifyDataSetChanged();
                     }
-                    tv_bz.setText( "共"+receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getImgs()+"步教程  点击图片查看");
-                    adapter.notifyDataSetChanged();
+
                     long curTime = System.currentTimeMillis();
                     long timers = receiveGoldModel.getExpiryTime() - curTime;
                     TimerUtils.startTimerHour1(ReceiveGoldDetailsActivity.this, timers, tvNumTime);
@@ -207,7 +216,7 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                         //设置隐藏指示器
                         .setIndicatorHide(false)
                         //设置自定义遮盖层，定制自己想要的效果，当设置遮盖层后，原本的指示器会被隐藏
-                       // .setCustomShadeView(showCustomShadeView ? customView : null)
+                        // .setCustomShadeView(showCustomShadeView ? customView : null)
                         //自定义ProgressView，不设置默认默认没有
                         //.setCustomProgressViewLayoutID(showCustomProgressView ? R.layout.layout_custom_progress_view : 0)
                         //当前位置
@@ -250,9 +259,9 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                         //全屏模式
                         .setFullScreenMode(true)
                         //打开动画
-                       /* .setActivityOpenAnime(openAnim)
-                        //关闭动画
-                        .setActivityExitAnime(exitAnim)*/
+                        /* .setActivityOpenAnime(openAnim)
+                         //关闭动画
+                         .setActivityExitAnime(exitAnim)*/
                         //手势下拉缩小效果
                         .setOpenPullDownGestureEffect(false)
                         //自定义显示View
@@ -298,10 +307,10 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                     return;
                 }
                 ARouter.getInstance().build("/ui/FinishRegisterActivity")
-                        .withBoolean("auditName",receiveGoldModel.getTaskDetailVO().getAuditTaskVO().isAuditName())
-                        .withBoolean("auditMobile",receiveGoldModel.getTaskDetailVO().getAuditTaskVO().isAuditMobile())
-                        .withBoolean("auditPicture",receiveGoldModel.getTaskDetailVO().getAuditTaskVO().isAuditPicture())
-                        .withSerializable("list",  mThumbViewInfoList).withInt("flag", flag).withInt("userTaskId", userTaskId).navigation();
+                        .withBoolean("auditName", receiveGoldModel.getTaskDetailVO().getAuditTaskVO().isAuditName())
+                        .withBoolean("auditMobile", receiveGoldModel.getTaskDetailVO().getAuditTaskVO().isAuditMobile())
+                        .withBoolean("auditPicture", receiveGoldModel.getTaskDetailVO().getAuditTaskVO().isAuditPicture())
+                        .withSerializable("list", mThumbViewInfoList).withInt("flag", flag).withInt("userTaskId", userTaskId).navigation();
                 break;
             case R.id.rl_back:
                 finish();

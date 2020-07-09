@@ -16,4 +16,6 @@ public class Url {
     @DefaultDomain //设置为默认域名
     public static String baseUrl = "http://47.97.153.105:8080/";
     //public static String baseUrl = "http://10.250.11.221:8080/";
+    //app更新
+    public static  String UpLoadApp="https://test99.rhinox.cn/standard/common/base";
 }

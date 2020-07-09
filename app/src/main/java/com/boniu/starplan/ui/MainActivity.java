@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -54,6 +55,7 @@ import com.boniu.starplan.entity.TaskMode;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.AnimatorUtil;
 import com.boniu.starplan.utils.GlideUtils;
+import com.boniu.starplan.utils.NetUtil;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.TimerUtils;
@@ -194,17 +196,19 @@ public class MainActivity extends BaseActivity {
         requestMPermission();
 
         loadingDialog = new LoadingDialog(this);
-        loadingDialog.show();
+
         GlideUtils.getInstance().LoadContextCircleBitmap(this, R.mipmap.touxiang, ivImg);
         //初始化
         initDraws();
-        MainActivityHelper.newInstance().initNewUserInfo(this);
+        if (ApplicationUtils.isNewUer) {
+            MainActivityHelper.newInstance().initNewUserInfo(this);
+        }
+
         initMenuView();
         initUserData();
         initNewUserTaskView();
         initDayTaskView();
         initWeTaskView();
-        //获取数据
         getData();
         tvGerMore.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -222,8 +226,8 @@ public class MainActivity extends BaseActivity {
                 getData();
             }
         });
-    }
 
+    }
 
 
     private void initDraws() {
@@ -280,6 +284,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 drawer.closeDrawer(navigationView);
+                ApplicationUtils.isNewUer = true;
                 SPUtils.getInstance().put(ComParamContact.Common.TOKEN_KEY, "");
                 SPUtils.getInstance().put(ComParamContact.Login.MOBILE, "");
                 ARouter.getInstance().build("/ui/LoginActivity").navigation();
@@ -291,7 +296,7 @@ public class MainActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onGetStickyEvent(MessageWrap message) {
         if (message.flag == 1) {
-            MainActivityHelper.newInstance().getUserInfo(MainActivity.this, tvPhone, tvMoney,tv_yc);
+            MainActivityHelper.newInstance().getUserInfo(MainActivity.this, tvPhone, tvMoney, tv_yc);
         }
         if (message.flag == 2) {
             MainActivityHelper.newInstance().IsSign(MainActivity.this, tvSign, tvMoreSign);
@@ -362,7 +367,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void convert(ViewHolder holder, MainTask.DayTaskBean taskMode, int position) {
-                GlideUtils.getInstance().LoadContextRoundBitmap(MainActivity.this,taskMode.getIcon(),holder.getView(R.id.iv_img),8);
+                GlideUtils.getInstance().LoadContextRoundBitmap(MainActivity.this, taskMode.getIcon(), holder.getView(R.id.iv_img), 8);
                 holder.setText(R.id.main_title, taskMode.getTaskName()).setText(R.id.sub_title, taskMode.getSubTitle()).setText(R.id.gold, taskMode.getTodayRemain() + "");
                 int viewStatus = dayTaskList.get(position).getTaskViewStatus();
                 if (viewStatus == 0) {
@@ -383,8 +388,9 @@ public class MainActivity extends BaseActivity {
                 type = dayTaskList.get(i).getType();
                 clickTaskId = dayTaskList.get(i).getTaskId();
                 clickAppSoure = dayTaskList.get(i).getApplySource();
-                loadingDialog.show();
+
                 if (viewStatus == 0) {
+                    loadingDialog.show();
                     ReceiveTask(dayTaskList.get(i).getTaskId(), type, clickAppSoure);
                 }
             }
@@ -423,9 +429,10 @@ public class MainActivity extends BaseActivity {
                 int viewStatus = newUserTaskList.get(i).getTaskViewStatus();
                 type = newUserTaskList.get(i).getType();
                 clickTaskId = newUserTaskList.get(i).getTaskId();
-                loadingDialog.show();
+
                 clickAppSoure = newUserTaskList.get(i).getApplySource();
                 if (viewStatus == 0) {
+                    loadingDialog.show();
                     ReceiveTask(newUserTaskList.get(i).getTaskId(), type, clickAppSoure);
                 }
             }
@@ -449,7 +456,7 @@ public class MainActivity extends BaseActivity {
                     loadingDialog.dismiss();
 
                     if (applyTask.isIsSucceed()) {
-                        Tip.showCancer1("领取成功，跳转中。。。");
+                        Tip.showCancer1("领取成功，跳转中...");
                         if (type == 1) {
                             ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("flag", 1).withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
                         } else {
@@ -690,8 +697,6 @@ public class MainActivity extends BaseActivity {
                     }
                 });
                 dialog.show();
-
-
             }
 
             @Override
@@ -702,11 +707,18 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getData() {
-        MainActivityHelper.newInstance().getUserInfo(this, tvPhone, tvMoney,tv_yc);
-        MainActivityHelper.newInstance().IsSign(this, tvSign, tvMoreSign);
-        getSign();
-        MainActivityHelper.newInstance().mainTaskList(this, loadingDialog, dayTaskList, newUserTaskList, dayTaskAdapter, newUserTaskAdapter, new_user_title_rl, rlvNewUserTask, tvDes, ivBx);
-        getTimer();
+        if (NetUtil.isNetworkAvalible(MainActivity.this)){
+            loadingDialog.show();
+            MainActivityHelper.newInstance().getUserInfo(this, tvPhone, tvMoney, tv_yc);
+            MainActivityHelper.newInstance().IsSign(this, tvSign, tvMoreSign);
+            getSign();
+            MainActivityHelper.newInstance().mainTaskList(this, loadingDialog, dayTaskList, newUserTaskList, dayTaskAdapter, newUserTaskAdapter, new_user_title_rl, rlvNewUserTask, tvDes, ivBx);
+            getTimer();
+            MainActivityHelper.newInstance().downLoad(this);
+        }else {
+            Tip.show("请检查当前网络！");
+        }
+
     }
 
     private void getTimer() {
@@ -760,7 +772,7 @@ public class MainActivity extends BaseActivity {
      *
      * @param i
      */
-    private void showSignDialog(int i, boolean isDouble,int incomes) {
+    private void showSignDialog(int i, boolean isDouble, int incomes) {
         SignSuccessDialog dialog = new SignSuccessDialog(this, i + 1, incomes, new SignSuccessDialog.SubMitCallBack() {
             @Override
             public void onSuccess() {
@@ -859,10 +871,10 @@ public class MainActivity extends BaseActivity {
                                 tvMoreSign.setVisibility(View.VISIBLE);
                                 if (weekSign == 2) {
                                     //第三天签到
-                                    showSignDialog(2, isSignModel.getList().get(2).isIsDouble(),isSignModel.getList().get(2).getWeekSignGold());
+                                    showSignDialog(2, isSignModel.getList().get(2).isIsDouble(), isSignModel.getList().get(2).getWeekSignGold());
                                 } else if (weekSign == 6) {
                                     //第四天签到
-                                    showSignDialog(6, isSignModel.getList().get(6).isIsDouble(),isSignModel.getList().get(6).getWeekSignGold());
+                                    showSignDialog(6, isSignModel.getList().get(6).isIsDouble(), isSignModel.getList().get(6).getWeekSignGold());
                                 } else {
                                     showNormalDialog(weekSign + 1, isSignModel.getList().get(weekSign).getWeekSignGold());
                                 }

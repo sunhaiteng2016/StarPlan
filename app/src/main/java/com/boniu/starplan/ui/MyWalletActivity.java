@@ -25,6 +25,7 @@ import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.DateTimeUtils;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.SPUtils;
+import com.boniu.starplan.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.zhy.adapter.recyclerview.CommonAdapter;
@@ -120,7 +121,7 @@ public class MyWalletActivity extends BaseActivity {
                         @Override
                         public void run() {
                             loadingDialog.dismiss();
-                            tvGoldBalance.setText(myGoldBean.getGoldBalance() + "");
+                            tvGoldBalance.setText(Utils.addComma(myGoldBean.getGoldBalance() + ""));
                             tvAccumulateEarnGoldAmount.setText(myGoldBean.getAccumulateEarnGoldAmount() + "");
                             default_placeholder.setText(myGoldBean.getAccumulateExpendGoldAmount() + "");
                             tvAvailableBalance.setText("可提现金币：" + myGoldBean.getAvailableBalance());

@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.entity.MessageWrap;
@@ -22,6 +23,7 @@ import rxhttp.wrapper.param.RxHttp;
 public class ReceiveGoldDialog2 extends Dialog {
 
 
+    private  int flag;
     private int goldNum;
     private TextView tvPrice;
 
@@ -33,8 +35,15 @@ public class ReceiveGoldDialog2 extends Dialog {
     public ReceiveGoldDialog2(@NonNull Context context, int goldNumber) {
         super(context, R.style.CustomProgressDialog);
         this.goldNum = goldNumber;
-    }
+        this.flag=flag;
 
+    }
+    public ReceiveGoldDialog2(@NonNull Context context, int goldNumber,int flag) {
+        super(context, R.style.CustomProgressDialog);
+        this.goldNum = goldNumber;
+        this.flag=flag;
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,13 +61,12 @@ public class ReceiveGoldDialog2 extends Dialog {
         findViewById(R.id.tv_submit2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 EventBus.getDefault().post(new MessageWrap(1));
                 dismiss();
             }
         });
     }
 
-    public interface ReceiveCallback {
-        void receive(int flag, String applyId);
-    }
+
 }

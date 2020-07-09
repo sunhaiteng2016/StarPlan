@@ -299,6 +299,7 @@ public class WithdrawalActivity extends BaseActivity {
                 if (!list1.get(i).getCode().equals("new_user")) {
                     getPreferential(clickType);
                 } else {
+                    tvDesc.setText("您已达到条件,可以立即提现");
                     llHuoyuedu.setVisibility(View.GONE);
                 }
 

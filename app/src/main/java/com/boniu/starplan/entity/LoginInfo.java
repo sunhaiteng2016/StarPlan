@@ -15,9 +15,19 @@ public class LoginInfo {
     private String code;
     private String message;
     private String mobile;
-    private String utoken;
+    private String uToken;
     private String goldAmount;
     private String accountStatus;
+    private String isPop;
+
+    public String getIsPop() {
+        return isPop;
+    }
+
+    public void setIsPop(String isPop) {
+        this.isPop = isPop;
+    }
+
     public String getAccountStatus() {
         return accountStatus;
     }
@@ -67,10 +77,10 @@ public class LoginInfo {
     }
 
     public String getUtoken() {
-        return utoken;
+        return uToken;
     }
 
     public void setUtoken(String utoken) {
-        this.utoken = utoken;
+        this.uToken = utoken;
     }
 }

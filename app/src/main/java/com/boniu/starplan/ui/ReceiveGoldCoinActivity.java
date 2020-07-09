@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -23,6 +24,7 @@ import com.boniu.starplan.entity.TaskMode;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.GlideUtils;
+import com.boniu.starplan.utils.NetUtil;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
@@ -33,6 +35,7 @@ import com.rxjava.rxlife.RxLife;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
@@ -102,54 +105,59 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
     }
 
     private void getData() {
-        RxHttp.postEncryptJson(ComParamContact.Main.TASk_LIST).add("page", page).add("pageSize", pageSize).add("type", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
-            String result = AESUtil.decrypt(s, AESUtil.KEY);
-            TaskMode taskModel = new Gson().fromJson(result, TaskMode.class);
-            if (page == 1) {
-                lists.clear();
-            }
-            lists.addAll(taskModel.getRows());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    loadingDialog1.dismiss();
-                    adapter.notifyDataSetChanged();
+        if (NetUtil.isNetworkAvalible(ReceiveGoldCoinActivity.this)){
+            RxHttp.postEncryptJson(ComParamContact.Main.TASk_LIST).add("page", page).add("pageSize", pageSize).add("type", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
+                String result = AESUtil.decrypt(s, AESUtil.KEY);
+                TaskMode taskModel = new Gson().fromJson(result, TaskMode.class);
+                if (page == 1) {
+                    lists.clear();
                 }
+                lists.addAll(taskModel.getRows());
+
+                loadingDialog1.dismiss();
+                adapter.notifyDataSetChanged();
+
+            }, (OnError) error -> {
+                error.show();
+                loadingDialog1.dismiss();
             });
-        }, (OnError) error -> {
-            error.show();
-        });
-        //用户进行中的任务
-        RxHttp.postEncryptJson(ComParamContact.Main.List_to_Do).add("taskType", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
-            String result = AESUtil.decrypt(s, AESUtil.KEY);
-            List<RunningTaskModel> lists = new Gson().fromJson(result, new TypeToken<List<RunningTaskModel>>() {
-            }.getType());
-            RunningTaskModel runningTaskModel = lists.get(0);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (runningTaskModel.getId() != 0) {
-                        isRunningTask = true;
-                        runTaskId = runningTaskModel.getTaskId();
-                        userTaskId = runningTaskModel.getId();
-                        rlRunningTask.setVisibility(View.VISIBLE);
-                        rlRunningTask.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                ARouter.getInstance().build("/ui/ReceiveGoldDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", runTaskId).navigation();
-                            }
-                        });
+            //用户进行中的任务
+            RxHttp.postEncryptJson(ComParamContact.Main.List_to_Do).add("taskType", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
+                String result = AESUtil.decrypt(s, AESUtil.KEY);
+                List<RunningTaskModel> lists = new Gson().fromJson(result, new TypeToken<List<RunningTaskModel>>() {
+                }.getType());
+                RunningTaskModel runningTaskModel = lists.get(0);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (runningTaskModel.getId() != 0) {
+                            isRunningTask = true;
+                            runTaskId = runningTaskModel.getTaskId();
+                            userTaskId = runningTaskModel.getId();
+                            rlRunningTask.setVisibility(View.VISIBLE);
+                            rlRunningTask.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    ARouter.getInstance().build("/ui/ReceiveGoldDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", runTaskId).navigation();
+                                }
+                            });
+                        }else{
+                            rlRunningTask.setVisibility(View.GONE);
+                        }
+                        GlideUtils.getInstance().LoadContextRoundBitmap(ReceiveGoldCoinActivity.this, runningTaskModel.getIcon(), ivTaskImg, 8);
+                        long curTime = System.currentTimeMillis();
+                        long timers = runningTaskModel.getExpiryTime() - curTime;
+                        TimerUtils.startTimerHour(ReceiveGoldCoinActivity.this, timers, tvTime);
+                        tvTitle.setText(runningTaskModel.getMainTitle());
+                        tvDes.setText(runningTaskModel.getSubTitle());
                     }
-                    GlideUtils.getInstance().LoadContextRoundBitmap(ReceiveGoldCoinActivity.this, runningTaskModel.getIcon(), ivTaskImg, 8);
-                    long curTime = System.currentTimeMillis();
-                    long timers = runningTaskModel.getExpiryTime() - curTime;
-                    TimerUtils.startTimerHour(ReceiveGoldCoinActivity.this, timers, tvTime);
-                    tvTitle.setText(runningTaskModel.getMainTitle());
-                    tvDes.setText(runningTaskModel.getSubTitle());
-                }
+                });
+            }, (OnError) error -> {
             });
-        }, (OnError) error -> {
-        });
+        }else{
+            Tip.show("请检查当前网络！");
+        }
+
     }
 
     private void initView() {
@@ -194,6 +202,14 @@ public class ReceiveGoldCoinActivity extends BaseActivity {
             public void onLoadMore(RefreshLayout refreshlayout) {
                 refreshlayout.finishLoadMore(1000/*,false*/);//传入false表示加载失败
                 page++;
+                getData();
+            }
+        });
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                refreshLayout.finishRefresh();
+                page=1;
                 getData();
             }
         });

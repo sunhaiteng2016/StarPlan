@@ -48,6 +48,7 @@ public class ApplicationUtils extends Application {
     private static String oaid;
     public static String accountId;
     private static boolean isSupportOaid=true;
+    public static boolean isNewUer=true;
     private static int errorCode;
 
     public static String getOaid() {

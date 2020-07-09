@@ -77,7 +77,7 @@ public class GameWebViewActivity extends BaseActivity {
 
     @Override
     public void init() {
-        tvBarTitle.setText("刷游戏赚");
+        tvBarTitle.setText("玩游戏赚");
         initView();
         getData();
     }
@@ -121,7 +121,6 @@ public class GameWebViewActivity extends BaseActivity {
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
         webView.addJavascriptInterface(new WebMethod(), "Android");
-
     }
 
     private File mPath;//文件保存路径
@@ -129,22 +128,17 @@ public class GameWebViewActivity extends BaseActivity {
     private void getData() {
         LoadingDialog dialog = new LoadingDialog(this);
         dialog.show();
-        RxHttp.postEncryptJson(ComParamContact.Main.gameUrl).add("gameChannel", "1").add("deviceId", UuidCreator.getInstance(this).getDeviceId()).add("deviceSource", 2).add("oaid", UuidCreator.getInstance(this).getDeviceId()).add("osVersion", SystemInfoUtils.getOSVersionName()).add("phoneModel", SystemInfoUtils.getBrandName())
+        RxHttp.postEncryptJson(ComParamContact.Main.gameUrl)
+                .add("gameChannel", "1").add("deviceId", UuidCreator.getInstance(this).getDeviceId())
+                .add("deviceSource", 2).add("oaid", UuidCreator.getInstance(this).getDeviceId()).add("osVersion", SystemInfoUtils.getOSVersionName()).add("phoneModel", SystemInfoUtils.getBrandName())
                 .asResponse(String.class)
+                .to(RxLife.toMain(this))
                 .subscribe(s -> {
                     String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.dismiss();
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    webView.loadUrl(resultStr);
-                                }
-                            });
-                        }
-                    });
+                    String s1 = resultStr.replace("\"", "");
+                    String s2 = s1.replace("\"", "");
+                    webView.loadUrl(s2);
+                    dialog.dismiss();
                 }, (OnError) error -> {
                     error.show();
                 });

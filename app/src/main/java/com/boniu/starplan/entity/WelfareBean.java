@@ -58,6 +58,15 @@ public class WelfareBean {
 
         private int days;
         private int status;
+        private boolean isShow;
+
+        public boolean isShow() {
+            return isShow;
+        }
+
+        public void setShow(boolean show) {
+            isShow = show;
+        }
 
         public int getDays() {
             return days;

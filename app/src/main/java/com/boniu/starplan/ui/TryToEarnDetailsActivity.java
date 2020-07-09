@@ -29,6 +29,7 @@ import com.boniu.starplan.dialog.LoadingDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog2;
 import com.boniu.starplan.dialog.ReceiveGoldDialog4;
+import com.boniu.starplan.dialog.ReceiveGoldDialog6;
 import com.boniu.starplan.entity.BeanTaskModel;
 import com.boniu.starplan.entity.ErrorInfo;
 import com.boniu.starplan.entity.TaskDetailsModel;
@@ -141,8 +142,8 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                                         });
                                         dialog4.show();
                                     } else {
-                                        ReceiveGoldDialog2 dialog2 = new ReceiveGoldDialog2(TryToEarnDetailsActivity.this);
-                                        dialog2.show();
+                                        ReceiveGoldDialog6 dialog6 = new ReceiveGoldDialog6(TryToEarnDetailsActivity.this, inCome, flag);
+                                        dialog6.show();
                                     }
                                 }
                             });
@@ -156,7 +157,11 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                             });
                         });
                     } else {
-                        OpenApp.OpenApp(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
+                        if (!taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl().equals("")) {
+                            OpenApp.schemeUrl(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl());
+                        } else {
+                            OpenApp.OpenApp(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
+                        }
                     }
 
                 } else {
@@ -180,6 +185,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     tvDes.setText(taskDetailsModel.getTaskDetailVO().getSubTitle());
                     GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getIcon(), ivAppIcon, 8);
                     inCome = taskDetailsModel.getIncome();
+                    tvTitle1.setText(taskDetailsModel.getTaskDetailVO().getRemark());
                     tvNumberGold.setText(taskDetailsModel.getIncome() + "");
                     long curTime = System.currentTimeMillis();
                     long timers = taskDetailsModel.getExpiryTime() - curTime;
@@ -223,13 +229,9 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                 break;
             case R.id.tv_start_down:
                 if (taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAddrType() != 1) {
-                    if (OpenApp.isMobile_spExist(this)) {
-                        OpenApp.channelUrl(this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
-                    } else {
-                        String url = taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAddr();
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        startActivity(browserIntent);
-                    }
+                    String url = taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAddr();
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(browserIntent);
                 } else {
                     downLoadApp();
                 }
@@ -244,7 +246,11 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     SPUtils.getInstance().put("taskID", taskId);
                     SPUtils.getInstance().put("beginTime", System.currentTimeMillis());
                     //还要开始任务
-                    OpenApp.OpenApp(this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
+                    if (!taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl().equals("")) {
+                        OpenApp.schemeUrl(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl());
+                    } else {
+                        OpenApp.OpenApp(this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
+                    }
                 } else {
                     Tip.show("请安装后， 再试玩！");
                 }
@@ -312,12 +318,9 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     progressDialog.setMax((int) progress.getTotalSize());
                     progressDialog.setProgress((int) progress.getCurrentSize());
                     //下载进度回调,0-100，仅在进度有更新时才会回调
-
                 }, AndroidSchedulers.mainThread())
-
                 .to(RxLife.as(this)) //加入感知生命周期的观察者
                 .subscribe(s -> { //s为String类型
-                    //Tip.show("下载完成" + s);
                     progressDialog.dismiss();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         boolean haveInstallPermission = getPackageManager().canRequestPackageInstalls();
@@ -329,7 +332,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Uri packageUri = Uri.parse("package:com.boniu.starplan");
+                                    Uri packageUri = Uri.parse("package:" + TryToEarnDetailsActivity.this.getPackageName());
                                     Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageUri);
                                     startActivityForResult(intent, 101);
                                 }

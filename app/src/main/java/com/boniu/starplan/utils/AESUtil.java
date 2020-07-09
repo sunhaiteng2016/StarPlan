@@ -15,11 +15,12 @@ public class AESUtil {
 
     public static String encrypt(String data, String key) {
         try {
-           SecretKeySpec spec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+            SecretKeySpec spec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, spec, new IvParameterSpec(new byte[cipher.getBlockSize()]));
-           byte[] bs = cipher.doFinal(data.getBytes("UTF-8"));
-            return JukeBase64.encode(bs);
+            byte[] bs = cipher.doFinal(data.getBytes("UTF-8"));
+           // return  data;
+           return JukeBase64.encode(bs);
         } catch (Exception e) {
             throw new RuntimeException("AES加密异常", e);
         }
@@ -29,11 +30,12 @@ public class AESUtil {
     public static String decrypt(String data, String key) {
         try {
             SecretKeySpec spec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, spec, new IvParameterSpec(new byte[cipher.getBlockSize()]));
+           Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+           cipher.init(Cipher.DECRYPT_MODE, spec, new IvParameterSpec(new byte[cipher.getBlockSize()]));
             byte[] originBytes = JukeBase64.decode(data);
-            byte[] result = cipher.doFinal(originBytes);
-           Log.e("参数","参数-->"+new String(result, "UTF-8"));
+           byte[] result = cipher.doFinal(originBytes);
+            Log.e("参数","参数-->"+new String(result, "UTF-8"));
+            //return  data ;
            return new String(result, "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException("AES解密异常", e);

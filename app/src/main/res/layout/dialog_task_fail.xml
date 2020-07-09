@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp20"
-            android:text="领取失败"
+            android:text="视频观看异常"
             android:textColor="#FF4F1E"
             android:textSize="20sp" />
 
@@ -32,8 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp13"
             android:gravity="center"
-            android:text="领取失败领取失败领取
-失败领取失败"
+            android:text="如果观看有效，奖励直接发放到您的账户"
             android:textColor="#ff666666"
             android:textSize="15sp" />
 
@@ -47,14 +46,14 @@
 
         <TextView
             android:layout_width="190dp"
-            android:layout_height="@dimen/dp40"
+            android:layout_height="34dp"
             android:layout_marginLeft="@dimen/dp14"
             android:layout_marginTop="@dimen/dp12"
             android:layout_marginRight="@dimen/dp14"
             android:layout_marginBottom="@dimen/dp20"
             android:background="@drawable/shape_dialog_bg_yinying"
             android:gravity="center"
-            android:text="返回我的钱包"
+            android:text="我知道了"
             android:textColor="#ffffffff"
             android:textSize="14sp" />
 

@@ -24,7 +24,9 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ui.PublicWbActivity"/>
         <activity android:name=".ui.GameWebViewActivity" />
-        <activity android:name=".ui.LauncherActivity">
+        <activity android:name=".ui.LauncherActivity"
+            android:theme="@style/AppTheme.Launcher"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

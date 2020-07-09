@@ -4,7 +4,7 @@ package com.boniu.starplan.dialog;
  * 签到成功
  */
 
-import android.app.Activity;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -14,9 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.boniu.starplan.R;
-import com.boniu.starplan.ad.ReWardVideoAdUtils;
 import com.boniu.starplan.entity.MessageWrap;
-import com.boniu.starplan.helper.MainActivityHelper;
+
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -44,7 +43,7 @@ public class SignSuccessNormalDialog extends Dialog {
             flag = 1;
         }
         tv2.setText("已签到" + flag + "天,继续签到可获得大礼包");
-        tvSubmit.setText("看视频领取更多");
+        tvSubmit.setText("我知道了");
 
         tvSubmit.setOnClickListener(new View.OnClickListener() {
             @Override

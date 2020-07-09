@@ -9,6 +9,7 @@ public class NewUserInfo {
      */
 
     private boolean isNewUser;
+    private boolean isPop;
     private int newUserAmount;
     private int weekSignGoldAmount;
 
@@ -34,5 +35,13 @@ public class NewUserInfo {
 
     public void setWeekSignGoldAmount(int weekSignGoldAmount) {
         this.weekSignGoldAmount = weekSignGoldAmount;
+    }
+
+    public boolean isPop() {
+        return isPop;
+    }
+
+    public void setPop(boolean pop) {
+        isPop = pop;
     }
 }
