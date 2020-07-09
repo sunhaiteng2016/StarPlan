@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +26,7 @@ import com.boniu.starplan.entity.TaskMode;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.GlideUtils;
+import com.boniu.starplan.utils.NetUtil;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
@@ -35,6 +37,7 @@ import com.rxjava.rxlife.RxLife;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
@@ -104,56 +107,60 @@ public class TryToEarnActivity extends BaseActivity {
     }
 
     private void getData() {
-
-        RxHttp.postEncryptJson(ComParamContact.Main.TASk_LIST).add("page", page).add("pageSize", pageSize).add("type", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
-            String result = AESUtil.decrypt(s, AESUtil.KEY);
-            TaskMode taskModel = new Gson().fromJson(result, TaskMode.class);
-            if (page == 1) {
-                taskList.clear();
-            }
-            taskList.addAll(taskModel.getRows());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    loadingDialog1.dismiss();
-                    adapter.notifyDataSetChanged();
+        if (NetUtil.isNetworkAvalible(TryToEarnActivity.this)){
+            RxHttp.postEncryptJson(ComParamContact.Main.TASk_LIST).add("page", page).add("pageSize", pageSize).add("type", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
+                String result = AESUtil.decrypt(s, AESUtil.KEY);
+                TaskMode taskModel = new Gson().fromJson(result, TaskMode.class);
+                if (page == 1) {
+                    taskList.clear();
                 }
+                taskList.addAll(taskModel.getRows());
+
+                loadingDialog1.dismiss();
+                adapter.notifyDataSetChanged();
+
+            }, (OnError) error -> {
+                loadingDialog1.dismiss();
+                error.show();
             });
-        }, (OnError) error -> {
-        });
-        //用户进行中的任务
-        RxHttp.postEncryptJson(ComParamContact.Main.List_to_Do).add("taskType", "1").asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
-            String result = AESUtil.decrypt(s, AESUtil.KEY);
-            List<RunningTaskModel> lists = new Gson().fromJson(result, new TypeToken<List<RunningTaskModel>>() {
-            }.getType());
-            RunningTaskModel runningTaskModel = lists.get(0);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (runningTaskModel.getId() != 0) {
-                        isRunningTask = true;
-                        runTaskId = runningTaskModel.getTaskId();
-                        userTaskId = runningTaskModel.getId();
-                        rlRunningTask.setVisibility(View.VISIBLE);
-                        rlRunningTask.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", runTaskId).navigation();
-                            }
-                        });
+            //用户进行中的任务
+            RxHttp.postEncryptJson(ComParamContact.Main.List_to_Do).add("taskType", "1").asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
+                String result = AESUtil.decrypt(s, AESUtil.KEY);
+                List<RunningTaskModel> lists = new Gson().fromJson(result, new TypeToken<List<RunningTaskModel>>() {
+                }.getType());
+                RunningTaskModel runningTaskModel = lists.get(0);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (runningTaskModel.getId() != 0) {
+                            isRunningTask = true;
+                            runTaskId = runningTaskModel.getTaskId();
+                            userTaskId = runningTaskModel.getId();
+                            rlRunningTask.setVisibility(View.VISIBLE);
+                            rlRunningTask.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", runTaskId).navigation();
+                                }
+                            });
+                        } else {
+                            rlRunningTask.setVisibility(View.GONE);
+                        }
+                        GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnActivity.this, runningTaskModel.getIcon(), ivTaskImg, 8);
+                        long curTime = System.currentTimeMillis();
+                        long timers = runningTaskModel.getExpiryTime() - curTime;
+                        TimerUtils.startTimerHour(TryToEarnActivity.this, timers, tvTime);
+                        tvTitle.setText(runningTaskModel.getMainTitle());
+                        tvDes.setText(runningTaskModel.getSubTitle());
                     }
-                    GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnActivity.this, runningTaskModel.getIcon(), ivTaskImg, 8);
-                    long curTime = System.currentTimeMillis();
-                    long timers = runningTaskModel.getExpiryTime() - curTime;
-                    TimerUtils.startTimerHour(TryToEarnActivity.this, timers, tvTime);
-                    tvTitle.setText(runningTaskModel.getMainTitle());
-                    tvDes.setText(runningTaskModel.getSubTitle());
-                }
+                });
+            }, (OnError) error -> {
             });
-        }, (OnError) error -> {
-        });
-    }
+        }else{
+            Tip.show("请检查当前网络！");
+        }
 
+    }
 
     private void initView() {
         RlvManagerUtils.createLinearLayout(this, rlvTask);
@@ -163,7 +170,7 @@ public class TryToEarnActivity extends BaseActivity {
             protected void convert(ViewHolder holder, TaskMode.RowsBean taskMode, int position) {
                 GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnActivity.this, taskMode.getIcon(), holder.getView(R.id.tv1), 8);
                 holder.setText(R.id.main_title, taskMode.getMainTitle()).setText(R.id.sub_title, taskMode.getSubTitle());
-                holder.setText(R.id.gradient_tv, "+"+taskMode.getIncome() );
+                holder.setText(R.id.gradient_tv, "+" + taskMode.getIncome());
             }
         };
         rlvTask.setAdapter(adapter);
@@ -177,6 +184,7 @@ public class TryToEarnActivity extends BaseActivity {
                     if (isRunningTask) {
                         showTaskRunningDialog();
                     } else {
+
                         ReceiveTask(taskList.get(i).getId());
                     }
                 }
@@ -192,6 +200,14 @@ public class TryToEarnActivity extends BaseActivity {
             public void onLoadMore(RefreshLayout refreshlayout) {
                 refreshlayout.finishLoadMore(1000/*,false*/);//传入false表示加载失败
                 page++;
+                getData();
+            }
+        });
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                refreshLayout.finishRefresh();
+                page = 1;
                 getData();
             }
         });
@@ -260,7 +276,7 @@ public class TryToEarnActivity extends BaseActivity {
      */
     private void ReceiveTask(int taskId) {
         loadingDialog1.show();
-        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).add("applySource","1").asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.TASK_APPLY).add("taskId", taskId).add("applySource", "1").asResponse(String.class).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             ApplyTask applyTask = new Gson().fromJson(result, ApplyTask.class);
             userTaskId = applyTask.getUserTaskId();
@@ -269,7 +285,7 @@ public class TryToEarnActivity extends BaseActivity {
                 public void run() {
                     loadingDialog1.dismiss();
                     if (applyTask.isIsSucceed()) {
-                        Tip.showCancer1("领取成功，跳转中。。。");
+                        Tip.showCancer1("领取成功，跳转中...");
                         ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", taskId).navigation();
                     } else {
                         if (applyTask.isIsExist()) {

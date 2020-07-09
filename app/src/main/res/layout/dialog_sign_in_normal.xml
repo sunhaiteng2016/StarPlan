@@ -10,12 +10,12 @@
     <LinearLayout
         android:id="@+id/top_layout"
         android:layout_marginTop="@dimen/dp65"
-        android:background="@drawable/shape_dialog_bg_white"
         android:orientation="vertical"
         android:layout_width="280dp"
         android:gravity="center_horizontal"
         android:layout_centerHorizontal="true"
         android:layout_height="wrap_content">
+
         <RelativeLayout
             android:background="@mipmap/qiandao"
             android:layout_width="match_parent"
@@ -42,6 +42,14 @@
                 android:textSize="14sp"
                 />
         </RelativeLayout>
+        <LinearLayout
+            android:background="@color/white"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
         <ImageView
             android:layout_marginTop="@dimen/dp25"
             android:background="@mipmap/jinbi"
@@ -95,6 +103,7 @@
             android:textColor="#ff996002"
             android:textSize="16sp"
             />
+        </LinearLayout>
     </LinearLayout>
 
     <ImageView

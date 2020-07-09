@@ -49,8 +49,10 @@ public class Utils {
     }
 
 
-
-
+    public static String addComma(String str) {
+        DecimalFormat decimalFormat = new DecimalFormat(",###");
+        return decimalFormat.format(Double.parseDouble(str));
+    }
 
 
 

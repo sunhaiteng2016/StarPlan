@@ -133,7 +133,7 @@ public class SignInRewardActivity extends BaseActivity {
                                 tvTake.setText("已领取");
                                 tvTake.setBackgroundResource(R.drawable.shape_round_16_c3);
                             } else {
-                                tvTake.setText("不符合条件" + weekSign + "/7");
+                                tvTake.setText("不符合条件" + weekSign + "/3");
                                 tvTake.setBackgroundResource(R.drawable.shape_round_16_c3);
                             }
                             //7天按钮的状态
@@ -244,7 +244,7 @@ public class SignInRewardActivity extends BaseActivity {
                         holder.setVisible(R.id.tv_hb_open, false);
                         holder.setVisible(R.id.tv_hb_close, false);
                         holder.setVisible(R.id.tv_circle, true);
-                        holder.setBackgroundRes(R.id.tv_circle,R.mipmap.signjinbi);
+                        holder.setBackgroundRes(R.id.tv_circle, R.mipmap.signjinbi);
                     }
                 }
 
@@ -260,16 +260,14 @@ public class SignInRewardActivity extends BaseActivity {
             protected void convert(ViewHolder holder, WelfareBean.CumulativeSignConfigListBean welfareBean1, int position) {
                 holder.setText(R.id.tv_title, "累计签到" + welfareBean1.getCumulativeSignAmount() + "天");
                 income = welfareBean1.getGoldAmount();
-                if (position==0){
+                if (welfareBean.getGetRewardsList().get(position).isShow()){
                     holder.setText(R.id.tv_gold, welfareBean1.getGoldAmount() + "");
                 }else{
-                   String number= welfareBean1.getGoldAmount()+"";
-                    String startStr = number.substring(0,2);
-                    String endSt = number.substring(startStr.length() - 1, startStr.length());
-                    holder.setText(R.id.tv_gold,startStr+"***"+endSt);
+                    holder.setText(R.id.tv_gold, "******");
                 }
                 if (welfareBean.getGetRewardsList().get(position).getStatus() == 1) {
                     holder.setText(R.id.iv_right, "可领取");
+
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(SignInRewardActivity.this, R.mipmap.lxqdklq, holder.getView(R.id.iv_img), 0);
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(SignInRewardActivity.this, R.mipmap.kdj, holder.getView(R.id.iv_bndj), 0);
                     holder.setTextColor(R.id.tv_title, mContext.getResources().getColor(R.color.text_99)).setTextColor(R.id.tv_gold, mContext.getResources().getColor(R.color.FF5151));
@@ -279,6 +277,7 @@ public class SignInRewardActivity extends BaseActivity {
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(SignInRewardActivity.this, R.mipmap.bndj, holder.getView(R.id.iv_bndj), 0);
                     holder.setTextColor(R.id.tv_title, mContext.getResources().getColor(R.color.text_99)).setTextColor(R.id.tv_gold, mContext.getResources().getColor(R.color.text_99));
                 } else {
+
                     holder.setText(R.id.iv_right, "不符合条件");
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(SignInRewardActivity.this, R.mipmap.lxqdbkdj, holder.getView(R.id.iv_img), 0);
                     GlideUtils.getInstance().LoadContextRoundBitmapInt(SignInRewardActivity.this, R.mipmap.bndj, holder.getView(R.id.iv_bndj), 0);
@@ -323,7 +322,7 @@ public class SignInRewardActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.rl_back, R.id.tv_submit, R.id.tv_take, R.id.tv_take7,R.id.tv_get_more})
+    @OnClick({R.id.rl_back, R.id.tv_submit, R.id.tv_take, R.id.tv_take7, R.id.tv_get_more})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_get_more:
@@ -338,18 +337,18 @@ public class SignInRewardActivity extends BaseActivity {
             case R.id.tv_take:
                 if (continuityList == null) return;
                 if (continuityList.get(2).getIsReceive() == 0) {
-                    ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(SignInRewardActivity.this, continuityList.get(2).getDoubleGold(), continuityList.get(2).getBoxId() + "",2,continuityList.get(2).isIsDouble(), new ReceiveGoldDialog3.ReceiveCallback() {
+                    ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(SignInRewardActivity.this, continuityList.get(2).getDoubleGold(), continuityList.get(2).getBoxId() + "", 2, continuityList.get(2).isIsDouble(), new ReceiveGoldDialog3.ReceiveCallback() {
                         @Override
                         public void receive(int flag, String applyId) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (flag==1){
+                                    if (flag == 1) {
                                         getData();
                                     }
                                     //开启激励视频
-                                    if (flag==2){
-                                        ReWardVideoAdUtils.initAd(SignInRewardActivity.this,applyId,continuityList.get(2).getDoubleGold());
+                                    if (flag == 2) {
+                                        ReWardVideoAdUtils.initAd(SignInRewardActivity.this, applyId, continuityList.get(2).getDoubleGold());
                                     }
                                 }
                             });
@@ -364,18 +363,18 @@ public class SignInRewardActivity extends BaseActivity {
             case R.id.tv_take7:
                 if (continuityList == null) return;
                 if (continuityList.get(6).getIsReceive() == 0) {
-                    ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(SignInRewardActivity.this, continuityList.get(6).getDoubleGold(), continuityList.get(6).getBoxId() + "",6,continuityList.get(6).isIsDouble(), new ReceiveGoldDialog3.ReceiveCallback() {
+                    ReceiveGoldDialog3 dialog = new ReceiveGoldDialog3(SignInRewardActivity.this, continuityList.get(6).getDoubleGold(), continuityList.get(6).getBoxId() + "", 6, continuityList.get(6).isIsDouble(), new ReceiveGoldDialog3.ReceiveCallback() {
                         @Override
                         public void receive(int flag, String applyId) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (flag==1){
+                                    if (flag == 1) {
                                         getData();
                                     }
                                     //开启激励视频
-                                    if (flag==2){
-                                        ReWardVideoAdUtils.initAd(SignInRewardActivity.this,applyId,continuityList.get(6).getDoubleGold());
+                                    if (flag == 2) {
+                                        ReWardVideoAdUtils.initAd(SignInRewardActivity.this, applyId, continuityList.get(6).getDoubleGold());
                                     }
                                 }
                             });

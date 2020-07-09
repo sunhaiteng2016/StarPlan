@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -21,15 +22,20 @@ import java.util.Calendar;
  */
 public class EverydayLogDialog extends Dialog {
 
-    public EverydayLogDialog(@NonNull Context context) {
+    private int inCome;
+    private TextView tvGold;
+
+    public EverydayLogDialog(@NonNull Context context, int inCome) {
         super(context, R.style.CustomProgressDialog);
+        this.inCome = inCome;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_every_day_login);
-
+        tvGold = findViewById(R.id.tv_gold);
+        tvGold.setText(inCome + "金币");
         findViewById(R.id.tv_go_to_look).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

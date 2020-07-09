@@ -205,7 +205,7 @@ public class GlideUtils {
         RequestOptions options = new RequestOptions()
                 .circleCrop();
         options.placeholder(R.mipmap.default_placeholder);
-        options.error(R.mipmap.default_placeholder);
+        options.error(R.mipmap.shibai);
         Glide.with(context).load(path).apply(options).into(imageView);
     }
 

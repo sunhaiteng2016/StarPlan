@@ -43,7 +43,7 @@
             android:paddingTop="@dimen/dp8"
             android:paddingRight="@dimen/dp45"
             android:paddingBottom="@dimen/dp8"
-            android:text="去看看"
+            android:text="直接领取"
             android:textColor="#A84B25" />
         <TextView
             android:id="@+id/tv_no_remind"

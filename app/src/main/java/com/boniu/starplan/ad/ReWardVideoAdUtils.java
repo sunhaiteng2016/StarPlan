@@ -11,7 +11,11 @@ import androidx.annotation.MainThread;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.GeneralFailDialog;
+import com.boniu.starplan.dialog.GeneralFailDialog2;
 import com.boniu.starplan.dialog.ReceiveGoldDialog2;
+import com.boniu.starplan.dialog.VideoGoldSuccessDialog;
+import com.boniu.starplan.entity.MessageWrap;
 import com.boniu.starplan.helper.TTAdManagerHolder;
 import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.StringUtils;
@@ -23,15 +27,17 @@ import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
 import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.bytedance.sdk.openadsdk.TTSplashAd;
 
+import org.greenrobot.eventbus.EventBus;
+
 public class ReWardVideoAdUtils {
 
     private static TTAdNative mTTAdNative;
     static TTRewardVideoAd newAd;
-    private static String TAG="ReWardVideoAdUtils";
+    private static String TAG = "ReWardVideoAdUtils";
     private static boolean isSuccess;
 
 
-    public static void initAd(Activity mContext,String code,int inCome) {
+    public static void initAd(Activity mContext, String code, int inCome) {
         mTTAdNative = TTAdManagerHolder.get().createAdNative(mContext);
 
         AdSlot adSlot = new AdSlot.Builder()
@@ -39,13 +45,14 @@ public class ReWardVideoAdUtils {
                 .setSupportDeepLink(true)
                 .setImageAcceptedSize(1080, 1920)
                 .setUserID(SPUtils.getInstance().getString(ComParamContact.Common.TOKEN_KEY))
-               .setMediaExtra(code)
+                .setMediaExtra(code)
                 .setOrientation(TTAdConstant.VERTICAL)
                 .build();
         mTTAdNative.loadRewardVideoAd(adSlot, new TTAdNative.RewardVideoAdListener() {
             @Override
             public void onError(int i, String s) {
-                Log.e(TAG, "onError: " +i +"---"+s);
+                Log.e(TAG, "onError: " + i + "---" + s);
+                //TODO 直接失败
                 Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
             }
 
@@ -57,71 +64,79 @@ public class ReWardVideoAdUtils {
 
                     @Override
                     public void onAdShow() {
-                        Log.e(TAG, "onAdShow: " );
+                        Log.e(TAG, "onAdShow: ");
                     }
 
                     @Override
                     public void onAdVideoBarClick() {
-                        Log.e(TAG, "onAdVideoBarClick: " );
+                        Log.e(TAG, "onAdVideoBarClick: ");
                     }
 
                     //视频广告关闭
                     @Override
                     public void onAdClose() {
-                        Log.e(TAG, "onAdClose: " );
+                        //TODO 统一处理成功失败
+                        Log.e(TAG, "onAdClose: ");
                         int goldNumer = inCome * 2;
-                         if (isSuccess){
-                             ReceiveGoldDialog2 dialog2= new ReceiveGoldDialog2(mContext,goldNumer);
-                             dialog2.show();
-                         }else{
-                             Tip.show("奖励获取失败！");
-                         }
+                        if (isSuccess) {
+                            VideoGoldSuccessDialog dialog2 = new VideoGoldSuccessDialog(mContext, goldNumer);
+                            dialog2.show();
+                        } else {
+                            GeneralFailDialog2 dialog = new GeneralFailDialog2(mContext);
+                            dialog.show();
+
+                        }
                     }
 
                     //视频广告播放完成
                     @Override
                     public void onVideoComplete() {
-                        Log.e(TAG, "onVideoComplete: " );
+                        //TODO 播放成功
+                        isSuccess = true;
+                        Log.e(TAG, "onVideoComplete: ");
                     }
 
                     @Override
                     public void onVideoError() {
-                        Log.e(TAG, "onVideoError: " );
+                        //TODO 播放异常
+                        isSuccess = false;
+                        Log.e(TAG, "onVideoError: ");
                     }
 
                     @Override
                     public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName) {
-                       /* SPUtils.getInstance(mContext).put(ConfigKeys.VIDEO_RETURN,rewardVerify);*/
-                        isSuccess=rewardVerify;
-                        Log.e(TAG, "onRewardVerify: " + rewardVerify + "::" + rewardAmount + "::"  + rewardName );
+                        /* SPUtils.getInstance(mContext).put(ConfigKeys.VIDEO_RETURN,rewardVerify);*/
+                        isSuccess = rewardVerify;
+                        Log.e(TAG, "onRewardVerify: " + rewardVerify + "::" + rewardAmount + "::" + rewardName);
                     }
 
                     @Override
                     public void onSkippedVideo() {
-                        Log.e(TAG, "onSkippedVideo: " );
-
+                        Log.e(TAG, "onSkippedVideo: ");
                     }
                 });
                 newAd.setDownloadListener(new TTAppDownloadListener() {
                     @Override
                     public void onIdle() {
-                        Log.e(TAG, "onIdle: " );
+                        Log.e(TAG, "onIdle: ");
                     }
 
                     @Override
                     public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
-                        Log.e(TAG, "onDownloadActive: " );
+                        Log.e(TAG, "onDownloadActive: ");
                     }
 
                     @Override
                     public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
-                        Log.e(TAG, "onDownloadPaused: " );
+                        Log.e(TAG, "onDownloadPaused: ");
                     }
 
                     @Override
                     public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
-                       Log.e(TAG, "onDownloadFailed: " );
-                       // httpCallback(videoCallback,"false");*/
+                        Log.e(TAG, "onDownloadFailed: ");
+                        //TODO 下载视频失败
+                        isSuccess = false;
+                        // httpCallback(videoCallback,"false");*/
 
                     }
 
@@ -137,6 +152,7 @@ public class ReWardVideoAdUtils {
                     }
                 });
             }
+
             @Override
             public void onRewardVideoCached() {
                 newAd.showRewardVideoAd(mContext);
@@ -153,7 +169,7 @@ public class ReWardVideoAdUtils {
         //step3:创建开屏广告请求参数AdSlot,具体参数含义参考文档
         AdSlot adSlot = new AdSlot.Builder()
                 //801121648   PositionId.CSJ_CODEID
-                .setCodeId("945218666")
+                .setCodeId("887340136")
                 .setSupportDeepLink(true)
                 .setImageAcceptedSize(1080, 1920)
                 .build();
@@ -164,13 +180,13 @@ public class ReWardVideoAdUtils {
             @MainThread
             public void onError(int code, String message) {
                 Log.d(TAG, message);
-                gotoMain(token,context);
+                gotoMain(token, context);
             }
 
             @Override
             @MainThread
             public void onTimeout() {
-                gotoMain(token,context);
+                gotoMain(token, context);
             }
 
             @Override
@@ -190,7 +206,7 @@ public class ReWardVideoAdUtils {
                     //设置不开启开屏广告倒计时功能以及不显示跳过按钮,如果这么设置，您需要自定义倒计时逻辑
                     //ad.setNotAllowSdkCountdown();
                 } else {
-                    gotoMain(token,context);
+                    gotoMain(token, context);
                 }
 
                 //设置SplashView的交互监听器
@@ -209,8 +225,8 @@ public class ReWardVideoAdUtils {
                     public void onAdSkip() {
                         Log.d(TAG, "onAdSkip");
                         //goToMainActivity();
-                       // requestPermission();
-                        gotoMain(token,context);
+                        // requestPermission();
+                        gotoMain(token, context);
                     }
 
                     @Override
@@ -218,7 +234,7 @@ public class ReWardVideoAdUtils {
                         Log.d(TAG, "onAdTimeOver");
                         //goToMainActivity();
                         //requestPermission();
-                        gotoMain(token,context);
+                        gotoMain(token, context);
                     }
                 });
                 if (ad.getInteractionType() == TTAdConstant.INTERACTION_TYPE_DOWNLOAD) {
@@ -261,14 +277,15 @@ public class ReWardVideoAdUtils {
             }
         }, 3000);
     }
-    private static void gotoMain(String token,Context context) {
+
+    private static void gotoMain(String token, Context context) {
 
         if (StringUtils.isEmpty(token)) {
             ARouter.getInstance().build("/ui/LoginActivity").navigation();
         } else {
             ARouter.getInstance().build("/ui/MainActivity").navigation();
         }
-        Activity context1=(Activity)context;
+        Activity context1 = (Activity) context;
         context1.finish();
     }
 }

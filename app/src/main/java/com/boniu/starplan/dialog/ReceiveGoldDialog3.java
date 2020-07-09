@@ -47,7 +47,7 @@ public class ReceiveGoldDialog3 extends Dialog {
         if (isFalse) {
 
             tvSubmit.setVisibility(View.VISIBLE);
-            tvSubmit2.setText("翻倍领取");
+            tvSubmit2.setText("领取×2倍的奖励");
         } else {
             tvSubmit.setVisibility(View.GONE);
             tvSubmit2.setText("领取奖励");

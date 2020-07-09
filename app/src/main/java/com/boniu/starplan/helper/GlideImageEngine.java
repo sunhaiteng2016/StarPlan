@@ -29,7 +29,7 @@ public class GlideImageEngine implements ImageEngine {
         Glide.with(context)
                 .asBitmap()
                 .load(url)
-                .apply(new RequestOptions().fitCenter().error(R.mipmap.default_placeholder).placeholder(R.mipmap.default_placeholder))
+                .apply(new RequestOptions().fitCenter().error(R.mipmap.shibai).placeholder(R.mipmap.shibai))
                 .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {

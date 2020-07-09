@@ -126,6 +126,15 @@ public class TaskDetailsModel {
         private int todayRemain;
         private TryTaskVOBean tryTaskVO;
         private int type;
+        private String remark;
+
+        public String getRemark() {
+            return remark;
+        }
+
+        public void setRemark(String remark) {
+            this.remark = remark;
+        }
 
         public int getCycleDays() {
             return cycleDays;
@@ -245,6 +254,15 @@ public class TaskDetailsModel {
             private String appOpenUrl;
             private int taskId;
             private int tryTime;
+            private String schemeUrl;
+
+            public String getSchemeUrl() {
+                return schemeUrl;
+            }
+
+            public void setSchemeUrl(String schemeUrl) {
+                this.schemeUrl = schemeUrl;
+            }
 
             public String getAddr() {
                 return addr;

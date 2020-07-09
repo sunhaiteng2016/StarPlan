@@ -56,7 +56,7 @@
             android:layout_marginBottom="@dimen/dp10"
             android:background="@drawable/shape_round_22_red"
             android:gravity="center"
-            android:text="翻倍领取"
+            android:text="领取×2倍的奖励"
             android:textColor="#ffffffff"
             android:textSize="14sp" />
 

@@ -216,6 +216,7 @@
                                         android:layout_marginRight="8dp">
 
                                         <TextView
+                                            android:layout_marginTop="@dimen/dp6"
                                             android:id="@+id/tv_sign"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
@@ -337,7 +338,7 @@
                                 android:layout_alignParentRight="true"
                                 android:layout_centerVertical="true"
                                 android:layout_marginRight="15dp"
-                                android:src="@mipmap/baoxiang" />
+                                />
 
                         </RelativeLayout>
 
@@ -348,7 +349,7 @@
                             android:layout_marginLeft="@dimen/dp20"
                             android:layout_marginRight="@dimen/dp20"
                             android:background="@drawable/shape_round_withe_8"
-                            android:elevation="@dimen/dp3"
+                            android:elevation="@dimen/dp1"
                             android:nestedScrollingEnabled="false"
                             android:paddingTop="@dimen/dp12"
                             android:paddingBottom="@dimen/dp12" />

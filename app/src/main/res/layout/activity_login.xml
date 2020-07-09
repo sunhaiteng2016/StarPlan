@@ -96,17 +96,19 @@
         android:layout_marginLeft="@dimen/dp37"
         android:layout_marginTop="@dimen/dp30"
         android:layout_marginRight="@dimen/dp37"
-        android:background="@mipmap/loginbtn"
+        android:background="@drawable/shape_dialog_bg_yinying"
         android:gravity="center"
+        android:paddingTop="@dimen/dp10"
+        android:paddingBottom="@dimen/dp10"
         android:text="登录/注册"
         android:textColor="@color/white"
         android:textSize="16sp" />
 
     <LinearLayout
-        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
         android:orientation="horizontal">
 
         <TextView

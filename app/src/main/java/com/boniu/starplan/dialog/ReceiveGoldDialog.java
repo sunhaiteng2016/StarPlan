@@ -52,7 +52,7 @@ public class ReceiveGoldDialog extends Dialog {
         TextView tvSubMit2 = findViewById(R.id.tv_submit2);
         if (isDouble){
             tvSubMit.setVisibility(View.VISIBLE);
-            tvSubMit2.setText("翻倍领取");
+            tvSubMit2.setText("领取×2倍的奖励");
         }else {
             tvSubMit2.setText("领取奖励");
             tvSubMit.setVisibility(View.GONE);
@@ -74,8 +74,6 @@ public class ReceiveGoldDialog extends Dialog {
                     }, (OnError) error -> {
                         error.show();
                     });
-
-
 
             }
         });

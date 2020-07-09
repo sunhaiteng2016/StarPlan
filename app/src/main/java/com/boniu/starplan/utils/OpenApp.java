@@ -52,7 +52,7 @@ public class OpenApp {
     }
 
 
-    public static  void installApk(Context context, File file) {
+    public static void installApk(Context context, File file) {
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
 
@@ -66,10 +66,11 @@ public class OpenApp {
                 intent.setDataAndType(uri, "application/vnd.android.package-archive");
             }
             context.startActivity(intent);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     /**
      * 打开外部浏览器
      */
@@ -114,14 +115,30 @@ public class OpenApp {
         for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
             if (appProcess.processName.equals(context.getPackageName())) {
                 if (appProcess.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                    Log.e("asd", "后台"+ appProcess.processName);
+                    Log.e("asd", "后台" + appProcess.processName);
                     return true;
                 } else {
-                    Log.e("asd", "前台"+ appProcess.processName);
+                    Log.e("asd", "前台" + appProcess.processName);
                     return false;
                 }
             }
         }
         return false;
+    }
+
+    private boolean schemeValid(Context mContext, String str) {
+        PackageManager manager = mContext.getPackageManager();
+        Intent action = new Intent(Intent.ACTION_VIEW);
+        action.setData(Uri.parse(str));
+        List list = manager.queryIntentActivities(action, PackageManager.GET_RESOLVED_FILTER);
+        return list != null && list.size() > 0;
+    }
+
+    public static void schemeUrl(Context mContext, String str) {
+        Intent action = new Intent(Intent.ACTION_VIEW);
+        StringBuilder builder = new StringBuilder();
+        builder.append(str);
+        action.setData(Uri.parse(builder.toString()));
+        mContext.startActivity(action);
     }
 }

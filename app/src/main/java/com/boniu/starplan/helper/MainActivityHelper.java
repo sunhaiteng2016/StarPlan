@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.ad.ReWardVideoAdUtils;
+import com.boniu.starplan.base.Url;
 import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.dialog.EverydayLogDialog;
 import com.boniu.starplan.dialog.LoadingDialog;
@@ -33,13 +35,18 @@ import com.boniu.starplan.entity.MainTask;
 import com.boniu.starplan.entity.NewUserInfo;
 import com.boniu.starplan.entity.SignModel;
 import com.boniu.starplan.entity.TaskMode;
+import com.boniu.starplan.entity.VersionModel;
 import com.boniu.starplan.entity.VideoAdModel;
 import com.boniu.starplan.http.OnError;
+import com.boniu.starplan.oaid.UuidCreator;
+import com.boniu.starplan.ui.ApplicationUtils;
 import com.boniu.starplan.ui.MainActivity;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.AnimatorUtil;
 import com.boniu.starplan.utils.SPUtils;
+import com.boniu.starplan.utils.SystemInfoUtils;
 import com.boniu.starplan.utils.Tip;
+import com.boniu.starplan.utils.Utils;
 import com.boniu.starplan.utils.Validator;
 import com.google.gson.Gson;
 import com.zhy.adapter.recyclerview.CommonAdapter;
@@ -52,6 +59,7 @@ import rxhttp.wrapper.param.RxHttp;
 public class MainActivityHelper {
 
     private int weekSign;
+    private BoxState boxState;
 
 
     public static MainActivityHelper newInstance() {
@@ -67,7 +75,7 @@ public class MainActivityHelper {
 
         //创建激励视频翻倍任务
         RxHttp.postEncryptJson(ComParamContact.Main.addVideoAD).asResponse(String.class).subscribe(s -> {
-            String result = AESUtil.encrypt(s, AESUtil.KEY);
+            String result = AESUtil.decrypt(s, AESUtil.KEY);
             VideoAdModel adModel = new Gson().fromJson(result, VideoAdModel.class);
             //然后在观看激励视频
             context.runOnUiThread(new Runnable() {
@@ -83,16 +91,20 @@ public class MainActivityHelper {
 
     public void downLoad(Activity context) {
 
-        RxHttp.postEncryptJson(ComParamContact.DownLoad.PATH).asResponse(String.class).subscribe(s -> {
-            String result = AESUtil.encrypt(s, AESUtil.KEY);
-            //然后在观看激励视频
-            context.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    UpdateAppDialog dialog = new UpdateAppDialog(context);
-                    dialog.show();
-                }
-            });
+        RxHttp.postJson(Url.UpLoadApp).add("appName", "LEZHUAN_STAR_BONIU").add("deviceType", "ANDROID").add("deviceModel", SystemInfoUtils.getModelName()).add("version", SystemInfoUtils.getAppVersionName(context)).add("channel", SystemInfoUtils.getAppSource(context, "UMENG_CHANNEL")).asString().subscribe(s -> {
+            // VersionModel versionModel = new Gson().fromJson(s, VersionModel.class);
+            VersionModel versionModel = new Gson().fromJson(s, VersionModel.class);
+            if (versionModel.isSuccess()) {
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (versionModel.getResult().getVersionInfoVo().getVersion().compareTo(SystemInfoUtils.getAppVersionName(context)) > 0) {
+                            UpdateAppDialog dialog = new UpdateAppDialog(context, versionModel);
+                            dialog.show();
+                        }
+                    }
+                });
+            }
         }, (OnError) error -> {
             error.show();
         });
@@ -107,12 +119,14 @@ public class MainActivityHelper {
                 .subscribe(s -> {
                     String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
                     LoginInfo loginInfo = new Gson().fromJson(resultStr, LoginInfo.class);
+
                     context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             SPUtils.getInstance().put("accountStatus", loginInfo.getAccountStatus());
                             tvPhone.setText(Validator.Md5Phone(loginInfo.getMobile()));
-                            tvMoney.setText(loginInfo.getGoldAmount());
+                            tvMoney.setText(Utils.addComma(loginInfo.getGoldAmount()));
+
                             if (!loginInfo.getAccountStatus().equals("0")) {
                                 tvyc.setVisibility(View.VISIBLE);
                             }
@@ -203,6 +217,8 @@ public class MainActivityHelper {
                              RelativeLayout new_user_title_rl, RecyclerView rlvNewUserTask, TextView tvDes, ImageView ivBx) {
         loadingDialog.show();
         //任务列表
+        ObjectAnimator animator = AnimatorUtil.sway(ivBx);
+        animator.setRepeatCount(ValueAnimator.INFINITE);
         RxHttp.postEncryptJson(ComParamContact.Main.queryTaskMarketList)
                 .asResponse(String.class)
                 .subscribe(s -> {
@@ -231,7 +247,7 @@ public class MainActivityHelper {
                                 }
                             }
 
-
+                            ivBx.setBackgroundResource(R.mipmap.baoxiang);
                             SpannableStringBuilder spannableString = new SpannableStringBuilder();
                             if (i == 0) {
                                 spannableString.append("任务达成，点击领取宝箱");
@@ -246,48 +262,52 @@ public class MainActivityHelper {
                             tvDes.setText(spannableString);
                             if (i == 0) {
                                 //生成宝箱
-                                ObjectAnimator animator = AnimatorUtil.sway(ivBx);
-                                animator.setRepeatCount(ValueAnimator.INFINITE);
-                                animator.start();
+                                RxHttp.postEncryptJson(ComParamContact.Main.queryTreasureBoxTaskStatus).add("type", "1").add("typeValue", "dayTask").asResponse(String.class).subscribe(s -> {
+                                    String result = AESUtil.decrypt(s, AESUtil.KEY);
+                                    boxState = new Gson().fromJson(result, BoxState.class);
+                                    context.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (boxState.getStatus() != 0) {
+                                                ivBx.setBackgroundResource(R.mipmap.baoxiangopen);
+                                                tvDes.setText("宝箱已领取");
+                                            } else {
+                                                animator.start();
+                                            }
+                                        }
+                                    });
+
+                                }, (OnError) error -> {
+                                    error.show();
+                                });
                                 ivBx.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        LoadingDialog loadingDialog1 = new LoadingDialog(context);
-                                        loadingDialog1.show();
-                                        //查询每日任务宝箱状态
-                                        RxHttp.postEncryptJson(ComParamContact.Main.queryTreasureBoxTaskStatus).add("type", "1").add("typeValue", "dayTask").asResponse(String.class).subscribe(s -> {
-                                            String result = AESUtil.decrypt(s, AESUtil.KEY);
-                                            BoxState boxState = new Gson().fromJson(result, BoxState.class);
-                                            context.runOnUiThread(new Runnable() {
+                                        if (boxState.getStatus() == 0) {
+                                            ReceiveGoldDialog dialog = new ReceiveGoldDialog(context, boxState.getGoldCount(), boxState.getId() + "", true, new ReceiveGoldDialog.ReceiveCallback() {
                                                 @Override
-                                                public void run() {
-                                                    loadingDialog1.dismiss();
-                                                    ReceiveGoldDialog dialog = new ReceiveGoldDialog(context, boxState.getGoldCount(), boxState.getId() + "", true, new ReceiveGoldDialog.ReceiveCallback() {
+                                                public void receive(int flag, String applyId) {
+                                                    //开启激励视频
+                                                    context.runOnUiThread(new Runnable() {
                                                         @Override
-                                                        public void receive(int flag, String applyId) {
-                                                            //开启激励视频
-                                                            context.runOnUiThread(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    if (flag == 1) {
-                                                                        ivBx.setBackgroundResource(R.mipmap.baoxiang);
-                                                                        tvDes.setText("宝箱已领取");
-                                                                    }
-                                                                    if (flag == 2) {
-                                                                        ReWardVideoAdUtils.initAd(context, applyId, boxState.getGoldCount());
-                                                                    }
-                                                                }
-                                                            });
-
+                                                        public void run() {
+                                                            if (flag == 1) {
+                                                                ivBx.setBackgroundResource(R.mipmap.baoxiangopen);
+                                                                tvDes.setText("宝箱已领取");
+                                                                animator.clone();
+                                                            }
+                                                            if (flag == 2) {
+                                                                ReWardVideoAdUtils.initAd(context, applyId, boxState.getGoldCount());
+                                                            }
                                                         }
                                                     });
-                                                    dialog.show();
+
                                                 }
                                             });
-
-                                        }, (OnError) error -> {
-                                            error.show();
-                                        });
+                                            dialog.show();
+                                        } else {
+                                            Tip.show("宝箱已领取");
+                                        }
 
                                     }
                                 });
@@ -304,6 +324,8 @@ public class MainActivityHelper {
                 }, (OnError) error -> {
                     loadingDialog.dismiss();
                 });
+
+
     }
 
     /**
@@ -318,8 +340,11 @@ public class MainActivityHelper {
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (userInfo.isIsNewUser()) {
-                                NewPersonDialog dialog = new NewPersonDialog(activity);
+                            if (userInfo.isIsNewUser()){
+                                ApplicationUtils.isNewUer=false;
+                            }
+                            if (userInfo.isPop()) {
+                                NewPersonDialog dialog = new NewPersonDialog(activity, userInfo.getNewUserAmount());
                                 dialog.show();
                             } else {
                                 Calendar cd = Calendar.getInstance();
@@ -327,11 +352,11 @@ public class MainActivityHelper {
                                 int months = SPUtils.getInstance().getInt("month");
                                 boolean isEvery = SPUtils.getInstance().getBoolean("isEvery", true);
                                 if (month != months) {
-                                    EverydayLogDialog dialog = new EverydayLogDialog(activity);
+                                    EverydayLogDialog dialog = new EverydayLogDialog(activity, userInfo.getWeekSignGoldAmount());
                                     dialog.show();
                                 } else {
                                     if (isEvery) {
-                                        EverydayLogDialog dialog = new EverydayLogDialog(activity);
+                                        EverydayLogDialog dialog = new EverydayLogDialog(activity, userInfo.getWeekSignGoldAmount());
                                         dialog.show();
                                     }
                                 }
