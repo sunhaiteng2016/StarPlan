@@ -340,13 +340,13 @@ public class FinishRegisterActivity extends BaseActivity {
                     break;
                 case R.id.rl_ex1:
                     EasyPhotos.createAlbum(this, true, NGlideEngine.getInstance())
-                            .setFileProviderAuthority("com.boniu.starplan.TTFileProvider")
+                            .setFileProviderAuthority(getPackageName()+"TTFileProvider")
                             .start(101);
                     break;
                 case R.id.rl_ex2:
 
                     EasyPhotos.createAlbum(this, true, NGlideEngine.getInstance())
-                            .setFileProviderAuthority("com.boniu.starplan.TTFileProvide")
+                            .setFileProviderAuthority(getPackageName()+"TTFileProvide")
                             .start(102);
                     break;
             }

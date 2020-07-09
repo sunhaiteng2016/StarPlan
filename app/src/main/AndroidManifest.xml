@@ -25,8 +25,7 @@
         <activity android:name=".ui.PublicWbActivity"/>
         <activity android:name=".ui.GameWebViewActivity" />
         <activity android:name=".ui.LauncherActivity"
-            android:theme="@style/AppTheme.Launcher"
-            >
+            android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,8 +35,9 @@
         <activity
             android:name=".ui.LoginActivity"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".ui.FinishRegisterActivity" />
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity android:name=".ui.FinishRegisterActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize"/>
         <activity android:name=".ui.ReceiveGoldDetailsActivity" />
         <activity android:name=".ui.ReceiveGoldCoinActivity" />
         <activity android:name=".ui.TryToEarnDetailsActivity" />
@@ -49,10 +49,12 @@
         <activity android:name=".ui.WebViewActivity" />
         <activity android:name=".ui.MyWalletActivity" />
         <activity android:name=".ui.ReviewProgressActivity" />
-        <activity android:name=".ui.DownLoadWebViewActivity" /> <!-- value的值填写你在友盟后台申请的应用Appkey -->
+        <activity android:name=".ui.DownLoadWebViewActivity" />
+        <!-- value的值填写你在友盟后台申请的应用Appkey -->
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="5a910933f29d986f35000064" /> <!-- value的值填写渠道名称，例如yingyongbao。这里设置动态渠道变量 -->
+            android:value="5a910933f29d986f35000064" />
+        <!-- value的值填写渠道名称，例如yingyongbao。这里设置动态渠道变量 -->
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="${UMENG_CHANNEL_VALUE}" />

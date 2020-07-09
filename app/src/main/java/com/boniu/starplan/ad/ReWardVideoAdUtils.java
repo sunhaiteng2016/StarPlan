@@ -170,7 +170,7 @@ public class ReWardVideoAdUtils {
                 //801121648   PositionId.CSJ_CODEID
                 .setCodeId("887340136")
                 .setSupportDeepLink(true)
-                .setImageAcceptedSize(1080, 1920)
+               // .setImageAcceptedSize(1080, 1920)
                 .build();
         //step4:请求广告，调用开屏广告异步请求接口，对请求回调的广告作渲染处理
         mTTAdNative = TTAdManagerHolder.get().createAdNative(context);

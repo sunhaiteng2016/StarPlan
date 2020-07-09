@@ -57,7 +57,7 @@ public class OpenApp {
             Intent intent = new Intent(Intent.ACTION_VIEW);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Uri apkUri = FileProvider.getUriForFile(context, "com.boniu.starplan.TTFileProvider", file);
+                Uri apkUri = FileProvider.getUriForFile(context, context.getPackageName()+"TTFileProvider", file);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
             } else {

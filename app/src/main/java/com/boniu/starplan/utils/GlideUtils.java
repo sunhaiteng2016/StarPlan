@@ -204,7 +204,7 @@ public class GlideUtils {
     public void LoadContextCircleBitmap(Context context, String path, ImageView imageView) {
         RequestOptions options = new RequestOptions()
                 .circleCrop();
-        options.placeholder(R.mipmap.default_placeholder);
+        options.placeholder(R.mipmap.shibai);
         options.error(R.mipmap.shibai);
         Glide.with(context).load(path).apply(options).into(imageView);
     }
@@ -252,8 +252,8 @@ public class GlideUtils {
     public void LoadContextRoundBitmap(Context context, String path, ImageView imageView, int roundradius) {
         RequestOptions myOptions = new RequestOptions()
                 .centerCrop()
-                .error(R.mipmap.default_placeholder)
-                .placeholder(R.mipmap.default_placeholder)
+                .error(R.mipmap.shibai)
+                .placeholder(R.mipmap.shibai)
                 .transform(new GlideRoundTransform(context, roundradius));
         Glide.with(context).load(path).apply(myOptions).into(imageView);
     }
@@ -261,8 +261,8 @@ public class GlideUtils {
     public void LoadContextRoundBitmapInt(Context context, int img, ImageView imageView, int roundradius) {
         RequestOptions myOptions = new RequestOptions()
                 .centerCrop()
-                .error(R.mipmap.default_placeholder)
-                .placeholder(R.mipmap.default_placeholder)
+                .error(R.mipmap.shibai)
+                .placeholder(R.mipmap.shibai)
                 .transform(new GlideRoundTransform(context, roundradius));
         Glide.with(context).load(img).apply(myOptions).into(imageView);
     }
@@ -270,8 +270,8 @@ public class GlideUtils {
     public void LoadContextRoundBitmaps(Context context, String path, ImageView imageView, int roundradius) {
         RequestOptions myOptions = new RequestOptions()
                 .centerCrop()
-                .placeholder(R.mipmap.default_placeholder)
-                .error(R.mipmap.default_placeholder)
+                .placeholder(R.mipmap.shibai)
+                .error(R.mipmap.shibai)
                 .transform(new GlideRoundTransform(context, roundradius));
         Glide.with(context).load(path).apply(myOptions).into(imageView);
     }

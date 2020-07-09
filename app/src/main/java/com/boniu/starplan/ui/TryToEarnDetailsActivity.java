@@ -350,7 +350,6 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     } else {
                         OpenApp.installApk(mContext, destPath);
                     }
-
                     //下载成功，处理相关逻辑
                 }, (OnError) error -> {
                     // error.show();

@@ -271,6 +271,7 @@ public class MainActivityHelper {
                                             if (boxState.getStatus() != 0) {
                                                 ivBx.setBackgroundResource(R.mipmap.baoxiangopen);
                                                 tvDes.setText("宝箱已领取");
+                                                animator.clone();
                                             } else {
                                                 animator.start();
                                             }
