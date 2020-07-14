@@ -1,6 +1,7 @@
 package com.boniu.starplan.ui;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import com.boniu.starplan.helper.GlideImageEngine;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.GlideUtils;
+import com.boniu.starplan.utils.OpenApp;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.StringUtils;
@@ -69,6 +71,8 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
     TextView tvDes;
     @BindView(R.id.tv_gold_num)
     TextView tvGoldNum;
+    @BindView(R.id.tv_gold_num2)
+    TextView tvGoldNum2;
     @BindView(R.id.tv_num_time)
     TextView tvNumTime;
     @BindView(R.id.web_view)
@@ -147,7 +151,6 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
         if (dm.densityDpi > 240) {
             settings.setDefaultFontSize(24); //可以取1-72之间的任意值，默认16
         }
-
     }
 
     private void getData() {
@@ -164,7 +167,12 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                     tvDes.setText(receiveGoldModel.getTaskDetailVO().getSubTitle());
                     tvPlaySm.setText(receiveGoldModel.getTaskDetailVO().getMajorDesc());
                     webView.loadDataWithBaseURL(null, auditTaskVO.getShowDesc(), "text/html", "utf-8", null);
+                    if (flag==1){
+                        tvGoldNum2.setText(receiveGoldModel.getTaskDetailVO().getIncome()+"");
+                        tvGoldNum2.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG );
+                    }
                     tvGoldNum.setText(receiveGoldModel.getIncome() + "");
+
                     if (null != taskImgVo) {
                         imgList.clear();
                         imgList.addAll(taskImgVo);
@@ -293,10 +301,18 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                 //外链
                 if (!StringUtils.isEmpty(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl())) {
                     SPUtils.getInstance().put("taskID", taskId);
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl()));
-                    startActivity(browserIntent);
                     tvEndTask.setBackgroundResource(R.drawable.shape_round_green_22);
                     tvEndTask.setTextColor(getResources().getColor(R.color.white));
+                    if (receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl().contains("http")) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl()));
+                        startActivity(browserIntent);
+                    } else {
+                        if (OpenApp.schemeValid(ReceiveGoldDetailsActivity.this, receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl())) {
+                            OpenApp.schemeUrl(ReceiveGoldDetailsActivity.this, receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl());
+                        } else {
+                            Tip.show("请按照数据流程操作");
+                        }
+                    }
                 } else {
                     Tip.show("链接失效，请退出重试！");
                 }

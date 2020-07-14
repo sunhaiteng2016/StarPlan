@@ -2,12 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_marginTop="@dimen/dp40"
     android:gravity="center_horizontal"
     android:layout_height="wrap_content">
 
     <RelativeLayout
-        android:layout_marginTop="@dimen/dp40"
         android:background="@mipmap/npd_bg"
         android:layout_width="300dp"
         android:layout_height="350dp">

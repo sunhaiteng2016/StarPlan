@@ -3,6 +3,7 @@ package com.boniu.starplan.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.net.Uri;
 import android.os.Build;
@@ -72,6 +73,8 @@ public class TryToEarnDetailsActivity extends BaseActivity {
     TextView tvSubmit;
     @BindView(R.id.tv_number_gold)
     TextView tvNumberGold;
+    @BindView(R.id.tv_number_gold2)
+    TextView tvNumberGold2;
     @BindView(R.id.iv_app_icon)
     ImageView ivAppIcon;
     @BindView(R.id.tv_title)
@@ -95,6 +98,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
     private int inCome;
     private File destPath;
     private int flag;
+    private int taskIncome;
 
 
     @Override
@@ -187,8 +191,14 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     tvDes.setText(taskDetailsModel.getTaskDetailVO().getSubTitle());
                     GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getIcon(), ivAppIcon, 8);
                     inCome = taskDetailsModel.getIncome();
+                    taskIncome=taskDetailsModel.getTaskDetailVO().getIncome();
                     tvTitle1.setText(taskDetailsModel.getTaskDetailVO().getRemark());
+                    if (flag==1){
+                        tvNumberGold2.setText(taskIncome+"");
+                        tvNumberGold2.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG );
+                    }
                     tvNumberGold.setText(taskDetailsModel.getIncome() + "");
+
                     long curTime = System.currentTimeMillis();
                     long timers = taskDetailsModel.getExpiryTime() - curTime;
                     TimerUtils.startTimerHour1(TryToEarnDetailsActivity.this, timers, tvTime);
@@ -249,7 +259,12 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     SPUtils.getInstance().put("beginTime", System.currentTimeMillis());
                     //还要开始任务
                     if (!StringUtils.isEmpty(taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl())) {
-                        OpenApp.schemeUrl(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl());
+                        if (OpenApp.schemeValid(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl())) {
+                            OpenApp.schemeUrl(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl());
+                        }else{
+                            Tip.show("请按照流程操作");
+                        }
+
                     } else {
                         OpenApp.OpenApp(this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getAppOpenUrl());
                     }
@@ -273,7 +288,6 @@ public class TryToEarnDetailsActivity extends BaseActivity {
         }
 
     }
-
 
     public void begin() {
         RxHttp.postEncryptJson(ComParamContact.Main.TASK_BEGIN).add("userTaskId", userTaskId).asResponse(String.class).subscribe(s -> {

@@ -17,6 +17,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
+import com.boniu.starplan.base.Response;
 import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.dialog.DialogReturnInterfaces;
 import com.boniu.starplan.dialog.GeneralFailDialog;
@@ -104,6 +105,7 @@ public class WithdrawalActivity extends BaseActivity {
     private MyGoldBean myGoldBean;
     private String putongTixian = "ordinary_withdrawal";
     private String accountStatus;
+    private int withDrawalNum;
 
     @Override
     public int getLayoutId() {
@@ -125,7 +127,7 @@ public class WithdrawalActivity extends BaseActivity {
 
     private void getPreferential(String type) {
         RxHttp.postEncryptJson(ComParamContact.Main.preferential)
-                .add("appID", "test")
+                .add("appID", "LEZHUAN_STAR_BONIU")
                 .add("type", type)
                 .asResponse(String.class)
                 .subscribe(s -> {
@@ -372,27 +374,32 @@ public class WithdrawalActivity extends BaseActivity {
                 .subscribe(s -> {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);
                     TransferInfoBean transferInfoBean = new Gson().fromJson(result, TransferInfoBean.class);
+                    withDrawalNum = transferInfoBean.getWithdrawalNum();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             dialog.dismiss();
-                            if ("YES".equals(transferInfoBean.getChangeFlag())) {
-                                WithdrawalDialog withdrawalDialog = new WithdrawalDialog(mContext, withdrwaalMoney + "", new WithDrawalVerCodeDialog.WithDrawalInterfaces() {
-                                    @Override
-                                    public void withDrawalRight(String code, String name, String zhanghao) {
-                                        withdrawalMoney(code, name, zhanghao);
-                                    }
-                                });
-                                withdrawalDialog.show();
-                            } else {
-                                Withdrawal2Dialog withdrawal2Dialog = new Withdrawal2Dialog(mContext, transferInfoBean.getReceivedAccount(), transferInfoBean.getRealName(), withdrwaalMoney + "", new WithDrawalVerCodeDialog.WithDrawalInterfaces() {
+                            if (withDrawalNum > 0) {
+                                if ("YES".equals(transferInfoBean.getChangeFlag())) {
+                                    WithdrawalDialog withdrawalDialog = new WithdrawalDialog(mContext, withdrwaalMoney + "", new WithDrawalVerCodeDialog.WithDrawalInterfaces() {
+                                        @Override
+                                        public void withDrawalRight(String code, String name, String zhanghao) {
+                                            withdrawalMoney(code, name, zhanghao);
+                                        }
+                                    });
+                                    withdrawalDialog.show();
+                                } else {
+                                    Withdrawal2Dialog withdrawal2Dialog = new Withdrawal2Dialog(mContext, transferInfoBean.getReceivedAccount(), transferInfoBean.getRealName(), withdrwaalMoney + "", new WithDrawalVerCodeDialog.WithDrawalInterfaces() {
 
-                                    @Override
-                                    public void withDrawalRight(String code, String name, String zhanghao) {
-                                        withdrawalMoney(code, name, zhanghao);
-                                    }
-                                });
-                                withdrawal2Dialog.show();
+                                        @Override
+                                        public void withDrawalRight(String code, String name, String zhanghao) {
+                                            withdrawalMoney(code, name, zhanghao);
+                                        }
+                                    });
+                                    withdrawal2Dialog.show();
+                                }
+                            } else {
+                                Tip.show("今日提现次数用完，请明日再来！");
                             }
                         }
                     });
@@ -425,50 +432,76 @@ public class WithdrawalActivity extends BaseActivity {
                 .add("expendType", clickType + "")
                 .add("goldAmount", withdrwaalMoney + "")
                 .add("orderNum", (long) (Math.random() * 1000000000))
-                .asResponse(String.class)
+                .asString()
                 .subscribe(s -> {
-                    String result = AESUtil.decrypt(s, AESUtil.KEY);
-                    NoticeBean noticeBean = new NoticeBean();
-                    noticeBean.setTitle("您已经提交审核");
-                    noticeBean.setContent("可以通过 提现中心 > 提现记录 进行查询");
-                    noticeBean.setClickText("确定");
-                    Dialog dialog = new SubmitReviewDialog(mContext, noticeBean, new DialogReturnInterfaces() {
+                    Response resultBean = new Gson().fromJson(s, Response.class);
+                    runOnUiThread(new Runnable() {
                         @Override
-                        public void dismiss() {
-                            ARouter.getInstance().build("MyWalletActivity").navigation();
-                        }
+                        public void run() {
+                            if (resultBean.getReturnCode() == 0) {
+                                NoticeBean noticeBean = new NoticeBean();
+                                noticeBean.setTitle("您已经提交审核");
+                                noticeBean.setContent("可以通过 提现中心 > 提现记录 进行查询");
+                                noticeBean.setClickText("确定");
+                                Dialog dialog = new SubmitReviewDialog(mContext, noticeBean, new DialogReturnInterfaces() {
+                                    @Override
+                                    public void dismiss() {
+                                        ARouter.getInstance().build("/ui/MyWalletActivity").navigation();
+                                    }
 
-                        @Override
-                        public void clickType(String clickType) {
+                                    @Override
+                                    public void clickType(String clickType) {
+                                        ARouter.getInstance().build("/ui/MyWalletActivity").navigation();
+                                    }
+                                });
+                                dialog.show();
+                                withdrwaalMoney = 0L;
+                                getDates();
+                            } else {
+                                int returnCode = resultBean.getReturnCode();
+                                switch (returnCode + "") {
+                                    case "101":
+                                    case "103":
+                                    case "121":
+                                    case "120":
+                                        NoticeBean noticeBean = new NoticeBean();
+                                        noticeBean.setTitle("提现失败");
+                                        noticeBean.setContent(resultBean.getErrorMsg() + "");
+                                        noticeBean.setClickText("返回我的钱包");
+                                        Dialog dialog = new GeneralFailDialog(mContext, noticeBean, new DialogReturnInterfaces() {
+                                            @Override
+                                            public void dismiss() {
+                                            }
 
-                            ARouter.getInstance().build("MyWalletActivity").navigation();
+                                            @Override
+                                            public void clickType(String clickType) {
+                                            }
+                                        });
+                                        dialog.show();
+                                        break;
+                                    case "-100":
+                                    case "102":
+                                        Tip.show(resultBean.getErrorMsg());
+                                        finish();
+                                        break;
+                                    case "104":
+                                    case "105":
+                                    case "107":
+                                    case "108":
+                                    case "109":
+                                    case "122":
+                                        Tip.show(resultBean.getErrorMsg());
+                                        break;
+                                    case "-400":
+                                    case "106":
+                                        ARouter.getInstance().build("/ui/MainAvtivity").navigation();
+                                        break;
+                                }
+                            }
                         }
                     });
-                    dialog.show();
-                    withdrwaalMoney = 0L;
-                    getDates();
                     //设置签到数据
                 }, (OnError) error -> {
-                    error.show();
-
-                    NoticeBean noticeBean = new NoticeBean();
-                    noticeBean.setTitle("提现失败");
-                    noticeBean.setContent(error + "");
-                    noticeBean.setClickText("返回我的钱包");
-                    Dialog dialog = new GeneralFailDialog(mContext, noticeBean, new DialogReturnInterfaces() {
-                        @Override
-                        public void dismiss() {
-                            ARouter.getInstance().build("MyWalletActivity").navigation();
-                        }
-
-                        @Override
-                        public void clickType(String clickType) {
-                            ARouter.getInstance().build("MyWalletActivity").navigation();
-                            finish();
-                        }
-                    });
-                    dialog.show();
-
 
                 });
     }

@@ -134,6 +134,7 @@
                                         android:textSize="16sp" />
 
                                     <RelativeLayout
+                                        android:layout_toLeftOf="@+id/tv_phone"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_alignParentRight="true"
@@ -306,6 +307,7 @@
                             android:paddingBottom="@dimen/dp12" />
 
                         <RelativeLayout
+                            android:id="@+id/rl_day_task"
                             android:layout_width="match_parent"
                             android:layout_height="60dp"
                             android:layout_marginLeft="15dp"

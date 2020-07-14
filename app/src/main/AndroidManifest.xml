@@ -22,10 +22,13 @@
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.PublicWbActivity"/>
+        <activity android:name=".ui.PublicWbActivity" />
         <activity android:name=".ui.GameWebViewActivity" />
-        <activity android:name=".ui.LauncherActivity"
-            android:theme="@style/AppTheme.Launcher">
+        <activity
+            android:name=".ui.LauncherActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Launcher"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,9 +38,10 @@
         <activity
             android:name=".ui.LoginActivity"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateVisible|adjustResize" />
-        <activity android:name=".ui.FinishRegisterActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"/>
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".ui.FinishRegisterActivity"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".ui.ReceiveGoldDetailsActivity" />
         <activity android:name=".ui.ReceiveGoldCoinActivity" />
         <activity android:name=".ui.TryToEarnDetailsActivity" />
@@ -50,6 +54,8 @@
         <activity android:name=".ui.MyWalletActivity" />
         <activity android:name=".ui.ReviewProgressActivity" />
         <activity android:name=".ui.DownLoadWebViewActivity" />
+        <activity android:name=".help.FeedbackDetailsActivity" />
+        <activity android:name=".help.HelpAndFeedbackActivity" />
         <!-- value的值填写你在友盟后台申请的应用Appkey -->
         <meta-data
             android:name="UMENG_APPKEY"

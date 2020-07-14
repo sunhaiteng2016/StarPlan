@@ -57,7 +57,7 @@ public class OpenApp {
             Intent intent = new Intent(Intent.ACTION_VIEW);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Uri apkUri = FileProvider.getUriForFile(context, context.getPackageName()+"TTFileProvider", file);
+                Uri apkUri = FileProvider.getUriForFile(context, context.getPackageName()+".TTFileProvider", file);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
             } else {
@@ -126,7 +126,7 @@ public class OpenApp {
         return false;
     }
 
-    private boolean schemeValid(Context mContext, String str) {
+    public static boolean schemeValid(Context mContext, String str) {
         PackageManager manager = mContext.getPackageManager();
         Intent action = new Intent(Intent.ACTION_VIEW);
         action.setData(Uri.parse(str));
@@ -141,4 +141,5 @@ public class OpenApp {
         action.setData(Uri.parse(builder.toString()));
         mContext.startActivity(action);
     }
+
 }

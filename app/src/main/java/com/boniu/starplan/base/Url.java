@@ -10,11 +10,11 @@ import rxhttp.wrapper.annotation.Domain;
  */
 public class Url {
 
-    @Domain(name = "Update")
-    public static String update = "http://update.9158.com";
+   /* @Domain(name = "Update")
+    public static String update = "http://update.9158.com";*/
 
     @DefaultDomain //设置为默认域名
-    public static String baseUrl = "http://47.97.153.105:8080/";
+    public static String baseUrl = "https://earth.rhinox.cn/";
     //public static String baseUrl = "http://10.250.11.221:8080/";
     //app更新
     public static  String UpLoadApp="https://test99.rhinox.cn/standard/common/base";

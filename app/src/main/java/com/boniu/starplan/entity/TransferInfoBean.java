@@ -11,6 +11,15 @@ public class TransferInfoBean {
     private String changeFlag;
     private String realName;
     private String receivedAccount;
+    private int withdrawalNum;
+
+    public int getWithdrawalNum() {
+        return withdrawalNum;
+    }
+
+    public void setWithdrawalNum(int withdrawalNum) {
+        this.withdrawalNum = withdrawalNum;
+    }
 
     public String getChangeFlag() {
         return changeFlag;

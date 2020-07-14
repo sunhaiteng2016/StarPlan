@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_marginLeft="@dimen/dp42"
+    android:layout_marginRight="@dimen/dp42"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/img_close"
+        android:layout_gravity="right"
+        android:layout_marginRight="@dimen/dp10"
+        android:layout_marginTop="@dimen/dp10"
+        android:layout_width="@dimen/dp24"
+        android:layout_height="@dimen/dp24"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginTop="@dimen/dp10"
+        android:layout_gravity="center_horizontal"
+        android:text="温馨提示"
+        android:textColor="#ff333333"
+        android:textSize="20sp"
+        />
+    <TextView
+        android:layout_marginLeft="@dimen/dp20"
+        android:layout_marginRight="@dimen/dp20"
+        android:layout_marginTop="@dimen/dp17"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="本软件功能完全使用公开接口实现，仅供娱乐消遣，不得以任何违法方式发布或投递欺诈性信息，或诱导用户受到经济损失。用户发表的内容不代表对话生成器的立场或观点，作为内容发布者，用户需自行对其发布的内容负责，因发表的违法内容引发的一切纠纷，由该内容的发表方承担全部法律责任以及连带责任，本软件不承担任何责任。"
+        android:textColor="#ff333333"
+        android:textSize="12sp"
+        />
+
+    <LinearLayout
+        android:layout_marginLeft="@dimen/dp15"
+        android:layout_marginRight="@dimen/dp15"
+        android:orientation="horizontal"
+        android:layout_marginBottom="@dimen/dp30"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_agree"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/dp20"
+            android:paddingTop="@dimen/dp8"
+            android:layout_marginRight="@dimen/dp13"
+            android:paddingBottom="@dimen/dp8"
+            android:layout_height="wrap_content"
+            android:text="继续注销"
+            android:gravity="center"
+            android:background="@drawable/shape_xieyi_close"
+            android:textColor="#ffffffff"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/tv_close"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/dp20"
+            android:paddingTop="@dimen/dp8"
+            android:paddingBottom="@dimen/dp8"
+            android:layout_height="wrap_content"
+            android:text="我再想想"
+            android:gravity="center"
+            android:background="@drawable/shape_xieyi_agree"
+            android:textColor="#ffffffff"
+            android:textSize="16sp"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

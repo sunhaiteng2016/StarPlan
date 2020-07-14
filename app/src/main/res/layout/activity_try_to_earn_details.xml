@@ -63,9 +63,16 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="@dimen/dp10"
-                    android:text="6000"
                     android:textColor="@color/white"
                     android:textSize="24sp" />
+                <TextView
+                    android:layout_marginLeft="@dimen/dp4"
+                    android:id="@+id/tv_number_gold2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
             </LinearLayout>
 
             <TextView

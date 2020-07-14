@@ -1,8 +1,11 @@
 package com.boniu.starplan.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Path;
 import android.net.Uri;
 import android.os.Build;
@@ -11,6 +14,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -27,6 +31,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.boniu.starplan.R;
@@ -38,6 +43,7 @@ import com.boniu.starplan.oaid.UuidCreator;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.DevicesUtil;
 import com.boniu.starplan.utils.OpenApp;
+import com.boniu.starplan.utils.StringUtils;
 import com.boniu.starplan.utils.SystemInfoUtils;
 import com.rxjava.rxlife.RxLife;
 
@@ -49,6 +55,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import okhttp3.OkHttpClient;
+import pub.devrel.easypermissions.EasyPermissions;
 import rxhttp.wrapper.param.RxHttp;
 
 /***
@@ -65,9 +72,7 @@ public class GameWebViewActivity extends BaseActivity {
     TextView tvSubmit;
     @BindView(R.id.web_view)
     WebView webView;
-
-
-    private WebSettings mWebSettings;
+    private File destPath;
 
 
     @Override
@@ -82,13 +87,13 @@ public class GameWebViewActivity extends BaseActivity {
         getData();
     }
 
+
+
     @SuppressLint("JavascriptInterface")
     private void initView() {
         WebSettings settings = webView.getSettings();
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-
         }
 
         webView.getSettings().setBlockNetworkImage(false);
@@ -120,7 +125,32 @@ public class GameWebViewActivity extends BaseActivity {
         settings.setDisplayZoomControls(false);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
-        webView.addJavascriptInterface(new WebMethod(), "Android");
+        webView.addJavascriptInterface(new WebMethod(), "android");
+
+    }
+
+    public static String getDeviceid(Context context) {
+        if (null == context) {
+            return "";
+        }
+        try {
+            String deviceid = "";
+            int permission = ActivityCompat.checkSelfPermission(context,
+                    Manifest.permission.READ_PHONE_STATE);
+            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (null != telephonyManager && permission == PackageManager.PERMISSION_GRANTED) {
+                //有权限
+                deviceid = telephonyManager.getDeviceId();
+            }
+            //如果deviceid为空，并且是10.0系统,取androidid
+            if (TextUtils.isEmpty(deviceid) && Build.VERSION.SDK_INT >= 29) {
+                deviceid = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+            }
+            return deviceid;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        }
     }
 
     private File mPath;//文件保存路径
@@ -129,8 +159,8 @@ public class GameWebViewActivity extends BaseActivity {
         LoadingDialog dialog = new LoadingDialog(this);
         dialog.show();
         RxHttp.postEncryptJson(ComParamContact.Main.gameUrl)
-                .add("gameChannel", "1").add("deviceId", UuidCreator.getInstance(this).getDeviceId())
-                .add("deviceSource", 2).add("oaid", UuidCreator.getInstance(this).getDeviceId()).add("osVersion", SystemInfoUtils.getOSVersionName()).add("phoneModel", SystemInfoUtils.getBrandName())
+                .add("gameChannel", "1").add("deviceId", getDeviceid(this))
+                .add("deviceSource", 2).add("oaid", DevicesUtil.getOaid()).add("osVersion", SystemInfoUtils.getOSVersionName()).add("phoneModel", SystemInfoUtils.getBrandName())
                 .asResponse(String.class)
                 .to(RxLife.toMain(this))
                 .subscribe(s -> {
@@ -171,9 +201,6 @@ public class GameWebViewActivity extends BaseActivity {
 
     //h5调用方法
     private class WebMethod {
-        public WebMethod() {
-
-        }
 
         /**
          * @param packageName 应用包名
@@ -267,7 +294,7 @@ public class GameWebViewActivity extends BaseActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 boolean haveInstallPermission = getPackageManager().canRequestPackageInstalls();
                 if (haveInstallPermission) {
-                    OpenApp.installApk(mContext, new File(path));
+                    OpenApp.installApk(mContext, mPath);
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setMessage("安装应用需要打开安装未知来源应用权限，请去设置中开启权限");
@@ -288,7 +315,7 @@ public class GameWebViewActivity extends BaseActivity {
                     builder.create().show();
                 }
             } else {
-                OpenApp.installApk(mContext, new File(path));
+                OpenApp.installApk(mContext, mPath);
             }
             if (webView != null) {
                 webView.post(new Runnable() {
@@ -379,9 +406,8 @@ public class GameWebViewActivity extends BaseActivity {
                             if (1 == isInstall) {
                                 myHanlder.sendEmptyMessage(0);
                             }
-
-
-                        }, error -> {
+                        }, (OnError) error -> {
+                            error.show();
                             Message message = new Message();
                             message.what = 3;
                             message.obj = "javascript:downloadApkFileErrorListener("

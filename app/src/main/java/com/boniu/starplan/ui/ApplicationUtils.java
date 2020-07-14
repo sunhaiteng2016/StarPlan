@@ -33,7 +33,7 @@ import io.github.inflationx.viewpump.ViewPump;
 public class ApplicationUtils extends Application {
 
     private static Context mContext;//全局上下文对象
-    public List<Activity> allActivityList = new ArrayList<>();
+    public static List<Activity> allActivityList = new ArrayList<>();
 
     public static Context getContext() {
         return mContext;

@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -49,6 +50,7 @@ import com.boniu.starplan.utils.Tip;
 import com.boniu.starplan.utils.Utils;
 import com.boniu.starplan.utils.Validator;
 import com.google.gson.Gson;
+import com.rxjava.rxlife.RxLife;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 
 import java.util.Calendar;
@@ -74,14 +76,14 @@ public class MainActivityHelper {
     public void AdLook(Activity context) {
 
         //创建激励视频翻倍任务
-        RxHttp.postEncryptJson(ComParamContact.Main.addVideoAD).asResponse(String.class).subscribe(s -> {
+        RxHttp.postEncryptJson(ComParamContact.Main.addVideoAD).asResponse(String.class).to(RxLife.toMain((LifecycleOwner) context)).subscribe(s -> {
             String result = AESUtil.decrypt(s, AESUtil.KEY);
             VideoAdModel adModel = new Gson().fromJson(result, VideoAdModel.class);
             //然后在观看激励视频
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ReWardVideoAdUtils.initAd(context, adModel.getApplyId(), adModel.getIncome()/2);
+                    ReWardVideoAdUtils.initAd(context, adModel.getApplyId(), adModel.getIncome() / 2);
                 }
             });
         }, (OnError) error -> {
@@ -92,7 +94,6 @@ public class MainActivityHelper {
     public void downLoad(Activity context) {
 
         RxHttp.postJson(Url.UpLoadApp).add("appName", "LEZHUAN_STAR_BONIU").add("deviceType", "ANDROID").add("deviceModel", SystemInfoUtils.getModelName()).add("version", SystemInfoUtils.getAppVersionName(context)).add("channel", SystemInfoUtils.getAppSource(context, "UMENG_CHANNEL")).asString().subscribe(s -> {
-            // VersionModel versionModel = new Gson().fromJson(s, VersionModel.class);
             VersionModel versionModel = new Gson().fromJson(s, VersionModel.class);
             if (versionModel.isSuccess()) {
                 context.runOnUiThread(new Runnable() {
@@ -214,7 +215,7 @@ public class MainActivityHelper {
      */
     public void mainTaskList(Activity context, LoadingDialog loadingDialog, List<MainTask.DayTaskBean> dayTaskList, List<MainTask.NewUserTaskBean> newUserTaskList,
                              CommonAdapter<MainTask.DayTaskBean> dayTaskAdapter, CommonAdapter<MainTask.NewUserTaskBean> newUserTaskAdapter,
-                             RelativeLayout new_user_title_rl, RecyclerView rlvNewUserTask, TextView tvDes, ImageView ivBx) {
+                             RelativeLayout new_user_title_rl, RecyclerView rlvNewUserTask, TextView tvDes, ImageView ivBx, RelativeLayout relativeLayout, RecyclerView rlvDayTask) {
         loadingDialog.show();
         //任务列表
         ObjectAnimator animator = AnimatorUtil.sway(ivBx);
@@ -237,6 +238,10 @@ public class MainActivityHelper {
                             if (newUserTaskList.size() <= 0) {
                                 new_user_title_rl.setVisibility(View.GONE);
                                 rlvNewUserTask.setVisibility(View.GONE);
+                            }
+                            if (dayTaskList.size() <= 0) {
+                                relativeLayout.setVisibility(View.GONE);
+                                rlvDayTask.setVisibility(View.GONE);
                             }
                             dayTaskAdapter.notifyDataSetChanged();
                             newUserTaskAdapter.notifyDataSetChanged();
@@ -271,7 +276,7 @@ public class MainActivityHelper {
                                             if (boxState.getStatus() != 0) {
                                                 ivBx.setBackgroundResource(R.mipmap.baoxiangopen);
                                                 tvDes.setText("宝箱已领取");
-                                                animator.clone();
+                                                animator.end();
                                             } else {
                                                 animator.start();
                                             }
@@ -292,11 +297,9 @@ public class MainActivityHelper {
                                                     context.runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            if (flag == 1) {
-                                                                ivBx.setBackgroundResource(R.mipmap.baoxiangopen);
-                                                                tvDes.setText("宝箱已领取");
-                                                                animator.clone();
-                                                            }
+                                                            animator.end();
+                                                            ivBx.setBackgroundResource(R.mipmap.baoxiangopen);
+                                                            tvDes.setText("宝箱已领取");
                                                             if (flag == 2) {
                                                                 ReWardVideoAdUtils.initAd(context, applyId, boxState.getGoldCount());
                                                             }
@@ -307,6 +310,7 @@ public class MainActivityHelper {
                                             });
                                             dialog.show();
                                         } else {
+                                            animator.end();
                                             Tip.show("宝箱已领取");
                                         }
 
@@ -343,7 +347,7 @@ public class MainActivityHelper {
                         public void run() {
                             if (userInfo.isIsNewUser()) {
                                 ApplicationUtils.isNewUer = false;
-                            }else {
+                            } else {
                                 //签到相关
                                 RxHttp.postEncryptJson(ComParamContact.Main.IS_SIGN)
                                         .asResponse(String.class)

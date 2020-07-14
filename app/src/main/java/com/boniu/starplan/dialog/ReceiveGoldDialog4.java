@@ -55,7 +55,7 @@ public class ReceiveGoldDialog4 extends Dialog {
             @Override
             public void onClick(View view) {
                 if (flag == 1) {
-                    ARouter.getInstance().build("ui/MainActivity").navigation();
+                    ARouter.getInstance().build("/ui/MainActivity").navigation();
                 } else {
                     callback.receive(1, "");
                 }

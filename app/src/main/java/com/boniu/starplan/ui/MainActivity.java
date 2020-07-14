@@ -7,10 +7,13 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -61,6 +64,7 @@ import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
 
+import com.boniu.starplan.utils.Utils;
 import com.boniu.starplan.utils.Validator;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
@@ -139,6 +143,8 @@ public class MainActivity extends BaseActivity {
     RefreshLayout refreshLayout;
     @BindView(R.id.tv_yc)
     TextView tv_yc;
+    @BindView(R.id.rl_day_task)
+    RelativeLayout rl_day_task;
 
 
     //初始化首页相关数据
@@ -159,10 +165,12 @@ public class MainActivity extends BaseActivity {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.WRITE_SETTINGS,
             Manifest.permission.READ_CONTACTS,
+            Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
+
     };
     public static int weekSign = 0;
     private boolean isTake = true;
@@ -213,7 +221,9 @@ public class MainActivity extends BaseActivity {
         tvGerMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivityHelper.newInstance().AdLook(MainActivity.this);
+                if (Utils.isFastClick()){
+                    MainActivityHelper.newInstance().AdLook(MainActivity.this);
+                }
             }
         });
         if (!EventBus.getDefault().isRegistered(this)) {
@@ -261,6 +271,7 @@ public class MainActivity extends BaseActivity {
         draw1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ARouter.getInstance().build("/mime/HelpAndFeedbackActivity").navigation();
                 drawer.closeDrawers();
             }
         });
@@ -296,12 +307,11 @@ public class MainActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onGetStickyEvent(MessageWrap message) {
         if (message.flag == 1) {
-            MainActivityHelper.newInstance().getUserInfo(MainActivity.this, tvPhone, tvMoney, tv_yc);
+          getData();
         }
         if (message.flag == 2) {
             gotoSign();
         }
-
     }
 
     @Override
@@ -591,7 +601,9 @@ public class MainActivity extends BaseActivity {
                         ARouter.getInstance().build("/ui/GameWebViewActivity").navigation();
                         break;
                     case 3:
-                        MainActivityHelper.newInstance().AdLook(MainActivity.this);
+                        if (Utils.isFastClick()){
+                            MainActivityHelper.newInstance().AdLook(MainActivity.this);
+                        }
                         break;
                     default:
                         break;
@@ -628,7 +640,7 @@ public class MainActivity extends BaseActivity {
                 }
                 income = listBean.getWeekSignGold();
                 if (listBean.isIsSign()) {
-                    holder.setText(R.id.tv_hb_close, listBean.getWeekSignGold() + "");
+                   // holder.setText(R.id.tv_hb_close, listBean.getWeekSignGold() + "");
                     holder.setTextColor(R.id.tv_circle, mContext.getResources().getColor(R.color.FEC50B));
                     if (listBean.getType().equals("gif")) {
 
@@ -712,7 +724,7 @@ public class MainActivity extends BaseActivity {
             MainActivityHelper.newInstance().getUserInfo(this, tvPhone, tvMoney, tv_yc);
             MainActivityHelper.newInstance().IsSign(this, tvSign, tvMoreSign);
             getSign();
-            MainActivityHelper.newInstance().mainTaskList(this, loadingDialog, dayTaskList, newUserTaskList, dayTaskAdapter, newUserTaskAdapter, new_user_title_rl, rlvNewUserTask, tvDes, ivBx);
+            MainActivityHelper.newInstance().mainTaskList(this, loadingDialog, dayTaskList, newUserTaskList, dayTaskAdapter, newUserTaskAdapter, new_user_title_rl, rlvNewUserTask, tvDes, ivBx,rl_day_task,rlvDayTask);
             getTimer();
             MainActivityHelper.newInstance().downLoad(this);
         }else {
@@ -787,7 +799,7 @@ public class MainActivity extends BaseActivity {
                                 }
                                 if (flag == 2) {
                                     // 开启激励视频
-                                    ReWardVideoAdUtils.initAd(MainActivity.this, applyId, income);
+                                    ReWardVideoAdUtils.initAd(MainActivity.this, applyId, signList.get(i).getDoubleGold());
                                 }
                             }
                         });
@@ -895,6 +907,36 @@ public class MainActivity extends BaseActivity {
         SignSuccessNormalDialog dialog = new SignSuccessNormalDialog(MainActivity.this, weekSigns, inCome);
         dialog.show();
     }
+    private static int isExit=0;
 
+    //实现按两次后退才退出
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            super.handleMessage(msg);
+            isExit--;
+        }
+    };
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode==KeyEvent.KEYCODE_BACK){
+            isExit++;
+            exit();
+            return false;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    private void exit(){
+        if(isExit<2){
+           Tip.show("再按一次，退出程序");
+
+            //利用handler延迟发送更改状态信息
+            handler.sendEmptyMessageDelayed(0,2000);
+
+        }else{
+            ApplicationUtils.newInstance().removeActivity();
+            super.onBackPressed();
+        }
+    }
 
 }

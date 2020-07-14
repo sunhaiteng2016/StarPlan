@@ -13,6 +13,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.constant.ComParamContact;
 import com.boniu.starplan.dialog.GeneralFailDialog;
 import com.boniu.starplan.dialog.GeneralFailDialog2;
+import com.boniu.starplan.dialog.LoadingDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog2;
 import com.boniu.starplan.dialog.VideoGoldSuccessDialog;
 import com.boniu.starplan.entity.MessageWrap;
@@ -39,6 +40,13 @@ public class ReWardVideoAdUtils {
 
     public static void initAd(Activity mContext, String code, int inCome) {
         mTTAdNative = TTAdManagerHolder.get().createAdNative(mContext);
+        LoadingDialog dialog = new LoadingDialog(mContext);
+        mContext.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog.show();
+            }
+        });
 
         AdSlot adSlot = new AdSlot.Builder()
                 .setCodeId("945218666")
@@ -53,7 +61,14 @@ public class ReWardVideoAdUtils {
             public void onError(int i, String s) {
                 Log.e(TAG, "onError: " + i + "---" + s);
                 //TODO 直接失败
-                Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+                mContext.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                    }
+                });
+
             }
 
             @Override
@@ -143,6 +158,12 @@ public class ReWardVideoAdUtils {
                     public void onDownloadFinished(long totalBytes, String fileName, String appName) {
                         //Log.e(TAG, "onDownloadFinished: " );
                         newAd.showRewardVideoAd(mContext);
+                        mContext.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                            }
+                        });
                     }
 
                     @Override
@@ -154,6 +175,12 @@ public class ReWardVideoAdUtils {
 
             @Override
             public void onRewardVideoCached() {
+                mContext.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                    }
+                });
                 newAd.showRewardVideoAd(mContext);
             }
         });
@@ -170,7 +197,7 @@ public class ReWardVideoAdUtils {
                 //801121648   PositionId.CSJ_CODEID
                 .setCodeId("887340136")
                 .setSupportDeepLink(true)
-               // .setImageAcceptedSize(1080, 1920)
+                .setImageAcceptedSize(1080, 1920)
                 .build();
         //step4:请求广告，调用开屏广告异步请求接口，对请求回调的广告作渲染处理
         mTTAdNative = TTAdManagerHolder.get().createAdNative(context);
@@ -179,6 +206,7 @@ public class ReWardVideoAdUtils {
             @MainThread
             public void onError(int code, String message) {
                 Log.d(TAG, message);
+
                 gotoMain(token, context);
             }
 

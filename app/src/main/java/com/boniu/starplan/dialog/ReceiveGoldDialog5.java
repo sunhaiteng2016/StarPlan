@@ -34,7 +34,7 @@ public class ReceiveGoldDialog5 extends Dialog {
                 }else{
                     ApplicationUtils.newInstance().popActivity(FinishRegisterActivity.class);
                     ApplicationUtils.newInstance().popActivity(ReceiveGoldDetailsActivity.class);
-                    ARouter.getInstance().build("/ui/ReceiveGoldCoinActivity").navigation();
+                    //ARouter.getInstance().build("/ui/ReceiveGoldCoinActivity").navigation();
                 }
                 dismiss();
             }

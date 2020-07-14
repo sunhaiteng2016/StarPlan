@@ -14,6 +14,7 @@ import com.boniu.starplan.entity.MessageWrap;
 import com.boniu.starplan.ui.ApplicationUtils;
 import com.boniu.starplan.ui.FinishRegisterActivity;
 import com.boniu.starplan.ui.ReceiveGoldDetailsActivity;
+import com.boniu.starplan.ui.TryToEarnDetailsActivity;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -61,10 +62,10 @@ public class ReceiveGoldDialog6 extends Dialog {
             @Override
             public void onClick(View view) {
                 if (flag == 1) {
-                    ARouter.getInstance().build("ui/MainActivity").navigation();
+                    ARouter.getInstance().build("/ui/MainActivity").navigation();
                 } else {
-                    ApplicationUtils.newInstance().popActivity(FinishRegisterActivity.class);
-                    ApplicationUtils.newInstance().popActivity(ReceiveGoldDetailsActivity.class);
+                    ApplicationUtils.newInstance().popActivity(TryToEarnDetailsActivity.class);
+                    ARouter.getInstance().build("/ui/TryToEarnActivity").navigation();
                 }
                 EventBus.getDefault().post(new MessageWrap(1));
                 dismiss();
