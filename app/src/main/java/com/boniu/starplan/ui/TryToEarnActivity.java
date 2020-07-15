@@ -128,6 +128,7 @@ public class TryToEarnActivity extends BaseActivity {
                 String result = AESUtil.decrypt(s, AESUtil.KEY);
                 List<RunningTaskModel> lists = new Gson().fromJson(result, new TypeToken<List<RunningTaskModel>>() {
                 }.getType());
+                if (lists.size()==0) rlRunningTask.setVisibility(View.GONE);
                 RunningTaskModel runningTaskModel = lists.get(0);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -184,7 +185,6 @@ public class TryToEarnActivity extends BaseActivity {
                     if (isRunningTask) {
                         showTaskRunningDialog();
                     } else {
-
                         ReceiveTask(taskList.get(i).getId());
                     }
                 }
@@ -241,6 +241,7 @@ public class TryToEarnActivity extends BaseActivity {
                     public void run() {
                         loadingDialog1.dismiss();
                         isRunningTask = false;
+                        runTaskId=-1;
                         rlRunningTask.setVisibility(View.GONE);
                         //是否开始新的任务
                         RunningTaskDialog dialog = new RunningTaskDialog(TryToEarnActivity.this, 2, new RunningTaskDialog.RunningCallback() {
@@ -291,7 +292,7 @@ public class TryToEarnActivity extends BaseActivity {
                         if (applyTask.isIsExist()) {
                             showTaskRunningDialog();
                         } else {
-                            Tip.show("领取失败！");
+                            Tip.show(applyTask.getMessage());
                         }
                     }
                 }

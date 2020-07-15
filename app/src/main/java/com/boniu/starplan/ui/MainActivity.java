@@ -485,7 +485,7 @@ public class MainActivity extends BaseActivity {
                         if (applyTask.isIsExist()) {
                             showTaskRunningDialog();
                         } else {
-                            Tip.show("领取失败！");
+                            Tip.show(applyTask.getMessage());
                         }
 
                     }

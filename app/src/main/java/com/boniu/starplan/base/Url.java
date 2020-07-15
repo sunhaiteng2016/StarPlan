@@ -14,8 +14,9 @@ public class Url {
     public static String update = "http://update.9158.com";*/
 
     @DefaultDomain //设置为默认域名
-    public static String baseUrl = "https://earth.rhinox.cn/";
-    //public static String baseUrl = "http://10.250.11.221:8080/";
+    public static String baseUrl = "http://earth.test.rhinox.cn/";
+   // public static String baseUrl = "https://earth.rhinox.cn/";
+
     //app更新
     public static  String UpLoadApp="https://test99.rhinox.cn/standard/common/base";
 }

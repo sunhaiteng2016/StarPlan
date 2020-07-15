@@ -4,16 +4,34 @@ public class ApplyTask {
 
 
     /**
-     * isExist : true
+     * isExist : false
      * isSucceed : false
-     * taskId : 307
-     * userTaskId : 140
+     * message : 活动火爆，该任务已被抢完，请明日再来
+     * todayRemain : 0
      */
 
     private boolean isExist;
     private boolean isSucceed;
+    private String message;
+    private int todayRemain;
+    private  int userTaskId;
     private int taskId;
-    private int userTaskId;
+
+    public int getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
+    }
+
+    public int getUserTaskId() {
+        return userTaskId;
+    }
+
+    public void setUserTaskId(int userTaskId) {
+        this.userTaskId = userTaskId;
+    }
 
     public boolean isIsExist() {
         return isExist;
@@ -31,19 +49,19 @@ public class ApplyTask {
         this.isSucceed = isSucceed;
     }
 
-    public int getTaskId() {
-        return taskId;
+    public String getMessage() {
+        return message;
     }
 
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public int getUserTaskId() {
-        return userTaskId;
+    public int getTodayRemain() {
+        return todayRemain;
     }
 
-    public void setUserTaskId(int userTaskId) {
-        this.userTaskId = userTaskId;
+    public void setTodayRemain(int todayRemain) {
+        this.todayRemain = todayRemain;
     }
 }

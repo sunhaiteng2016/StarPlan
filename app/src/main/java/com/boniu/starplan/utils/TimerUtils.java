@@ -67,7 +67,10 @@ public class TimerUtils {
     }
 
     public static void startTimerHour(final Context context, long times, final TextView tvCode) {
-         timer = new CountDownTimer(times, 1000) {
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = new CountDownTimer(times, 1000) {
             public void onTick(long millisUntilFinished) {
                 String minutes = "";
                 String seconds = "";
@@ -95,6 +98,7 @@ public class TimerUtils {
         timer.start();
 
     }
+
     public static void startTimerHour1(Activity context, long times, final TextView tvCode) {
         new CountDownTimer(times, 1000) {
             public void onTick(long millisUntilFinished) {
