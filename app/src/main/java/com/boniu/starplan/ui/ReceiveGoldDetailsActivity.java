@@ -1,10 +1,13 @@
 package com.boniu.starplan.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -24,6 +28,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.DownloadProgressDialog;
 import com.boniu.starplan.entity.ReceiveGoldModel;
 import com.boniu.starplan.helper.GlideImageEngine;
 import com.boniu.starplan.http.OnError;
@@ -44,17 +49,22 @@ import com.maning.imagebrowserlibrary.listeners.OnClickListener;
 import com.maning.imagebrowserlibrary.listeners.OnLongClickListener;
 import com.maning.imagebrowserlibrary.listeners.OnPageChangeListener;
 import com.maning.imagebrowserlibrary.model.ImageBrowserConfig;
+import com.rxjava.rxlife.RxLife;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import rxhttp.wrapper.param.RxHttp;
+
+import static com.boniu.starplan.dialog.DownloadProgressDialog.STYLE_HORIZONTAL;
 
 /**
  * 领金币详情
@@ -103,6 +113,7 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
     public ImageBrowserConfig.IndicatorType indicatorType = ImageBrowserConfig.IndicatorType.Indicator_Number;
     public ImageBrowserConfig.ScreenOrientationType screenOrientationType = ImageBrowserConfig.ScreenOrientationType.Screenorientation_Default;
     private ImageEngine imageEngine = new GlideImageEngine();
+    private File destPath;
 
     @Override
     public int getLayoutId() {
@@ -167,9 +178,9 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                     tvDes.setText(receiveGoldModel.getTaskDetailVO().getSubTitle());
                     tvPlaySm.setText(receiveGoldModel.getTaskDetailVO().getMajorDesc());
                     webView.loadDataWithBaseURL(null, auditTaskVO.getShowDesc(), "text/html", "utf-8", null);
-                    if (flag==1){
-                        tvGoldNum2.setText(receiveGoldModel.getTaskDetailVO().getIncome()+"");
-                        tvGoldNum2.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG );
+                    if (receiveGoldModel.getTaskDetailVO().getIncome() != receiveGoldModel.getIncome()) {
+                        tvGoldNum2.setText(receiveGoldModel.getTaskDetailVO().getIncome() + "");
+                        tvGoldNum2.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
                     }
                     tvGoldNum.setText(receiveGoldModel.getIncome() + "");
 
@@ -223,10 +234,6 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                         .setIndicatorType(indicatorType)
                         //设置隐藏指示器
                         .setIndicatorHide(false)
-                        //设置自定义遮盖层，定制自己想要的效果，当设置遮盖层后，原本的指示器会被隐藏
-                        // .setCustomShadeView(showCustomShadeView ? customView : null)
-                        //自定义ProgressView，不设置默认默认没有
-                        //.setCustomProgressViewLayoutID(showCustomProgressView ? R.layout.layout_custom_progress_view : 0)
                         //当前位置
                         .setCurrentPosition(i)
                         //图片引擎
@@ -235,48 +242,10 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
                         .setImageList(mThumbViewInfoList)
                         //方向设置
                         .setScreenOrientationType(screenOrientationType)
-                        //点击监听
-                        /*.setOnClickListener(new OnClickListener() {
-                            @Override
-                            public void onClick(FragmentActivity activity, View view, int position, String url) {
-                                //TODO:注意，这里的View可能是ImageView,也可能是自定义setCustomImageViewLayout的View
-                            }
-                        })
-                        //长按监听
-                        .setOnLongClickListener(new OnLongClickListener() {
-                            @Override
-                            public void onLongClick(final FragmentActivity activity, final View imageView, int position, String url) {
-                                //TODO:注意，这里的View可能是ImageView,也可能是自定义setCustomImageViewLayout的View
-                                if(imageView instanceof ImageView){
-                                    showListDialog(activity, (ImageView) imageView);
-                                }else{
-                                    MToast.makeTextShort(context,"自定义setCustomImageViewLayout的View,自己实现长按功能");
-                                }
-                            }
-                        })
-                        //页面切换监听
-                        .setOnPageChangeListener(new OnPageChangeListener() {
-                            @Override
-                            public void onPageSelected(int position) {
-                                Log.i(TAG, "onPageSelected:" + position);
-                                if (tv_number_indicator != null) {
-                                    tv_number_indicator.setText((position + 1) + "/" + MNImageBrowser.getImageList().size());
-                                }
-                            }
-                        })*/
                         //全屏模式
                         .setFullScreenMode(true)
-                        //打开动画
-                        /* .setActivityOpenAnime(openAnim)
-                         //关闭动画
-                         .setActivityExitAnime(exitAnim)*/
-                        //手势下拉缩小效果
                         .setOpenPullDownGestureEffect(false)
-                        //自定义显示View
-                        //.setCustomImageViewLayoutID(showCustomImageView ? R.layout.layout_custom_image_view_fresco : 0)
-                        //显示：传入当前View
                         .show(view);
-
             }
 
             @Override
@@ -299,23 +268,29 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
         switch (view.getId()) {
             case R.id.tv_start_task:
                 //外链
-                if (!StringUtils.isEmpty(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl())) {
-                    SPUtils.getInstance().put("taskID", taskId);
-                    tvEndTask.setBackgroundResource(R.drawable.shape_round_green_22);
-                    tvEndTask.setTextColor(getResources().getColor(R.color.white));
-                    if (receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl().contains("http")) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl()));
-                        startActivity(browserIntent);
-                    } else {
-                        if (OpenApp.schemeValid(ReceiveGoldDetailsActivity.this, receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl())) {
-                            OpenApp.schemeUrl(ReceiveGoldDetailsActivity.this, receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl());
-                        } else {
-                            Tip.show("请按照数据流程操作");
-                        }
-                    }
+                if (receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToType() == 2) {
+                    //下载app
+                    downLoadApp(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl());
                 } else {
-                    Tip.show("链接失效，请退出重试！");
+                    if (!StringUtils.isEmpty(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl())) {
+                        SPUtils.getInstance().put("taskID", taskId);
+                        tvEndTask.setBackgroundResource(R.drawable.shape_round_green_22);
+                        tvEndTask.setTextColor(getResources().getColor(R.color.white));
+                        if (receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl().contains("http")) {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl()));
+                            startActivity(browserIntent);
+                        } else {
+                            if (OpenApp.schemeValid(ReceiveGoldDetailsActivity.this, receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl())) {
+                                OpenApp.schemeUrl(ReceiveGoldDetailsActivity.this, receiveGoldModel.getTaskDetailVO().getAuditTaskVO().getToUrl());
+                            } else {
+                                Tip.show("请按照数据流程操作");
+                            }
+                        }
+                    } else {
+                        Tip.show("链接失效，请退出重试！");
+                    }
                 }
+
                 break;
             case R.id.tv_end_task:
                 if (SPUtils.getInstance().getInt("taskID", -1) == -1) {
@@ -337,5 +312,82 @@ public class ReceiveGoldDetailsActivity extends BaseActivity {
         }
     }
 
+    private void downLoadApp(String toUrl) {
+
+        DownloadProgressDialog progressDialog = new DownloadProgressDialog(ReceiveGoldDetailsActivity.this);
+        // 设置ProgressDialog 标题图标
+        //progressDialog.setIcon(R.drawable.a);
+        // 设置ProgressDialog 进度条进度
+        // 设置ProgressDialog 的进度条是否不明确
+        progressDialog.setProgressStyle(STYLE_HORIZONTAL);
+        // 设置ProgressDialog 是否可以按退回按键取消
+        progressDialog.setCancelable(true);
+        progressDialog.show();
+        File externalDownloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File applicationFileDir = new File(externalDownloadsDir, "boniu");
+        if (!applicationFileDir.exists()) {
+            applicationFileDir.mkdirs();
+        }
+        destPath = new File(applicationFileDir, System.currentTimeMillis() + ".apk");
+        progressDialog.setMax(100);
+        long length = destPath.length();
+        RxHttp.get(toUrl)
+                .setRangeHeader(length, -1, true)  //设置开始下载位置，结束位置默认为文件末尾
+                .asDownload(destPath.getPath(), progress -> {
+                    Log.e("sht", "progress->" + progress);
+                    //如果需要衔接上次的下载进度，则需要传入上次已下载的字节数length
+                    progressDialog.setMax((int) progress.getTotalSize());
+                    progressDialog.setProgress((int) progress.getCurrentSize());
+                    //下载进度回调,0-100，仅在进度有更新时才会回调
+                }, AndroidSchedulers.mainThread())
+                .to(RxLife.as(this)) //加入感知生命周期的观察者
+                .subscribe(s -> { //s为String类型
+                    progressDialog.dismiss();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        boolean haveInstallPermission = getPackageManager().canRequestPackageInstalls();
+                        if (haveInstallPermission) {
+                            OpenApp.installApk(mContext, destPath);
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                            builder.setMessage("安装应用需要打开安装未知来源应用权限，请去设置中开启权限");
+                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Uri packageUri = Uri.parse("package:" + ReceiveGoldDetailsActivity.this.getPackageName());
+                                    Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageUri);
+                                    startActivityForResult(intent, 101);
+                                }
+                            });
+                            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            builder.create().show();
+                        }
+                    } else {
+                        OpenApp.installApk(mContext, destPath);
+                    }
+                    //下载成功，处理相关逻辑
+                }, (OnError) error -> {
+                    // error.show();
+                    Tip.show("下载失败");
+                    //下载失败，处理相关逻辑
+                });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 101) {
+            if (resultCode == RESULT_OK) {
+                OpenApp.installApk(mContext, destPath);
+            } else {
+                Tip.show("未打开'安装未知来源'开关,无法安装,请打开后重试");
+            }
+        }
+
+
+    }
 
 }

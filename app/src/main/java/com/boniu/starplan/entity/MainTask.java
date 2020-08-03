@@ -47,6 +47,42 @@ public class MainTask {
         private int todayRemain;
         private int type;
         private String applySource;
+        private boolean keepLive;
+        private String addr;
+        private String appOpenUrl;
+        private String schemeUrl;
+
+        public boolean isKeepLive() {
+            return keepLive;
+        }
+
+        public void setKeepLive(boolean keepLive) {
+            this.keepLive = keepLive;
+        }
+
+        public String getAddr() {
+            return addr;
+        }
+
+        public void setAddr(String addr) {
+            this.addr = addr;
+        }
+
+        public String getAppOpenUrl() {
+            return appOpenUrl;
+        }
+
+        public void setAppOpenUrl(String appOpenUrl) {
+            this.appOpenUrl = appOpenUrl;
+        }
+
+        public String getSchemeUrl() {
+            return schemeUrl;
+        }
+
+        public void setSchemeUrl(String schemeUrl) {
+            this.schemeUrl = schemeUrl;
+        }
 
         public String getApplySource() {
             return applySource;
@@ -152,6 +188,43 @@ public class MainTask {
         private int todayRemain;
         private int type;
         private String applySource;
+        private boolean keepLive;
+        private String addr;
+        private String appOpenUrl;
+        private String schemeUrl;
+
+
+        public boolean isKeepLive() {
+            return keepLive;
+        }
+
+        public void setKeepLive(boolean keepLive) {
+            this.keepLive = keepLive;
+        }
+
+        public String getAddr() {
+            return addr;
+        }
+
+        public void setAddr(String addr) {
+            this.addr = addr;
+        }
+
+        public String getAppOpenUrl() {
+            return appOpenUrl;
+        }
+
+        public void setAppOpenUrl(String appOpenUrl) {
+            this.appOpenUrl = appOpenUrl;
+        }
+
+        public String getSchemeUrl() {
+            return schemeUrl;
+        }
+
+        public void setSchemeUrl(String schemeUrl) {
+            this.schemeUrl = schemeUrl;
+        }
 
         public String getApplySource() {
             return applySource;

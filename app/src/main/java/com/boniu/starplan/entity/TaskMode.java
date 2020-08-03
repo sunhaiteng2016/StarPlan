@@ -46,6 +46,43 @@ public class TaskMode {
         private String mainTitle;
         private String subTitle;
         private int todayRemain;
+        private boolean keepLive;
+        private String addr;
+        private String appOpenUrl;
+        private String schemeUrl;
+
+
+        public String getAddr() {
+            return addr;
+        }
+
+        public void setAddr(String addr) {
+            this.addr = addr;
+        }
+
+        public String getAppOpenUrl() {
+            return appOpenUrl;
+        }
+
+        public void setAppOpenUrl(String appOpenUrl) {
+            this.appOpenUrl = appOpenUrl;
+        }
+
+        public String getSchemeUrl() {
+            return schemeUrl;
+        }
+
+        public void setSchemeUrl(String schemeUrl) {
+            this.schemeUrl = schemeUrl;
+        }
+
+        public boolean getKeepLive() {
+            return keepLive;
+        }
+
+        public void setKeepLive(boolean keepLive) {
+            this.keepLive = keepLive;
+        }
 
         public int getDurableTime() {
             return durableTime;

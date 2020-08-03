@@ -255,7 +255,15 @@ public class TaskDetailsModel {
             private int taskId;
             private int tryTime;
             private String schemeUrl;
+            private boolean keepLive;
 
+            public boolean isKeepLive(){
+                return keepLive;
+            }
+
+            public void setKeepLive(boolean keepLive){
+                this.keepLive=keepLive;
+            }
             public String getSchemeUrl() {
                 return schemeUrl;
             }

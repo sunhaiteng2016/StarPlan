@@ -114,7 +114,7 @@ public class GameWebViewActivity extends BaseActivity {
                 layoutParams.leftMargin = dp2px(12);
                 layoutParams.rightMargin = dp2px(12);
                 webView.setLayoutParams(layoutParams);
-                //replaceLicenseAppName(webview);
+
             }
         };
         webView.setWebViewClient(webViewClient);

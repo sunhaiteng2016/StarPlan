@@ -5,14 +5,9 @@ import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,8 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.ad.ReWardVideoAdUtils;
+import com.boniu.starplan.dialog.InvigorateDialog;
 import com.boniu.starplan.dialog.LoadingDialog;
-import com.boniu.starplan.dialog.NewPersonDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog;
 import com.boniu.starplan.dialog.ReceiveGoldDialog2;
 import com.boniu.starplan.dialog.ReceiveGoldDialog3;
@@ -37,28 +32,27 @@ import com.boniu.starplan.dialog.RunningTaskDialog;
 import com.boniu.starplan.dialog.SignSuccessDialog;
 import com.boniu.starplan.dialog.SignSuccessNormalDialog;
 import com.boniu.starplan.entity.ApplyTask;
-import com.boniu.starplan.entity.BoxState;
 import com.boniu.starplan.entity.CollectTimeModel;
 import com.boniu.starplan.entity.IsSignModel;
-import com.boniu.starplan.entity.LoginInfo;
 import com.boniu.starplan.entity.MainTask;
 import com.boniu.starplan.entity.MessageWrap;
-import com.boniu.starplan.entity.NewUserInfo;
 import com.boniu.starplan.entity.TimeGoldModel;
+import com.boniu.starplan.entity.WeTaskBean;
 import com.boniu.starplan.helper.MainActivityHelper;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.constant.ComParamContact;
-import com.boniu.starplan.dialog.EverydayLogDialog;
 import com.boniu.starplan.dialog.SignTimeDialog;
 import com.boniu.starplan.entity.HomeMenu;
 import com.boniu.starplan.entity.SignModel;
 import com.boniu.starplan.entity.TaskMode;
 import com.boniu.starplan.utils.AESUtil;
 import com.boniu.starplan.utils.AnimatorUtil;
+import com.boniu.starplan.utils.DownloadAppUtils;
 import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.NetUtil;
+import com.boniu.starplan.utils.OpenApp;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.SPUtils;
 import com.boniu.starplan.utils.TimerUtils;
@@ -152,8 +146,8 @@ public class MainActivity extends BaseActivity {
     private CommonAdapter<HomeMenu> menuAdapter;
     private List<MainTask.DayTaskBean> dayTaskList = new ArrayList<>();
     private CommonAdapter<MainTask.DayTaskBean> dayTaskAdapter;
-    private List<TaskMode> weTaskList = new ArrayList<>();
-    private CommonAdapter<TaskMode> weTaskAdapter;
+    private List<WeTaskBean> weTaskList = new ArrayList<>();
+    private CommonAdapter<WeTaskBean> weTaskAdapter;
     private List<MainTask.NewUserTaskBean> newUserTaskList = new ArrayList<>();
     private CommonAdapter<MainTask.NewUserTaskBean> newUserTaskAdapter;
     private CommonAdapter<SignModel.ListBean> signAdapter;
@@ -174,11 +168,9 @@ public class MainActivity extends BaseActivity {
     };
     public static int weekSign = 0;
     private boolean isTake = true;
-    private int userTaskId, clickTaskId;
+    private int userTaskId, clickTaskId, type;
     public String clickAppSoure;
-    private int type;
     private LoadingDialog loadingDialog;
-    private int income;
     private AppBarConfiguration mAppBarConfiguration;
     private NavigationView navigationView;
     private RelativeLayout rlDrawerLayout;
@@ -202,33 +194,19 @@ public class MainActivity extends BaseActivity {
     @Override
     public void init() {
         requestMPermission();
-
         loadingDialog = new LoadingDialog(this);
-
         GlideUtils.getInstance().LoadContextCircleBitmap(this, R.mipmap.touxiang, ivImg);
         //初始化
-        initDraws();
         if (ApplicationUtils.isNewUer) {
             MainActivityHelper.newInstance().initNewUserInfo(this);
         }
-
+        initDraws();
         initMenuView();
         initUserData();
         initNewUserTaskView();
         initDayTaskView();
         initWeTaskView();
         getData();
-        tvGerMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Utils.isFastClick()){
-                    MainActivityHelper.newInstance().AdLook(MainActivity.this);
-                }
-            }
-        });
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
@@ -236,7 +214,14 @@ public class MainActivity extends BaseActivity {
                 getData();
             }
         });
-
+        tvGerMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Utils.isFastClick()) {
+                    MainActivityHelper.newInstance().AdLook(MainActivity.this);
+                }
+            }
+        });
     }
 
 
@@ -302,12 +287,16 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onGetStickyEvent(MessageWrap message) {
         if (message.flag == 1) {
-          getData();
+            getData();
         }
         if (message.flag == 2) {
             gotoSign();
@@ -325,27 +314,31 @@ public class MainActivity extends BaseActivity {
      */
     private void initWeTaskView() {
         RlvManagerUtils.createLinearLayout(this, rlvWeTask);
-        weTaskList.add(new TaskMode());
-        weTaskList.add(new TaskMode());
-        weTaskList.add(new TaskMode());
-        weTaskAdapter = new CommonAdapter<TaskMode>(this, R.layout.item_task_we, weTaskList) {
+
+        weTaskAdapter = new CommonAdapter<WeTaskBean>(this, R.layout.item_task_we, weTaskList) {
 
             @Override
-            protected void convert(ViewHolder holder, TaskMode taskMode, int position) {
-                if (position == 0) {
-                    holder.setText(R.id.main_title, "休闲游戏赚").setText(R.id.sub_title, "闯关玩金币，简单好玩").setText(R.id.gold, "50000");
-                    GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.xiuxian, holder.getView(R.id.iv_img), 8);
-                    holder.setText(R.id.tv_complete, "立即闯关");
-                }
-                if (position == 1) {
-                    GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.gaoe, holder.getView(R.id.iv_img), 8);
-                    holder.setText(R.id.main_title, "高额赚钱").setText(R.id.sub_title, "最高月入100元现金红包").setText(R.id.gold, "90000");
-                    holder.setText(R.id.tv_complete, "立即赚钱");
-                }
-                if (position == 2) {
-                    GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.shiwan, holder.getView(R.id.iv_img), 8);
-                    holder.setText(R.id.main_title, "试玩软件赚钱").setText(R.id.sub_title, "安装软件，打开赚高额奖励").setText(R.id.gold, "20000");
-                    holder.setText(R.id.tv_complete, "立即试玩");
+            protected void convert(ViewHolder holder, WeTaskBean taskMode, int position) {
+                if (!MainActivityHelper.hasData) {
+                    if (position == 0) {
+                        holder.setText(R.id.main_title, "休闲游戏赚").setText(R.id.sub_title, "闯关玩金币，简单好玩").setText(R.id.gold, "50000");
+                        GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.xiuxian, holder.getView(R.id.iv_img), 8);
+                        holder.setText(R.id.tv_complete, "立即闯关");
+                    }
+                    if (position == 1) {
+                        GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.gaoe, holder.getView(R.id.iv_img), 8);
+                        holder.setText(R.id.main_title, "高额赚钱").setText(R.id.sub_title, "最高月入100元现金红包").setText(R.id.gold, "90000");
+                        holder.setText(R.id.tv_complete, "立即赚钱");
+                    }
+                    if (position == 2) {
+                        GlideUtils.getInstance().LoadContextRoundBitmapInt(MainActivity.this, R.mipmap.shiwan, holder.getView(R.id.iv_img), 8);
+                        holder.setText(R.id.main_title, "试玩软件赚钱").setText(R.id.sub_title, "安装软件，打开赚高额奖励").setText(R.id.gold, "20000");
+                        holder.setText(R.id.tv_complete, "立即试玩");
+                    }
+                } else {
+                    holder.setText(R.id.main_title, taskMode.getTaskName()).setText(R.id.sub_title, taskMode.getSubTitle()).setText(R.id.gold, taskMode.getIncome() + "");
+                    GlideUtils.getInstance().LoadContextRoundBitmap(MainActivity.this, taskMode.getIcon(), holder.getView(R.id.iv_img), 8);
+                    holder.setText(R.id.tv_complete, "我也要做");
                 }
             }
         };
@@ -353,15 +346,48 @@ public class MainActivity extends BaseActivity {
         weTaskAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int i) {
-                if (i == 0) {
-                    ARouter.getInstance().build("/ui/GameWebViewActivity").navigation();
+                if (!MainActivityHelper.hasData) {
+                    if (i == 0) {
+                        ARouter.getInstance().build("/ui/GameWebViewActivity").navigation();
+                    }
+                    if (i == 1) {
+                        ARouter.getInstance().build("/ui/ReceiveGoldCoinActivity").navigation();
+                    }
+                    if (i == 2) {
+                        ARouter.getInstance().build("/ui/TryToEarnActivity").navigation();
+                    }
+                } else {
+                    if (weTaskList.get(i).isKeepLive()) {
+                        if (OpenApp.isInstalled(MainActivity.this, weTaskList.get(i).getAppOpenUrl())) {
+                            InvigorateDialog invigorateDialog = new InvigorateDialog(MainActivity.this, weTaskList.get(i), 2, new InvigorateDialog.DownloadUrlCallback() {
+                                @Override
+                                public void onLoad() {
+                                    //去下载
+                                    DownloadAppUtils.newInstance().gotoLoad(MainActivity.this, weTaskList.get(i).getAddr());
+                                    RxHttp.postEncryptJson(ComParamContact.Main.repetition).add("applySource", "16").add("taskId", dayTaskList.get(i).getTaskId()).asResponse(String.class).subscribe(s -> {
+                                    });
+                                }
+                            });
+                            invigorateDialog.show();
+                        } else {
+                            loadingDialog.show();
+                            type = weTaskList.get(i).getType();
+                            clickTaskId = weTaskList.get(i).getTaskId();
+                            clickAppSoure = weTaskList.get(i).getApplySource();
+                            loadingDialog.show();
+                            ReceiveTask(weTaskList.get(i).getTaskId(), type, clickAppSoure);
+                        }
+                    } else {
+                        loadingDialog.show();
+                        type = weTaskList.get(i).getType();
+                        clickTaskId = weTaskList.get(i).getTaskId();
+                        clickAppSoure = weTaskList.get(i).getApplySource();
+                        loadingDialog.show();
+                        ReceiveTask(weTaskList.get(i).getTaskId(), type, clickAppSoure);
+                    }
+
                 }
-                if (i == 1) {
-                    ARouter.getInstance().build("/ui/ReceiveGoldCoinActivity").navigation();
-                }
-                if (i == 2) {
-                    ARouter.getInstance().build("/ui/TryToEarnActivity").navigation();
-                }
+
             }
 
             @Override
@@ -371,6 +397,9 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    /**
+     * 每日任务
+     */
     private void initDayTaskView() {
         RlvManagerUtils.createLinearLayout(this, rlvDayTask);
         dayTaskAdapter = new CommonAdapter<MainTask.DayTaskBean>(this, R.layout.item_task_we, dayTaskList) {
@@ -400,8 +429,27 @@ public class MainActivity extends BaseActivity {
                 clickAppSoure = dayTaskList.get(i).getApplySource();
 
                 if (viewStatus == 0) {
-                    loadingDialog.show();
-                    ReceiveTask(dayTaskList.get(i).getTaskId(), type, clickAppSoure);
+                    if (dayTaskList.get(i).isKeepLive()) {
+                        if (OpenApp.isInstalled(MainActivity.this, dayTaskList.get(i).getAppOpenUrl())) {
+                            InvigorateDialog invigorateDialog = new InvigorateDialog(MainActivity.this, dayTaskList.get(i), 1, new InvigorateDialog.DownloadUrlCallback() {
+                                @Override
+                                public void onLoad() {
+                                    //去下载
+                                    DownloadAppUtils.newInstance().gotoLoad(MainActivity.this, dayTaskList.get(i).getAddr());
+                                    RxHttp.postEncryptJson(ComParamContact.Main.repetition).add("applySource", "16").add("taskId", dayTaskList.get(i).getTaskId()).asResponse(String.class).subscribe(s -> {
+                                    });
+                                }
+                            });
+                            invigorateDialog.show();
+                        } else {
+                            loadingDialog.show();
+                            ReceiveTask(dayTaskList.get(i).getTaskId(), type, clickAppSoure);
+                        }
+                    } else {
+                        loadingDialog.show();
+                        ReceiveTask(dayTaskList.get(i).getTaskId(), type, clickAppSoure);
+                    }
+
                 }
             }
 
@@ -412,6 +460,9 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    /**
+     * 新用户福利
+     */
     private void initNewUserTaskView() {
 
         RlvManagerUtils.createLinearLayout(this, rlvNewUserTask);
@@ -442,8 +493,27 @@ public class MainActivity extends BaseActivity {
 
                 clickAppSoure = newUserTaskList.get(i).getApplySource();
                 if (viewStatus == 0) {
-                    loadingDialog.show();
-                    ReceiveTask(newUserTaskList.get(i).getTaskId(), type, clickAppSoure);
+                    if (newUserTaskList.get(i).isKeepLive()) {
+                        if (OpenApp.isInstalled(MainActivity.this, newUserTaskList.get(i).getAppOpenUrl())) {
+                            InvigorateDialog invigorateDialog = new InvigorateDialog(MainActivity.this, newUserTaskList.get(i), 0, new InvigorateDialog.DownloadUrlCallback() {
+                                @Override
+                                public void onLoad() {
+                                    //去下载
+                                    DownloadAppUtils.newInstance().gotoLoad(MainActivity.this, newUserTaskList.get(i).getAddr());
+                                    RxHttp.postEncryptJson(ComParamContact.Main.repetition).add("applySource", "16").add("taskId", newUserTaskList.get(i).getTaskId()).asResponse(String.class).subscribe(s -> {
+                                    });
+                                }
+                            });
+                            invigorateDialog.show();
+                        } else {
+                            loadingDialog.show();
+                            ReceiveTask(newUserTaskList.get(i).getTaskId(), type, clickAppSoure);
+                        }
+                    } else {
+                        loadingDialog.show();
+                        ReceiveTask(newUserTaskList.get(i).getTaskId(), type, clickAppSoure);
+                    }
+
                 }
             }
 
@@ -601,7 +671,7 @@ public class MainActivity extends BaseActivity {
                         ARouter.getInstance().build("/ui/GameWebViewActivity").navigation();
                         break;
                     case 3:
-                        if (Utils.isFastClick()){
+                        if (Utils.isFastClick()) {
                             MainActivityHelper.newInstance().AdLook(MainActivity.this);
                         }
                         break;
@@ -638,9 +708,8 @@ public class MainActivity extends BaseActivity {
                 } else {
                     holder.setVisible(R.id.line1, true);
                 }
-                income = listBean.getWeekSignGold();
                 if (listBean.isIsSign()) {
-                   // holder.setText(R.id.tv_hb_close, listBean.getWeekSignGold() + "");
+                    // holder.setText(R.id.tv_hb_close, listBean.getWeekSignGold() + "");
                     holder.setTextColor(R.id.tv_circle, mContext.getResources().getColor(R.color.FEC50B));
                     if (listBean.getType().equals("gif")) {
 
@@ -719,18 +788,18 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getData() {
-        if (NetUtil.isNetworkAvalible(MainActivity.this)){
+        if (NetUtil.isNetworkAvalible(MainActivity.this)) {
             loadingDialog.show();
             MainActivityHelper.newInstance().getUserInfo(this, tvPhone, tvMoney, tv_yc);
             MainActivityHelper.newInstance().IsSign(this, tvSign, tvMoreSign);
             getSign();
-            MainActivityHelper.newInstance().mainTaskList(this, loadingDialog, dayTaskList, newUserTaskList, dayTaskAdapter, newUserTaskAdapter, new_user_title_rl, rlvNewUserTask, tvDes, ivBx,rl_day_task,rlvDayTask);
+            MainActivityHelper.newInstance().mainTaskList(this, loadingDialog, dayTaskList, newUserTaskList, dayTaskAdapter, newUserTaskAdapter, new_user_title_rl, rlvNewUserTask, tvDes, ivBx, rl_day_task, rlvDayTask);
             getTimer();
             MainActivityHelper.newInstance().downLoad(this);
-        }else {
+            MainActivityHelper.newInstance().weTask(this, weTaskList, weTaskAdapter);
+        } else {
             Tip.show("请检查当前网络！");
         }
-
     }
 
     private void getTimer() {
@@ -826,7 +895,6 @@ public class MainActivity extends BaseActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_sign:
-
                 gotoSign();
                 break;
             case R.id.tv_with_draw:
@@ -907,33 +975,36 @@ public class MainActivity extends BaseActivity {
         SignSuccessNormalDialog dialog = new SignSuccessNormalDialog(MainActivity.this, weekSigns, inCome);
         dialog.show();
     }
-    private static int isExit=0;
+
+    private static int isExit = 0;
 
     //实现按两次后退才退出
-    Handler handler=new Handler(){
+    Handler handler = new Handler() {
         @Override
-        public void handleMessage(Message msg){
+        public void handleMessage(Message msg) {
             super.handleMessage(msg);
             isExit--;
         }
     };
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode==KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             isExit++;
             exit();
             return false;
         }
         return super.onKeyDown(keyCode, event);
     }
-    private void exit(){
-        if(isExit<2){
-           Tip.show("再按一次，退出程序");
+
+    private void exit() {
+        if (isExit < 2) {
+            Tip.show("再按一次，退出程序");
 
             //利用handler延迟发送更改状态信息
-            handler.sendEmptyMessageDelayed(0,2000);
+            handler.sendEmptyMessageDelayed(0, 2000);
 
-        }else{
+        } else {
             ApplicationUtils.newInstance().removeActivity();
             super.onBackPressed();
         }

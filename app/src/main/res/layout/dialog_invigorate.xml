@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:background="@drawable/shape_dialog_bg_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="@dimen/dp20">
+
+        <ImageView
+            android:layout_marginTop="@dimen/dp20"
+            android:id="@+id/iv_icon"
+            android:layout_width="@dimen/dp65"
+            android:layout_height="@dimen/dp65"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:layout_marginTop="@dimen/dp8"
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp4"
+            android:text="新浪微博"
+            android:textStyle="bold"
+            android:textColor="#333"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_marginTop="@dimen/dp8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp4"
+            android:text="检测到本地没有此APP!"
+            android:textColor="#333"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/dp2">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="需提前下载，明日起每日可领"
+                android:textColor="#333"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="150金币"
+                android:textColor="@color/tt_skip_red"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp16"
+            android:padding="@dimen/dp4"
+            android:textSize="13sp"
+            android:text="注意:下载成功后不可删除APP"
+            android:textColor="@color/tt_skip_red" />
+
+        <TextView
+            android:id="@+id/tv_down_load"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp20"
+            android:layout_marginBottom="@dimen/dp20"
+            android:background="@drawable/shape_board_green_22"
+            android:paddingLeft="@dimen/dp25"
+            android:paddingTop="@dimen/dp12"
+            android:paddingRight="25dp"
+            android:paddingBottom="@dimen/dp12"
+            android:text="今日下载，明日领钱"
+            android:textColor="@color/D7B6" />
+    </LinearLayout>
+</LinearLayout>

@@ -287,9 +287,17 @@ public class ReceiveGoldModel {
             private boolean auditPicture;
             private int imgs;
             private String showDesc;
-
             private String toUrl;
             private int taskId;
+            private  int toType;
+
+            public int getToType() {
+                return toType;
+            }
+
+            public void setToType(int toType) {
+                this.toType = toType;
+            }
 
             public String getToUrl() {
                 return toUrl;

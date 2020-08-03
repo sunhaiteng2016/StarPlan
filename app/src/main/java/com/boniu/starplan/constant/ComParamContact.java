@@ -92,6 +92,8 @@ public class ComParamContact {
         public final static String List_to_Do = "api/task/user/listToDo";
         //任务翻倍
         public final static String addPrepositionDouble = "api/task/user/addPrepositionDouble";
+        public final static String queryEveryoneDoTask = "api/taskMarketConfig/queryEveryoneDoTask";
+        public final static String repetition = "api/task/user/tryTaskKeepLiveDownload";
 
         /**
          * 宝箱相关

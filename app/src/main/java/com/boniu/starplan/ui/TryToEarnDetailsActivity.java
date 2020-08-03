@@ -13,6 +13,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -93,6 +94,14 @@ public class TryToEarnDetailsActivity extends BaseActivity {
     TextView tvStartPlay;
     @BindView(R.id.tv_receive_rewards)
     TextView tvReceiveRewards;
+    @BindView(R.id.tv_content1)
+    TextView tvContent1;
+    @BindView(R.id.tv_content2)
+    TextView tvContent2;
+    @BindView(R.id.tv_content3)
+    TextView tvContent3;
+    @BindView(R.id.ll_one)
+    LinearLayout llOne;
     private int taskId, userTaskId;
     private TaskDetailsModel taskDetailsModel;
     private int inCome;
@@ -137,7 +146,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                                                     @Override
                                                     public void run() {
                                                         if (flag == 2) {
-                                                            ReWardVideoAdUtils.initAd(TryToEarnDetailsActivity.this, applyId, inCome/2);
+                                                            ReWardVideoAdUtils.initAd(TryToEarnDetailsActivity.this, applyId, inCome / 2);
                                                         } else {
                                                             TryToEarnDetailsActivity.this.finish();
                                                         }
@@ -191,11 +200,11 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     tvDes.setText(taskDetailsModel.getTaskDetailVO().getSubTitle());
                     GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getIcon(), ivAppIcon, 8);
                     inCome = taskDetailsModel.getIncome();
-                    taskIncome=taskDetailsModel.getTaskDetailVO().getIncome();
+                    taskIncome = taskDetailsModel.getTaskDetailVO().getIncome();
                     tvTitle1.setText(taskDetailsModel.getTaskDetailVO().getRemark());
-                    if (flag==1){
-                        tvNumberGold2.setText(taskIncome+"");
-                        tvNumberGold2.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG );
+                    if (taskIncome != taskDetailsModel.getIncome()) {
+                        tvNumberGold2.setText(taskIncome + "");
+                        tvNumberGold2.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
                     }
                     tvNumberGold.setText(taskDetailsModel.getIncome() + "");
 
@@ -208,9 +217,18 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                         tvStartPlay.setTextColor(TryToEarnDetailsActivity.this.getResources().getColor(R.color.white));
                         tvStartPlay.setEnabled(true);
                     }
+                    if (taskDetailsModel.getTaskDetailVO().getTryTaskVO().isKeepLive()) {
+                        tvStartPlay.setBackgroundResource(R.drawable.shape_round_green_16);
+                        tvStartPlay.setTextColor(TryToEarnDetailsActivity.this.getResources().getColor(R.color.white));
+                        tvStartPlay.setEnabled(true);
+                        tvContent2.setText("① 点击“开始试玩”体验10秒");
+                        tvContent3.setText("②  试玩后回本页面领奖");
+                        llOne.setVisibility(View.GONE);
+                    }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             dialog.dismiss();
                         }
                     });
@@ -261,7 +279,7 @@ public class TryToEarnDetailsActivity extends BaseActivity {
                     if (!StringUtils.isEmpty(taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl())) {
                         if (OpenApp.schemeValid(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl())) {
                             OpenApp.schemeUrl(TryToEarnDetailsActivity.this, taskDetailsModel.getTaskDetailVO().getTryTaskVO().getSchemeUrl());
-                        }else{
+                        } else {
                             Tip.show("请按照流程操作");
                         }
 

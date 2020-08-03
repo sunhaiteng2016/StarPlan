@@ -1,13 +1,18 @@
 package com.boniu.starplan.ui;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
@@ -24,6 +29,8 @@ import com.boniu.starplan.helper.GlideImageEngine;
 import com.boniu.starplan.helper.NGlideEngine;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
+import com.boniu.starplan.utils.FileSizeUtil;
+import com.boniu.starplan.utils.FileUtils;
 import com.boniu.starplan.utils.GlideUtils;
 
 import com.boniu.starplan.utils.StringUtils;
@@ -44,7 +51,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import id.zelory.compressor.Compressor;
+import io.reactivex.functions.Consumer;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import rxhttp.wrapper.param.RxHttp;
+import top.zibin.luban.Luban;
+import top.zibin.luban.OnCompressListener;
 
 
 /**
@@ -102,7 +115,7 @@ public class FinishRegisterActivity extends BaseActivity {
     public ImageBrowserConfig.IndicatorType indicatorType = ImageBrowserConfig.IndicatorType.Indicator_Number;
     public ImageBrowserConfig.ScreenOrientationType screenOrientationType = ImageBrowserConfig.ScreenOrientationType.Screenorientation_Default;
     private ImageEngine imageEngine = new GlideImageEngine();
-    private boolean auditName,auditMobile,auditPicture;
+    private boolean auditName, auditMobile, auditPicture;
 
     @Override
     public int getLayoutId() {
@@ -115,22 +128,23 @@ public class FinishRegisterActivity extends BaseActivity {
         userTaskId = getIntent().getIntExtra("userTaskId", -1);
         zoomList = (ArrayList<String>) getIntent().getSerializableExtra("list");
         flag = getIntent().getIntExtra("flag", -1);
-        auditName = getIntent().getBooleanExtra("auditName",true);
-        auditMobile = getIntent().getBooleanExtra("auditMobile",true);
-        auditPicture = getIntent().getBooleanExtra("auditPicture",true);
+        auditName = getIntent().getBooleanExtra("auditName", true);
+        auditMobile = getIntent().getBooleanExtra("auditMobile", true);
+        auditPicture = getIntent().getBooleanExtra("auditPicture", true);
         try {
             GlideUtils.getInstance().LoadContextRoundBitmap(this, zoomList.get(zoomList.size() - 2), sl1, 8);
-            GlideUtils.getInstance().LoadContextRoundBitmap(this, zoomList.get(zoomList.size() - 1), sl1, 8);
+            GlideUtils.getInstance().LoadContextRoundBitmap(this, zoomList.get(zoomList.size() - 1), sl2, 8);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (!auditMobile){
+
+        if (!auditMobile) {
             llphone.setVisibility(View.GONE);
         }
-        if (!auditName){
+        if (!auditName) {
             llname.setVisibility(View.GONE);
         }
-        if (!auditPicture){
+        if (!auditPicture) {
             llIv.setVisibility(View.GONE);
         }
     }
@@ -163,7 +177,7 @@ public class FinishRegisterActivity extends BaseActivity {
                             //自定义ProgressView，不设置默认默认没有
                             //.setCustomProgressViewLayoutID(showCustomProgressView ? R.layout.layout_custom_progress_view : 0)
                             //当前位置
-                            .setCurrentPosition(zoomList.size()-2)
+                            .setCurrentPosition(zoomList.size() - 2)
                             //图片引擎
                             .setImageEngine(imageEngine)
                             //图片集合
@@ -226,7 +240,7 @@ public class FinishRegisterActivity extends BaseActivity {
                             //自定义ProgressView，不设置默认默认没有
                             //.setCustomProgressViewLayoutID(showCustomProgressView ? R.layout.layout_custom_progress_view : 0)
                             //当前位置
-                            .setCurrentPosition(zoomList.size()-1)
+                            .setCurrentPosition(zoomList.size() - 1)
                             //图片引擎
                             .setImageEngine(imageEngine)
                             //图片集合
@@ -281,24 +295,22 @@ public class FinishRegisterActivity extends BaseActivity {
                     String content = edContent.getText().toString().trim();
 
 
-
-
                     SubmitAuditModel submitAuditModel = new SubmitAuditModel();
-                    if (auditMobile){
+                    if (auditMobile) {
                         if (StringUtils.isEmpty(phone)) {
                             Tip.show("请输入手机号");
                             return;
                         }
                         submitAuditModel.setUserMobile(phone);
                     }
-                    if (auditName){
+                    if (auditName) {
                         if (StringUtils.isEmpty(name)) {
                             Tip.show("请输入姓名");
                             return;
                         }
                         submitAuditModel.setUserName(name);
                     }
-                    if (auditPicture){
+                    if (auditPicture) {
                         if (img1 == null || img2 == null) {
                             Tip.show("请选择图片");
                             return;
@@ -340,13 +352,13 @@ public class FinishRegisterActivity extends BaseActivity {
                     break;
                 case R.id.rl_ex1:
                     EasyPhotos.createAlbum(this, true, NGlideEngine.getInstance())
-                            .setFileProviderAuthority(getPackageName()+".TTFileProvider")
+                            .setFileProviderAuthority(getPackageName() + ".TTFileProvider")
                             .start(101);
                     break;
                 case R.id.rl_ex2:
 
                     EasyPhotos.createAlbum(this, true, NGlideEngine.getInstance())
-                            .setFileProviderAuthority(getPackageName()+".TTFileProvide")
+                            .setFileProviderAuthority(getPackageName() + ".TTFileProvide")
                             .start(102);
                     break;
             }
@@ -364,19 +376,35 @@ public class FinishRegisterActivity extends BaseActivity {
                 //返回对象集合：如果你需要了解图片的宽、高、大小、用户是否选中原图选项等信息，可以用这个
                 ArrayList<Photo> resultPhotos = data.getParcelableArrayListExtra(EasyPhotos.RESULT_PHOTOS);
                 ivPath = resultPhotos.get(0).path;
+                new Compressor(FinishRegisterActivity.this)
+                        .compressToFileAsFlowable(new File(ivPath))
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(new Consumer<File>() {
+                            @Override
+                            public void accept(File file) {
+                                RxHttp.postForm(ComParamContact.Main.uploadAudit)
+                                        .addFile("file", file)
 
-                RxHttp.postForm(ComParamContact.Main.uploadAudit)
-                        .addFile("file", new File(ivPath))
-                        .asResponse(String.class) //from操作符，是异步操作
-                        .to(RxLife.toMain(this))  //感知生命周期，并在主线程回调
-                        .subscribe(s -> {
-                            //成功回调
-                            String result = AESUtil.decrypt(s, AESUtil.KEY);
-                            ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
-                            img1 = imgUpLoadModel.getValue();
-                        }, (OnError) error -> {
-                            //失败回调
-                            error.show("上传失败,请稍后再试!");
+                                        
+                                        .asResponse(String.class) //from操作符，是异步操作
+                                        .to(RxLife.toMain(FinishRegisterActivity.this))  //感知生命周期，并在主线程回调
+                                        .subscribe(s -> {
+                                            //成功回调
+                                            String result = AESUtil.decrypt(s, AESUtil.KEY);
+                                            ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
+                                            img1 = imgUpLoadModel.getValue();
+                                        }, (OnError) error -> {
+                                            //失败回调
+                                            error.show("上传失败,请稍后再试!");
+                                        });
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) {
+                                throwable.printStackTrace();
+
+                                Tip.show("图片压缩失败，请重试！");
+                            }
                         });
 
                 GlideUtils.getInstance().LoadContextRoundBitmap(this, ivPath, ivEx1, 8);
@@ -387,19 +415,37 @@ public class FinishRegisterActivity extends BaseActivity {
                 ArrayList<Photo> resultPhotos = data.getParcelableArrayListExtra(EasyPhotos.RESULT_PHOTOS);
                 ivPath2 = resultPhotos.get(0).path;
                 GlideUtils.getInstance().LoadContextRoundBitmap(this, ivPath2, ivEx2, 8);
-                RxHttp.postForm(ComParamContact.Main.uploadAudit)
-                        .addFile("file", new File(ivPath2))
-                        .asResponse(String.class) //from操作符，是异步操作
-                        .to(RxLife.toMain(this))  //感知生命周期，并在主线程回调
-                        .subscribe(s -> {
-                            //成功回调
-                            String result = AESUtil.decrypt(s, AESUtil.KEY);
-                            ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
-                            img2 = imgUpLoadModel.getValue();
-                        }, (OnError) error -> {
-                            //失败回调
-                            error.show("上传失败,请稍后再试!");
+                new Compressor(FinishRegisterActivity.this)
+                        .compressToFileAsFlowable(new File(ivPath2))
+                        .subscribeOn(Schedulers.io())
+
+                        .subscribe(new Consumer<File>() {
+                            @Override
+                            public void accept(File file) {
+                                RxHttp.postForm(ComParamContact.Main.uploadAudit)
+                                        .addFile("file", file)
+                                        .asResponse(String.class) //from操作符，是异步操作
+                                        .to(RxLife.toMain(FinishRegisterActivity.this))  //感知生命周期，并在主线程回调
+                                        .subscribe(s -> {
+                                            //成功回调
+                                            String result = AESUtil.decrypt(s, AESUtil.KEY);
+                                            ImgUpLoadModel imgUpLoadModel = new Gson().fromJson(result, ImgUpLoadModel.class);
+                                            img2 = imgUpLoadModel.getValue();
+                                        }, (OnError) error -> {
+                                            //失败回调
+                                            error.show("上传失败,请稍后再试!");
+                                        });
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) {
+                                throwable.printStackTrace();
+
+                                Tip.show("图片压缩失败，请重试！");
+                            }
                         });
+
+
                 return;
             }
             return;

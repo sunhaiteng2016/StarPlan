@@ -17,6 +17,7 @@ public class ApplyTask {
     private  int userTaskId;
     private int taskId;
 
+
     public int getTaskId() {
         return taskId;
     }

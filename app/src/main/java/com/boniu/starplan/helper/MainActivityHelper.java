@@ -34,10 +34,12 @@ import com.boniu.starplan.entity.BoxState;
 import com.boniu.starplan.entity.LoginInfo;
 import com.boniu.starplan.entity.MainTask;
 import com.boniu.starplan.entity.NewUserInfo;
+import com.boniu.starplan.entity.RunningTaskModel;
 import com.boniu.starplan.entity.SignModel;
 import com.boniu.starplan.entity.TaskMode;
 import com.boniu.starplan.entity.VersionModel;
 import com.boniu.starplan.entity.VideoAdModel;
+import com.boniu.starplan.entity.WeTaskBean;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.oaid.UuidCreator;
 import com.boniu.starplan.ui.ApplicationUtils;
@@ -50,6 +52,7 @@ import com.boniu.starplan.utils.Tip;
 import com.boniu.starplan.utils.Utils;
 import com.boniu.starplan.utils.Validator;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.rxjava.rxlife.RxLife;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 
@@ -58,6 +61,9 @@ import java.util.List;
 
 import rxhttp.wrapper.param.RxHttp;
 
+/**
+ * 这个地方就不动了
+ */
 public class MainActivityHelper {
 
     private int weekSign;
@@ -330,7 +336,6 @@ public class MainActivityHelper {
                     loadingDialog.dismiss();
                 });
 
-
     }
 
     /**
@@ -390,6 +395,36 @@ public class MainActivityHelper {
                 }, (OnError) error -> {
                 });
 
+    }
+
+    public static boolean hasData;
+
+    /**
+     * 大家都在做
+     */
+    public void weTask(Activity activity, List<WeTaskBean> weTaskList, CommonAdapter<WeTaskBean> weTaskAdapter) {
+        RxHttp.postEncryptJson(ComParamContact.Main.queryEveryoneDoTask).asResponse(String.class).subscribe(s -> {
+            String resultStr = AESUtil.decrypt(s, AESUtil.KEY);
+            List<WeTaskBean> lists = new Gson().fromJson(resultStr, new TypeToken<List<WeTaskBean>>() {
+            }.getType());
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    weTaskList.clear();
+                    if (lists.size() > 0) {
+                        hasData = true;
+                        weTaskList.addAll(lists);
+                    } else {
+                        weTaskList.add(new WeTaskBean());
+                        weTaskList.add(new WeTaskBean());
+                        weTaskList.add(new WeTaskBean());
+                    }
+                    weTaskAdapter.notifyDataSetChanged();
+                }
+            });
+        }, (OnError) error -> {
+
+        });
     }
 
 

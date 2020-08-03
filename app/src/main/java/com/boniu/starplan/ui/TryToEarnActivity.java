@@ -1,6 +1,13 @@
 package com.boniu.starplan.ui;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,15 +25,20 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.boniu.starplan.R;
 import com.boniu.starplan.base.BaseActivity;
 import com.boniu.starplan.constant.ComParamContact;
+import com.boniu.starplan.dialog.DownloadProgressDialog;
+import com.boniu.starplan.dialog.InvigorateDialog;
 import com.boniu.starplan.dialog.LoadingDialog;
 import com.boniu.starplan.dialog.RunningTaskDialog;
 import com.boniu.starplan.entity.ApplyTask;
+import com.boniu.starplan.entity.ErrorInfo;
 import com.boniu.starplan.entity.RunningTaskModel;
 import com.boniu.starplan.entity.TaskMode;
 import com.boniu.starplan.http.OnError;
 import com.boniu.starplan.utils.AESUtil;
+import com.boniu.starplan.utils.DownloadAppUtils;
 import com.boniu.starplan.utils.GlideUtils;
 import com.boniu.starplan.utils.NetUtil;
+import com.boniu.starplan.utils.OpenApp;
 import com.boniu.starplan.utils.RlvManagerUtils;
 import com.boniu.starplan.utils.TimerUtils;
 import com.boniu.starplan.utils.Tip;
@@ -43,13 +55,17 @@ import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import rxhttp.wrapper.param.RxHttp;
+
+import static com.boniu.starplan.dialog.DownloadProgressDialog.STYLE_HORIZONTAL;
 
 /**
  * 试玩赚
@@ -89,6 +105,7 @@ public class TryToEarnActivity extends BaseActivity {
     private int runTaskId;
     private int clickTaskId;
     private LoadingDialog loadingDialog1;
+    private File destPath;
 
     @Override
     public int getLayoutId() {
@@ -107,7 +124,7 @@ public class TryToEarnActivity extends BaseActivity {
     }
 
     private void getData() {
-        if (NetUtil.isNetworkAvalible(TryToEarnActivity.this)){
+        if (NetUtil.isNetworkAvalible(TryToEarnActivity.this)) {
             RxHttp.postEncryptJson(ComParamContact.Main.TASk_LIST).add("page", page).add("pageSize", pageSize).add("type", type).asResponse(String.class).to(RxLife.toMain(this)).subscribe(s -> {
                 String result = AESUtil.decrypt(s, AESUtil.KEY);
                 TaskMode taskModel = new Gson().fromJson(result, TaskMode.class);
@@ -128,7 +145,7 @@ public class TryToEarnActivity extends BaseActivity {
                 String result = AESUtil.decrypt(s, AESUtil.KEY);
                 List<RunningTaskModel> lists = new Gson().fromJson(result, new TypeToken<List<RunningTaskModel>>() {
                 }.getType());
-                if (lists.size()==0) rlRunningTask.setVisibility(View.GONE);
+                if (lists.size() == 0) rlRunningTask.setVisibility(View.GONE);
                 RunningTaskModel runningTaskModel = lists.get(0);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -157,7 +174,7 @@ public class TryToEarnActivity extends BaseActivity {
                 });
             }, (OnError) error -> {
             });
-        }else{
+        } else {
             Tip.show("请检查当前网络！");
         }
 
@@ -172,6 +189,17 @@ public class TryToEarnActivity extends BaseActivity {
                 GlideUtils.getInstance().LoadContextRoundBitmap(TryToEarnActivity.this, taskMode.getIcon(), holder.getView(R.id.tv1), 8);
                 holder.setText(R.id.main_title, taskMode.getMainTitle()).setText(R.id.sub_title, taskMode.getSubTitle());
                 holder.setText(R.id.gradient_tv, "+" + taskMode.getIncome());
+                if (taskMode.getKeepLive()) {
+                    holder.setVisible(R.id.iv_day_task, true);
+                } else {
+                    holder.setVisible(R.id.iv_day_task, false);
+                }
+                holder.setOnClickListener(R.id.iv_day_task, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Tip.show("此任务可每日领金币！");
+                    }
+                });
             }
         };
         rlvTask.setAdapter(adapter);
@@ -182,10 +210,25 @@ public class TryToEarnActivity extends BaseActivity {
                 if (runTaskId == taskList.get(i).getId()) {
                     ARouter.getInstance().build("/ui/TryToEarnDetailsActivity").withInt("userTaskId", userTaskId).withInt("taskId", taskList.get(i).getId()).navigation();
                 } else {
-                    if (isRunningTask) {
-                        showTaskRunningDialog();
+                    //如果是促活任务
+                    if (taskList.get(i).getKeepLive()) {
+                        //检测本地有没有包
+                        if (OpenApp.isInstalled(TryToEarnActivity.this, taskList.get(i).getAppOpenUrl())) {
+                            if (isRunningTask) {
+                                showTaskRunningDialog();
+                            } else {
+                                ReceiveTask(taskList.get(i).getId());
+                            }
+                        } else {
+                            //上报服务端没有
+                            showKeepLive(taskList.get(i));
+                        }
                     } else {
-                        ReceiveTask(taskList.get(i).getId());
+                        if (isRunningTask) {
+                            showTaskRunningDialog();
+                        } else {
+                            ReceiveTask(taskList.get(i).getId());
+                        }
                     }
                 }
             }
@@ -198,7 +241,7 @@ public class TryToEarnActivity extends BaseActivity {
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshlayout) {
-                refreshlayout.finishLoadMore(1000/*,false*/);//传入false表示加载失败
+                refreshlayout.finishLoadMore();//传入false表示加载失败
                 page++;
                 getData();
             }
@@ -213,6 +256,22 @@ public class TryToEarnActivity extends BaseActivity {
         });
     }
 
+    /**
+     * 促活弹窗
+     *
+     * @param rowsBean
+     */
+    private void showKeepLive(TaskMode.RowsBean rowsBean) {
+        InvigorateDialog invigorateDialog = new InvigorateDialog(TryToEarnActivity.this, rowsBean, 3, new InvigorateDialog.DownloadUrlCallback() {
+            @Override
+            public void onLoad() {
+                //去下载
+                DownloadAppUtils.newInstance().gotoLoad(TryToEarnActivity.this, rowsBean.getAddr());
+                RxHttp.postEncryptJson(ComParamContact.Main.repetition).add("applySource", "1").add("taskId", rowsBean.getId()).asResponse(String.class).subscribe(s -> {});
+            }
+        });
+        invigorateDialog.show();
+    }
 
     private void showTaskRunningDialog() {
         RunningTaskDialog dialog = new RunningTaskDialog(this, 1, new RunningTaskDialog.RunningCallback() {
@@ -241,18 +300,16 @@ public class TryToEarnActivity extends BaseActivity {
                     public void run() {
                         loadingDialog1.dismiss();
                         isRunningTask = false;
-                        runTaskId=-1;
+                        runTaskId = -1;
                         rlRunningTask.setVisibility(View.GONE);
                         //是否开始新的任务
                         RunningTaskDialog dialog = new RunningTaskDialog(TryToEarnActivity.this, 2, new RunningTaskDialog.RunningCallback() {
                             @Override
                             public void running() {
-
                                 ReceiveTask(clickTaskId);
                             }
                         });
                         dialog.show();
-
                     }
                 });
             } else {
@@ -332,5 +389,17 @@ public class TryToEarnActivity extends BaseActivity {
     protected void onRestart() {
         super.onRestart();
         getData();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 101) {
+            if (resultCode == RESULT_OK) {
+                OpenApp.installApk(mContext, DownloadAppUtils.newInstance().destPath);
+            } else {
+                Tip.show("未打开'安装未知来源'开关,无法安装,请打开后重试");
+            }
+        }
     }
 }
