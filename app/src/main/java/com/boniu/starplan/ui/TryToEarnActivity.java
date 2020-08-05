@@ -266,8 +266,15 @@ public class TryToEarnActivity extends BaseActivity {
             @Override
             public void onLoad() {
                 //去下载
-                DownloadAppUtils.newInstance().gotoLoad(TryToEarnActivity.this, rowsBean.getAddr());
-                RxHttp.postEncryptJson(ComParamContact.Main.repetition).add("applySource", "1").add("taskId", rowsBean.getId()).asResponse(String.class).subscribe(s -> {});
+                if (rowsBean.getAddrType() != 1) {
+                    String url = rowsBean.getAddr();
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(browserIntent);
+                } else {
+                    DownloadAppUtils.newInstance().gotoLoad(TryToEarnActivity.this, rowsBean.getAddr());
+                }
+                RxHttp.postEncryptJson(ComParamContact.Main.repetition).add("applySource", "1").add("taskId", rowsBean.getId()).asResponse(String.class).subscribe(s -> {
+                });
             }
         });
         invigorateDialog.show();

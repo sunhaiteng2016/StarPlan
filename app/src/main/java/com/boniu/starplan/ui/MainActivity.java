@@ -358,7 +358,7 @@ public class MainActivity extends BaseActivity {
                     }
                 } else {
                     if (weTaskList.get(i).isKeepLive()) {
-                        if (OpenApp.isInstalled(MainActivity.this, weTaskList.get(i).getAppOpenUrl())) {
+                        if (!OpenApp.isInstalled(MainActivity.this, weTaskList.get(i).getAppOpenUrl())) {
                             InvigorateDialog invigorateDialog = new InvigorateDialog(MainActivity.this, weTaskList.get(i), 2, new InvigorateDialog.DownloadUrlCallback() {
                                 @Override
                                 public void onLoad() {
@@ -430,7 +430,7 @@ public class MainActivity extends BaseActivity {
 
                 if (viewStatus == 0) {
                     if (dayTaskList.get(i).isKeepLive()) {
-                        if (OpenApp.isInstalled(MainActivity.this, dayTaskList.get(i).getAppOpenUrl())) {
+                        if (!OpenApp.isInstalled(MainActivity.this, dayTaskList.get(i).getAppOpenUrl())) {
                             InvigorateDialog invigorateDialog = new InvigorateDialog(MainActivity.this, dayTaskList.get(i), 1, new InvigorateDialog.DownloadUrlCallback() {
                                 @Override
                                 public void onLoad() {
@@ -494,7 +494,7 @@ public class MainActivity extends BaseActivity {
                 clickAppSoure = newUserTaskList.get(i).getApplySource();
                 if (viewStatus == 0) {
                     if (newUserTaskList.get(i).isKeepLive()) {
-                        if (OpenApp.isInstalled(MainActivity.this, newUserTaskList.get(i).getAppOpenUrl())) {
+                        if (!OpenApp.isInstalled(MainActivity.this, newUserTaskList.get(i).getAppOpenUrl())) {
                             InvigorateDialog invigorateDialog = new InvigorateDialog(MainActivity.this, newUserTaskList.get(i), 0, new InvigorateDialog.DownloadUrlCallback() {
                                 @Override
                                 public void onLoad() {

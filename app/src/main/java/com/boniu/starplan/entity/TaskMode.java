@@ -50,7 +50,15 @@ public class TaskMode {
         private String addr;
         private String appOpenUrl;
         private String schemeUrl;
+        private int  addrType;
 
+        public int getAddrType() {
+            return addrType;
+        }
+
+        public void setAddrType(int addrType) {
+            this.addrType = addrType;
+        }
 
         public String getAddr() {
             return addr;

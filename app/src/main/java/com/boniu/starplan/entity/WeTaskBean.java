@@ -27,13 +27,11 @@ public class WeTaskBean {
     private int taskViewStatus;
     private int todayRemain;
     private int type;
-
-
     private boolean keepLive;
     private String addr;
     private String appOpenUrl;
     private String schemeUrl;
-
+    private String applySource;
 
     public boolean isKeepLive() {
         return keepLive;
@@ -67,7 +65,7 @@ public class WeTaskBean {
         this.schemeUrl = schemeUrl;
     }
 
-    private String applySource;
+
 
     public String getApplySource() {
         return applySource;
