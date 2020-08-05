@@ -94,6 +94,7 @@ public class RxHttpManager {
             map.put("deviceType", deviceType);
             map.put("uuid", uuid);
             map.put("version", version);
+            map.put("appID", "LEZHUAN_STAR_BONIU");
             String headerStr = new Gson().toJson(map);
             return p.addHeader("session", AESUtil.encrypt(headerStr, AESUtil.KEY)); //添加公共请求头
         });

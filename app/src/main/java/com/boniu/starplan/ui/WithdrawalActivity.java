@@ -179,7 +179,7 @@ public class WithdrawalActivity extends BaseActivity {
                     error.show();
                 });
         RxHttp.postEncryptJson(ComParamContact.Main.exclusiveList)
-                .add("appID", "test")
+                .add("appID", "LEZHUAN_STAR_BONIU")
                 .asResponse(String.class)
                 .subscribe(s -> {
                     String result = AESUtil.decrypt(s, AESUtil.KEY);
@@ -424,7 +424,7 @@ public class WithdrawalActivity extends BaseActivity {
      */
     private void withdrawalMoney(String code, String name, String zhanghao) {
         RxHttp.postEncryptJson(ComParamContact.Main.goldLaunch)
-                .add("appID", "test")
+                .add("appID", "LEZHUAN_STAR_BONIU")
                 .add("code", code)
                 .add("expendAccountID", zhanghao)
                 .add("expendAccountName", name)
