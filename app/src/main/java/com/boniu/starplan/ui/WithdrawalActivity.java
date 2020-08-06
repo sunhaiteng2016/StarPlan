@@ -399,6 +399,7 @@ public class WithdrawalActivity extends BaseActivity {
                                     withdrawal2Dialog.show();
                                 }
                             } else {
+
                                 Tip.show("今日提现次数用完，请明日再来！");
                             }
                         }
